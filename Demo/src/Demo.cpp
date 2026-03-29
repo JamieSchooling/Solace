@@ -1,8 +1,29 @@
 ﻿#include "Demo.h"
 
-#include <EntryPoint.h>
+#include <Core/EntryPoint.h>
+#include <Rendering/Window.h>
 
 Application* CreateApplication()
 {
 	return new DemoApp();
+}
+
+void DemoApp::Initialise()
+{
+	WindowProps props;
+	props.title = "Demo";
+	AddSubsystem<Window>(props);
+}
+
+void DemoApp::Run()
+{
+	while (Window::Get().IsOpen())
+	{
+		UpdateSubsystems();
+	}
+}
+
+void DemoApp::Shutdown()
+{
+	RemoveSubsystem<Window>();
 }

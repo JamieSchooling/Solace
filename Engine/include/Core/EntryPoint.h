@@ -5,7 +5,7 @@
 int main()
 {
 	Application* app = CreateApplication();
-	app->Start();
+	app->ExecuteLifecycle();
 	delete app;
 
 	return 0;

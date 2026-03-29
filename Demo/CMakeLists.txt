@@ -20,4 +20,4 @@ target_sources(${APPLICATION}
 
 set_target_properties(${APPLICATION} PROPERTIES CXX_STANDARD 20)
 
-target_link_libraries(${APPLICATION} PUBLIC Core)
+target_link_libraries(${APPLICATION} PUBLIC Engine)

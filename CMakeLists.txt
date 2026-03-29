@@ -3,5 +3,5 @@
 project (Solace)
 
 # Include sub-projects.
-add_subdirectory (Core)
+add_subdirectory (Engine)
 add_subdirectory (Demo)

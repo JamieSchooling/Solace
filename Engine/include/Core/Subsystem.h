@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Events/Event.h"
+
 struct SubsystemParams {};
 
 class Subsystem
@@ -11,6 +13,8 @@ public:
 	virtual void PreAppUpdate() {}
 	virtual void OnAppUpdate() {}
 	virtual void PostAppUpdate() {}
+
+	virtual void OnEvent(Event& event) {}
 protected:
 	Subsystem() = default;
 	~Subsystem() = default;

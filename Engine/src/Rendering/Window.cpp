@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+#include "Events/EventSystem.h"
+
 void Window::Start(SubsystemParams params)
 {
 	WindowProps props = static_cast<WindowProps>(params);
@@ -36,9 +38,34 @@ void Window::Start(SubsystemParams params)
     }
 
     glViewport(0, 0, props.width, props.height);
+
+    glfwSetWindowCloseCallback(m_GLFWInstance, [](GLFWwindow* window) {
+        Event e;
+        e.type = EventType::WindowClose;
+        EventSystem::Get().DispatchEvent(e);
+    });
+
     glfwSetFramebufferSizeCallback(m_GLFWInstance, [](GLFWwindow* window, int width, int height) {
-        auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
         glViewport(0, 0, width, height);
+        Event e;
+        e.type = EventType::WindowResize;
+        e.WindowResizeArgs.width = width;
+        e.WindowResizeArgs.height = height;
+        EventSystem::Get().DispatchEvent(e);
+    });
+
+    glfwSetWindowPosCallback(m_GLFWInstance, [](GLFWwindow* window, int x, int y) {
+        Event e;
+        e.type = EventType::WindowMove;
+        e.WindowMoveArgs.posX = x;
+        e.WindowMoveArgs.posY = y;
+        EventSystem::Get().DispatchEvent(e);
+    });
+
+    glfwSetWindowFocusCallback(m_GLFWInstance, [](GLFWwindow* window, int focused) {
+        Event e;
+        e.type = focused == GLFW_TRUE ? EventType::WindowFocus : EventType::WindowFocusLost;
+        EventSystem::Get().DispatchEvent(e);
     });
 }
 

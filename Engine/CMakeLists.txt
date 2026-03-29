@@ -9,6 +9,7 @@ target_sources(${CORE_LIBRARY}
     PRIVATE
         "src/Core/Application.cpp"
         "src/Rendering/Window.cpp"
+        "src/Events/EventSystem.cpp"
 
     PUBLIC
     FILE_SET HEADERS
@@ -18,8 +19,10 @@ target_sources(${CORE_LIBRARY}
         "include/Core/EntryPoint.h"
         "include/Core/Application.h"
         "include/Core/Subsystem.h" 
-        
-        "include/Rendering/Window.h")
+        "include/Rendering/Window.h"        
+        "include/Events/Event.h"
+        "include/Events/EventSystem.h" 
+        )
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

@@ -3,7 +3,7 @@
 #include <vector>
 
 class Subsystem;
-class SubsystemParams;
+struct SubsystemParams;
 
 class Application
 {
@@ -15,7 +15,7 @@ public:
 	virtual void Shutdown() = 0;
 protected:
 	template<typename T>
-	void AddSubsystem(SubsystemParams params)
+	void AddSubsystem(SubsystemParams params = {})
 	{
 		T& subsystem = T::Get();
 		subsystem.Start(params);

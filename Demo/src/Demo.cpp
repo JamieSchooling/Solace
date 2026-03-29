@@ -1,6 +1,7 @@
 ﻿#include "Demo.h"
 
 #include <Core/EntryPoint.h>
+#include <Events/EventSystem.h>
 #include <Rendering/Window.h>
 
 Application* CreateApplication()
@@ -13,6 +14,8 @@ void DemoApp::Initialise()
 	WindowProps props;
 	props.title = "Demo";
 	AddSubsystem<Window>(props);
+
+	AddSubsystem<EventSystem>();
 }
 
 void DemoApp::Run()
@@ -25,5 +28,6 @@ void DemoApp::Run()
 
 void DemoApp::Shutdown()
 {
+	RemoveSubsystem<EventSystem>();
 	RemoveSubsystem<Window>();
 }

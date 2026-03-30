@@ -21,3 +21,10 @@ target_sources(${APPLICATION}
 set_target_properties(${APPLICATION} PROPERTIES CXX_STANDARD 20)
 
 target_link_libraries(${APPLICATION} PUBLIC Engine)
+
+if(WIN32 AND MSVC)
+    # Hide console in Release builds
+    target_link_options(${APPLICATION} PRIVATE
+        "$<$<CONFIG:Release>:/SUBSYSTEM:WINDOWS>"
+    )
+endif()

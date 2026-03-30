@@ -11,11 +11,11 @@ Application* CreateApplication()
 
 void DemoApp::Initialise()
 {
+	AddSubsystem<EventSystem>();
+
 	WindowProps props;
 	props.title = "Demo";
 	AddSubsystem<Window>(props);
-
-	AddSubsystem<EventSystem>();
 }
 
 void DemoApp::Run()
@@ -28,6 +28,6 @@ void DemoApp::Run()
 
 void DemoApp::Shutdown()
 {
-	RemoveSubsystem<EventSystem>();
 	RemoveSubsystem<Window>();
+	RemoveSubsystem<EventSystem>();
 }

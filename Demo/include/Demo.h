@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Core/Application.h>
+#include <Rendering/RenderSystem.h>
 
 class DemoApp : public Application
 {

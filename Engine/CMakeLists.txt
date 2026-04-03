@@ -9,6 +9,7 @@ target_sources(${CORE_LIBRARY}
     PRIVATE
         "src/Core/Application.cpp"
         "src/Rendering/Window.cpp"
+        "src/Rendering/RenderSystem.cpp"
         "src/Events/EventSystem.cpp"
 
     PUBLIC
@@ -20,9 +21,9 @@ target_sources(${CORE_LIBRARY}
         "include/Core/Application.h"
         "include/Core/Subsystem.h" 
         "include/Rendering/Window.h"        
+        "include/Rendering/RenderSystem.h" 
         "include/Events/Event.h"
-        "include/Events/EventSystem.h" 
-        )
+        "include/Events/EventSystem.h" )
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

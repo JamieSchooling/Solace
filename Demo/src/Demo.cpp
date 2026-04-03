@@ -19,6 +19,27 @@ void DemoApp::Initialise()
 		props.eventSystem = &EventSystem::Get();
 		AddSubsystem<Window>(props);
 	}
+
+	auto renderQueue = std::make_shared<RenderQueue>(); // Could create in a better place
+
+	/*
+	* Concept:
+	* On update, SceneManager processes current scene, submits to render queue
+	* 
+	* SceneManagerProps props;
+	* props.renderQueue = renderQueue;
+	* 
+	* AddSubsystem<SceneManager>(props);
+	*/
+
+	{
+		RenderSystemProps props;
+		props.renderQueue = renderQueue;
+
+		AddSubsystem<RenderSystem>(props);
+	}
+	
+	
 }
 
 void DemoApp::Run()

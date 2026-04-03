@@ -1,9 +1,7 @@
 #pragma once
 
 #include <vector>
-
-class Subsystem;
-struct SubsystemParams;
+#include "Core/Subsystem.h"
 
 class Application
 {
@@ -14,8 +12,8 @@ public:
 	virtual void Run() = 0;
 	virtual void Shutdown() = 0;
 protected:
-	void AddSubsystem(SubsystemParams params = {})
 	template<typename T, typename = std::enable_if_t<std::is_base_of<SingletonSubsystem<T>, T>::value>>
+	void AddSubsystem(const SubsystemParams& params = {})
 	{
 		T& subsystem = T::Get();
 		subsystem.Start(params);

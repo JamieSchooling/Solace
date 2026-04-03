@@ -2,7 +2,7 @@
 
 #include "Events/Event.h"
 
-void EventSystem::Start(SubsystemParams params)
+void EventSystem::Start(const SubsystemParams& params)
 {
 }
 

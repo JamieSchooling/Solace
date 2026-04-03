@@ -13,9 +13,11 @@ void DemoApp::Initialise()
 {
 	AddSubsystem<EventSystem>();
 
-	WindowProps props;
-	props.title = "Demo";
-	AddSubsystem<Window>(props);
+	{
+		WindowProps props;
+		props.title = "Demo";
+		AddSubsystem<Window>(props);
+	}
 }
 
 void DemoApp::Run()

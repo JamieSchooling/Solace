@@ -9,7 +9,7 @@ struct Event;
 class EventSystem : public SingletonSubsystem<EventSystem>
 {
 public:
-	void Start(SubsystemParams params) override;
+	void Start(const SubsystemParams& params) override;
 	void Shutdown() override;
 
 	void AddListener(Subsystem& subsystem);

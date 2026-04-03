@@ -14,7 +14,7 @@ struct WindowProps : public SubsystemParams
 class Window : public SingletonSubsystem<Window>
 {
 public:
-	void Start(SubsystemParams params = WindowProps{}) override;
+	void Start(const SubsystemParams& params) override;
 	void Shutdown() override;
 
 	void PreAppUpdate() override;

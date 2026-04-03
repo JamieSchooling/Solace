@@ -7,7 +7,7 @@ struct SubsystemParams {};
 class Subsystem
 {
 public:
-	virtual void Start(SubsystemParams params) = 0;
+	virtual void Start(const SubsystemParams& params) = 0;
 	virtual void Shutdown() = 0;
 
 	virtual void PreAppUpdate() {}

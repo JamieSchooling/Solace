@@ -8,9 +8,9 @@
 
 #include "Events/EventSystem.h"
 
-void Window::Start(SubsystemParams params)
+void Window::Start(const SubsystemParams& params)
 {
-	WindowProps props = static_cast<WindowProps>(params);
+	const WindowProps& props = static_cast<const WindowProps&>(params);
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);

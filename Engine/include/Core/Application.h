@@ -14,15 +14,15 @@ public:
 	virtual void Run() = 0;
 	virtual void Shutdown() = 0;
 protected:
-	template<typename T>
 	void AddSubsystem(SubsystemParams params = {})
+	template<typename T, typename = std::enable_if_t<std::is_base_of<SingletonSubsystem<T>, T>::value>>
 	{
 		T& subsystem = T::Get();
 		subsystem.Start(params);
 		m_Subsystems.push_back(&subsystem);
 	}
 
-	template<typename T>
+	template<typename T, typename = std::enable_if_t<std::is_base_of<SingletonSubsystem<T>, T>::value>>
 	void RemoveSubsystem()
 	{
 		T& subsystem = T::Get();

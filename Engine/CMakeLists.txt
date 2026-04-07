@@ -11,6 +11,7 @@ target_sources(${CORE_LIBRARY}
         "src/Rendering/Window.cpp"
         "src/Rendering/RenderSystem.cpp"
         "src/Events/EventSystem.cpp"
+        "src/Rendering/VAO.cpp"
 
     PUBLIC
     FILE_SET HEADERS
@@ -23,7 +24,9 @@ target_sources(${CORE_LIBRARY}
         "include/Rendering/Window.h"        
         "include/Rendering/RenderSystem.h" 
         "include/Events/Event.h"
-        "include/Events/EventSystem.h" )
+        "include/Events/EventSystem.h"  
+        "include/Rendering/VAO.h"
+)
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

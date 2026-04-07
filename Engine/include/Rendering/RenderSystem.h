@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Subsystem.h"
+#include "Rendering/VAO.h"
 
 #include <memory>
 #include <vector>
@@ -8,7 +9,7 @@
 struct RenderItem
 {
 	// mat4 transform;
-	// VAO geometry;
+	VAO geometry;
 	// Material material // Contains shader
 };
 

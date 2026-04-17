@@ -12,6 +12,8 @@ target_sources(${CORE_LIBRARY}
         "src/Rendering/RenderSystem.cpp"
         "src/Events/EventSystem.cpp"
         "src/Rendering/VAO.cpp"
+        "src/Rendering/Shader.cpp"
+
 
     PUBLIC
     FILE_SET HEADERS
@@ -26,6 +28,7 @@ target_sources(${CORE_LIBRARY}
         "include/Events/Event.h"
         "include/Events/EventSystem.h"  
         "include/Rendering/VAO.h"
+        "include/Rendering/Shader.h"
 )
 
 target_include_directories(${CORE_LIBRARY}
@@ -46,6 +49,13 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
-FetchContent_MakeAvailable(glfw)
+FetchContent_Declare(
+	glm
+	GIT_REPOSITORY	https://github.com/g-truc/glm.git
+	GIT_TAG 	1.0.1
+)
+
+FetchContent_MakeAvailable(glfw glm)
 
 target_link_libraries(${CORE_LIBRARY} PRIVATE glfw)
+target_link_libraries(${CORE_LIBRARY} PUBLIC glm)

@@ -3,8 +3,19 @@
 #include <cstdint>
 #include <string>
 #include <unordered_map>
+#include <variant>
 
 #include <glm/glm.hpp>
+
+#include "Rendering/ShaderDataTypes.h"
+
+using UniformData = std::variant<std::monostate, bool, int, float, glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4>;
+
+struct UniformDescription
+{
+	uint32_t location;
+	ShaderDataType type;
+};
 
 class Shader
 {
@@ -13,21 +24,22 @@ public:
 	void Use();
 	inline unsigned int GetID() const { return m_ID; }
 
-	void SetBool(const char* name, bool value) const;
-	void SetInt(const char* name, int value) const;
-	void SetFloat(const char* name, float value) const;
-	void SetVec2(const char* name, const glm::vec2& value) const;
-	void SetVec2(const char* name, float x, float y) const;
-	void SetVec3(const char* name, const glm::vec3& value) const;
-	void SetVec3(const char* name, float x, float y, float z) const;
-	void SetVec4(const char* name, const glm::vec4& value) const;
-	void SetVec4(const char* name, float x, float y, float z, float w);
-	void SetMat2(const char* name, const glm::mat2& mat) const;
-	void SetMat3(const char* name, const glm::mat3& mat) const;
-	void SetMat4(const char* name, const glm::mat4& mat) const;
+	void SetUniform(const std::string& name, UniformData uniformData);
 
 private:
+	void UploadUniform(uint32_t location, bool value) const;
+	void UploadUniform(uint32_t location, int value) const;
+	void UploadUniform(uint32_t location, float value) const;
+	void UploadUniform(uint32_t location, const glm::vec2& value) const;
+	void UploadUniform(uint32_t location, const glm::vec3& value) const;
+	void UploadUniform(uint32_t location, const glm::vec4& value) const;
+	void UploadUniform(uint32_t location, const glm::mat3& mat) const;
+	void UploadUniform(uint32_t location, const glm::mat4& mat) const;
 	void CheckCompileErrors(uint32_t shader, const char* type);
+
+private:
 	uint32_t m_ID;
-	std::unordered_map<const char*, uint32_t> m_UniformLookup;
+	std::unordered_map<std::string, UniformDescription> m_UniformLookup;
+
+	friend class Material;
 };

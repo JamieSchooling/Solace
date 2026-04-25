@@ -27,7 +27,7 @@ void VAO::AddVertexBuffer(const std::vector<float>& vertices, const std::vector<
 	}
 }
 
-void VAO::Use()
+void VAO::Use() const
 {
 	glBindVertexArray(m_ID);
 }

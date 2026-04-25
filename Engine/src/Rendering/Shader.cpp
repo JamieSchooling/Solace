@@ -80,7 +80,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 	{
 		glGetActiveUniform(m_ID, i, bufSize, &length, &size, &type, name);
 		uint32_t location = glGetUniformLocation(m_ID, name);
-		m_UniformLookup[name] = location;
+		m_UniformLookup[name] = { location, (ShaderDataType)type }; // TODO: Implement check that type is supported
 	}
 }
 
@@ -113,63 +113,73 @@ void Shader::CheckCompileErrors(uint32_t shader, const char* type)
 	}
 }
 
-void Shader::SetBool(const char* name, bool value) const
+void Shader::SetUniform(const std::string& name, UniformData uniformData)
 {
-	glUniform1i(m_UniformLookup.at(name), (int)value);
+	if (std::holds_alternative<std::monostate>(uniformData))
+	{
+		std::cout << "Warning: Uniform value [" << name << "] not uploaded to shader, material value not set." << std::endl;
+		return;
+	}
+
+	UniformDescription desc = m_UniformLookup.at(name);
+
+	switch (desc.type)
+	{
+	case ShaderDataType::Bool:
+		UploadUniform(desc.location, std::get<bool>(uniformData)); break;
+	case ShaderDataType::Int:
+		UploadUniform(desc.location, std::get<int>(uniformData)); break;
+	case ShaderDataType::Float:
+		UploadUniform(desc.location, std::get<float>(uniformData)); break;
+	case ShaderDataType::Vector2:
+		UploadUniform(desc.location, std::get<glm::vec2>(uniformData)); break;
+	case ShaderDataType::Vector3:
+		UploadUniform(desc.location, std::get<glm::vec3>(uniformData)); break;
+	case ShaderDataType::Vector4:
+		UploadUniform(desc.location, std::get<glm::vec4>(uniformData)); break;
+	case ShaderDataType::Mat3:
+		UploadUniform(desc.location, std::get<glm::mat3>(uniformData)); break;
+	case ShaderDataType::Mat4:
+		UploadUniform(desc.location, std::get<glm::mat4>(uniformData)); break;
+	}
 }
 
-void Shader::SetInt(const const char* name, int value) const
+void Shader::UploadUniform(uint32_t location, bool value) const
 {
-	glUniform1i(m_UniformLookup.at(name), value);
+	glUniform1i(location, (int)value);
 }
 
-void Shader::SetFloat(const const char* name, float value) const
+void Shader::UploadUniform(uint32_t location, int value) const
 {
-	glUniform1f(m_UniformLookup.at(name), value);
+	glUniform1i(location, value);
 }
 
-void Shader::SetVec2(const const char* name, const glm::vec2& value) const
+void Shader::UploadUniform(uint32_t location, float value) const
 {
-	glUniform2f(m_UniformLookup.at(name), value.x, value.y);
+	glUniform1f(location, value);
 }
 
-void Shader::SetVec2(const const char* name, float x, float y) const
+void Shader::UploadUniform(uint32_t location, const glm::vec2& value) const
 {
-	glUniform2f(m_UniformLookup.at(name), x, y);
+	glUniform2f(location, value.x, value.y);
 }
 
-void Shader::SetVec3(const const char* name, const glm::vec3& value) const
+void Shader::UploadUniform(uint32_t location, const glm::vec3& value) const
 {
-	glUniform3f(m_UniformLookup.at(name), value.x, value.y, value.z);
+	glUniform3f(location, value.x, value.y, value.z);
 }
 
-void Shader::SetVec3(const const char* name, float x, float y, float z) const
+void Shader::UploadUniform(uint32_t location, const glm::vec4& value) const
 {
-
-	glUniform3f(m_UniformLookup.at(name), x, y, z);
+	glUniform4f(location, value.x, value.y, value.z, value.w);
 }
 
-void Shader::SetVec4(const const char* name, const glm::vec4& value) const
+void Shader::UploadUniform(uint32_t location, const glm::mat3& mat) const
 {
-	glUniform4f(m_UniformLookup.at(name), value.x, value.y, value.z, value.w);
+	glUniformMatrix3fv(location, 1, GL_FALSE, &mat[0][0]);
 }
 
-void Shader::SetVec4(const const char* name, float x, float y, float z, float w)
+void Shader::UploadUniform(uint32_t location, const glm::mat4& mat) const
 {
-	glUniform4f(m_UniformLookup.at(name), x, y, z, w);
-}
-
-void Shader::SetMat2(const const char* name, const glm::mat2& mat) const
-{
-	glUniformMatrix2fv(m_UniformLookup.at(name), 1, GL_FALSE, &mat[0][0]);
-}
-
-void Shader::SetMat3(const const char* name, const glm::mat3& mat) const
-{
-	glUniformMatrix3fv(m_UniformLookup.at(name), 1, GL_FALSE, &mat[0][0]);
-}
-
-void Shader::SetMat4(const const char* name, const glm::mat4& mat) const
-{
-	glUniformMatrix4fv(m_UniformLookup.at(name), 1, GL_FALSE, &mat[0][0]);
+	glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
 }

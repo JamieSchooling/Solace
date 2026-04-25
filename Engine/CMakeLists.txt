@@ -13,7 +13,7 @@ target_sources(${CORE_LIBRARY}
         "src/Events/EventSystem.cpp"
         "src/Rendering/VAO.cpp"
         "src/Rendering/Shader.cpp"
-
+        "src/Rendering/Material.cpp"
 
     PUBLIC
     FILE_SET HEADERS
@@ -29,7 +29,7 @@ target_sources(${CORE_LIBRARY}
         "include/Events/EventSystem.h"  
         "include/Rendering/VAO.h"
         "include/Rendering/Shader.h"
-)
+        "include/Rendering/Material.h"  "include/Rendering/ShaderDataTypes.h")
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

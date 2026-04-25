@@ -2,7 +2,7 @@
 
 #include "Core/Subsystem.h"
 #include "Rendering/VAO.h"
-#include "Rendering/Shader.h"
+#include "Rendering/Material.h"
 
 #include <memory>
 #include <vector>
@@ -11,10 +11,9 @@
 
 struct RenderItem
 {
-	glm::mat4 transform = glm::mat4(1.0f);
 	VAO geometry;
-	Shader shader;
-	// Material material <-- Will contain shader (replacing the shader field above)
+	Material material;
+	glm::mat4 transform = glm::mat4(1.0f);
 };
 
 using RenderQueue = std::vector<RenderItem>;
@@ -30,6 +29,7 @@ public:
 	void Start(const SubsystemParams& params) override;
 	void Shutdown() override;
 
+	void PreAppUpdate() override;
 	void OnAppUpdate() override;
 
 private:

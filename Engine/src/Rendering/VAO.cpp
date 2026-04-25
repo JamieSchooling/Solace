@@ -5,7 +5,10 @@ VAO::VAO(const std::vector<uint32_t>& indices)
 	glCreateVertexArrays(1, &m_ID);
 
 	glCreateBuffers(1, &m_EBO);
-	glNamedBufferStorage(m_ID, sizeof(uint32_t) * indices.size(), indices.data(), GL_DYNAMIC_STORAGE_BIT);
+	glNamedBufferStorage(m_EBO, sizeof(uint32_t) * indices.size(), indices.data(), GL_DYNAMIC_STORAGE_BIT);
+	glVertexArrayElementBuffer(m_ID, m_EBO);
+
+	m_Count = indices.size();
 }
 
 void VAO::AddVertexBuffer(const std::vector<float>& vertices, const std::vector<VertexAttribute>& attributes)

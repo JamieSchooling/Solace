@@ -5,7 +5,7 @@
 ## Quick Start
 
 ### Requirements
-- CMake 3.12+
+- CMake 3.28+
 - C++ 20 compatible compiler
 
 

@@ -7,27 +7,23 @@ void RenderSystem::Start(const SubsystemParams& params)
 {
 	const RenderSystemProps& props = static_cast<const RenderSystemProps&>(params);
 
-	m_RenderQueue = props.renderQueue;
+	m_RenderData = props.renderData;
 }
 
 void RenderSystem::Shutdown()
 {
-	m_RenderQueue = nullptr;
-}
 
-void RenderSystem::PreAppUpdate()
-{
-	if (m_RenderQueue->empty()) return;
 }
 
 void RenderSystem::OnAppUpdate()
-{
-	
-	for (RenderItem& item : *m_RenderQueue)
+{	
+	for (RenderItem& item : m_RenderData->renderQueue)
 	{
 		// Render
-		item.geometry.Use();
-		item.material.Use();
-		glDrawElements(GL_TRIANGLES, item.geometry.Count(), GL_UNSIGNED_INT, NULL);
+		item.geometry->Use();
+		item.material->SetValue("u_Model", item.transform);
+		item.material->SetValue("u_MVP", m_RenderData->cameraProjection * m_RenderData->cameraView * item.transform);
+		item.material->Use();
+		glDrawElements(GL_TRIANGLES, item.geometry->Count(), GL_UNSIGNED_INT, NULL);
 	}
 }

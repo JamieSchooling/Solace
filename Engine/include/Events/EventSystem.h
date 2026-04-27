@@ -13,6 +13,7 @@ public:
 	void Shutdown() override;
 
 	void AddListener(Subsystem& subsystem);
+	void AddListener(Subsystem* subsystem);
 	void RemoveListener(Subsystem& subsystem);
 
 	void DispatchEvent(Event event);

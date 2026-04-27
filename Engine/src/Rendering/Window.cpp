@@ -25,6 +25,10 @@ void Window::Start(const SubsystemParams& params)
 	glfwSetWindowUserPointer(m_GLFWInstance, static_cast<void*>(this));
 
 	m_Title = props.title;
+    m_Width = props.width;
+    m_Height = props.height;
+    m_AspectRatio = m_Width / m_Height;
+
     if (m_GLFWInstance == nullptr)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -51,10 +55,14 @@ void Window::Start(const SubsystemParams& params)
     glfwSetFramebufferSizeCallback(m_GLFWInstance, [](GLFWwindow* window, int width, int height) {
         auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
         glViewport(0, 0, width, height);
+        self->m_Width = width;
+        self->m_Height = height;
+        self->m_AspectRatio = self->m_Width / self->m_Height;
+
         Event e;
         e.type = EventType::WindowResize;
         e.WindowResizeArgs.width = width;
-        e.WindowResizeArgs.height = height;
+        e.WindowResizeArgs.height = height;        
         self->m_EventSystem->DispatchEvent(e);
     });
 

@@ -16,6 +16,11 @@ void EventSystem::AddListener(Subsystem& subsystem)
 	m_ListenerSystems.push_back(&subsystem);
 }
 
+void EventSystem::AddListener(Subsystem* subsystem)
+{
+	m_ListenerSystems.push_back(subsystem);
+}
+
 void EventSystem::RemoveListener(Subsystem& subsystem)
 {
 	m_ListenerSystems.erase(std::find(m_ListenerSystems.begin(), m_ListenerSystems.end(), &subsystem));

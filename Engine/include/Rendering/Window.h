@@ -23,8 +23,15 @@ public:
 	void PostAppUpdate() override;
 
 	bool IsOpen();
+
+	inline float GetWidth() const { return m_Width; }
+	inline float GetHeight() const { return m_Height; }
+	inline float GetAspectRatio() const { return m_AspectRatio; }
 private:
 	GLFWwindow* m_GLFWInstance;
 	EventSystem* m_EventSystem;
 	const char* m_Title;
+	float m_Width;
+	float m_Height;
+	float m_AspectRatio;
 };

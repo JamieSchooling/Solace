@@ -14,6 +14,9 @@ target_sources(${CORE_LIBRARY}
         "src/Rendering/VAO.cpp"
         "src/Rendering/Shader.cpp"
         "src/Rendering/Material.cpp"
+        "src/Scenes/Scene.cpp"
+        "src/Scenes/SceneSystem.cpp"
+        "src/Rendering/Camera.cpp"
 
     PUBLIC
     FILE_SET HEADERS
@@ -29,7 +32,15 @@ target_sources(${CORE_LIBRARY}
         "include/Events/EventSystem.h"  
         "include/Rendering/VAO.h"
         "include/Rendering/Shader.h"
-        "include/Rendering/Material.h"  "include/Rendering/ShaderDataTypes.h")
+        "include/Rendering/Material.h"  
+        "include/Rendering/ShaderDataTypes.h" 
+        "include/Rendering/Camera.h" 
+        "include/Scenes/Scene.h" 
+        "include/Scenes/SceneSystem.h"  
+        "include/Rendering/FrameRenderData.h"  
+        "include/Scenes/DefaultScene.h" 
+        "include/Rendering/MeshRender.h" 
+        "include/Transform/Transform.h")
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
@@ -55,7 +66,13 @@ FetchContent_Declare(
 	GIT_TAG 	1.0.3
 )
 
-FetchContent_MakeAvailable(glfw glm)
+FetchContent_Declare(entt
+	GIT_REPOSITORY	https://github.com/skypjack/entt.git
+	GIT_TAG			v3.16.0
+)
+
+FetchContent_MakeAvailable(glfw glm entt)
 
 target_link_libraries(${CORE_LIBRARY} PRIVATE glfw)
 target_link_libraries(${CORE_LIBRARY} PUBLIC glm)
+target_link_libraries(${CORE_LIBRARY} PUBLIC EnTT)

@@ -1,4 +1,4 @@
-﻿#include "Demo.h"
+﻿#include "Editor.h"
 
 #include <Core/EntryPoint.h>
 #include <Events/EventSystem.h>
@@ -11,10 +11,10 @@
 
 Application* CreateApplication()
 {
-	return new DemoApp();
+	return new Editor();
 }
 
-void DemoApp::Initialise()
+void Editor::Initialise()
 {
 	AddSubsystem<EventSystem>();
 
@@ -39,7 +39,7 @@ void DemoApp::Initialise()
 	
 }
 
-void DemoApp::Run()
+void Editor::Run()
 {
 	while (Window::Get().IsOpen())
 	{
@@ -47,7 +47,7 @@ void DemoApp::Run()
 	}
 }
 
-void DemoApp::Shutdown()
+void Editor::Shutdown()
 {
 	RemoveSubsystem<Window>();
 	RemoveSubsystem<EventSystem>();

@@ -1,20 +1,20 @@
 # CMakeList.txt : CMake project for Demo Application
 
-set(APPLICATION Demo)
+set(APPLICATION Editor)
 
 # Add source to this project's executable.
 add_executable (${APPLICATION})
 
 target_sources(${APPLICATION}
     PRIVATE
-        "src/Demo.cpp"
+        "src/Editor.cpp"
 
     PRIVATE
     FILE_SET HEADERS
     BASE_DIRS
         include
     FILES
-        "include/Demo.h")
+        "include/Editor.h")
 
 
 

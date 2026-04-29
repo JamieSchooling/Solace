@@ -18,13 +18,6 @@ public:
 			return;
 		}
 
-		/*if (!std::holds_alternative<T>(m_UniformData.at(name).data))
-		{
-			std::cout << "Material value [" << name << "] not set, data type not supported." << std::endl;
-			std::cout << typeid(glm::mat4).name() << ", " << typeid(T).name() << std::endl;
-			return;
-		}*/
-
 		m_UniformData[name] = data;
 	}
 

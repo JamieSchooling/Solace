@@ -9,6 +9,8 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <Scenes/SceneSystem.h>
 
+#include "EditorSystem.h"
+
 Application* CreateApplication()
 {
 	return new Editor();
@@ -37,6 +39,11 @@ void Editor::Initialise()
 		AddSubsystem<RenderSystem>(props);
 	};	
 	
+	{
+		EditorSystemProps props;
+		props.GLFWInstance = Window::Get().GetGLFWInstance();
+		AddSubsystem<EditorSystem>(props);
+	}
 }
 
 void Editor::Run()

@@ -8,19 +8,45 @@ add_executable (${APPLICATION})
 target_sources(${APPLICATION}
     PRIVATE
         "src/Editor.cpp"
+        "src/EditorSystem.cpp"
 
     PRIVATE
     FILE_SET HEADERS
     BASE_DIRS
         include
     FILES
-        "include/Editor.h")
+        "include/Editor.h" 
+        "include/EditorSystem.h")
 
+include(FetchContent)
 
+FetchContent_Declare(imgui
+  URL https://github.com/ocornut/imgui/archive/refs/tags/v1.92.7-docking.zip
+)
+
+FetchContent_MakeAvailable(imgui)
+
+add_library(imgui STATIC
+  ${imgui_SOURCE_DIR}/imgui.cpp
+  ${imgui_SOURCE_DIR}/imgui_draw.cpp
+  ${imgui_SOURCE_DIR}/imgui_tables.cpp
+  ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+  ${imgui_SOURCE_DIR}/imgui_demo.cpp
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+)
+
+target_link_libraries(imgui PRIVATE glfw)
+target_include_directories(imgui
+    PUBLIC
+      ${imgui_SOURCE_DIR}
+      ${imgui_SOURCE_DIR}/backends
+)
 
 set_target_properties(${APPLICATION} PROPERTIES CXX_STANDARD 20)
 
 target_link_libraries(${APPLICATION} PUBLIC Engine)
+target_link_libraries(${APPLICATION} PUBLIC imgui)
 
 if(WIN32 AND MSVC)
     # Hide console in Release builds

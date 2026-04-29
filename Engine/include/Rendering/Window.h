@@ -27,6 +27,8 @@ public:
 	inline float GetWidth() const { return m_Width; }
 	inline float GetHeight() const { return m_Height; }
 	inline float GetAspectRatio() const { return m_AspectRatio; }
+
+	inline GLFWwindow* GetGLFWInstance() { return m_GLFWInstance; }
 private:
 	GLFWwindow* m_GLFWInstance;
 	EventSystem* m_EventSystem;

@@ -73,6 +73,6 @@ FetchContent_Declare(entt
 
 FetchContent_MakeAvailable(glfw glm entt)
 
-target_link_libraries(${CORE_LIBRARY} PRIVATE glfw)
+target_link_libraries(${CORE_LIBRARY} PUBLIC glfw)
 target_link_libraries(${CORE_LIBRARY} PUBLIC glm)
 target_link_libraries(${CORE_LIBRARY} PUBLIC EnTT)

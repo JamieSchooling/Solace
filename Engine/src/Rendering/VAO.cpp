@@ -1,5 +1,7 @@
 #include "Rendering/VAO.h"
 
+#include <glad/gl.h>
+
 VAO::VAO(const std::vector<uint32_t>& indices)
 {
 	glCreateVertexArrays(1, &m_ID);

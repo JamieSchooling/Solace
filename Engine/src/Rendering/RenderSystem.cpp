@@ -8,6 +8,11 @@ void RenderSystem::Start(const SubsystemParams& params)
 	const RenderSystemProps& props = static_cast<const RenderSystemProps&>(params);
 
 	m_RenderData = props.renderData;
+	m_RenderTarget = props.renderTarget;
+	if (!m_RenderTarget)
+	{
+		m_RenderTarget = std::make_shared<FBO>();
+	}
 }
 
 void RenderSystem::Shutdown()
@@ -17,6 +22,8 @@ void RenderSystem::Shutdown()
 
 void RenderSystem::OnAppUpdate()
 {	
+	m_RenderTarget->Use();
+
 	for (RenderItem& item : m_RenderData->renderQueue)
 	{
 		// Render
@@ -26,4 +33,6 @@ void RenderSystem::OnAppUpdate()
 		item.material->Use();
 		glDrawElements(GL_TRIANGLES, item.geometry->Count(), GL_UNSIGNED_INT, NULL);
 	}
+
+	m_RenderTarget->Unbind();
 }

@@ -2,6 +2,7 @@
 
 #include "Core/Subsystem.h"
 #include "Rendering/FrameRenderData.h"
+#include "Rendering/FBO.h"
 
 #include <memory>
 #include <vector>
@@ -11,6 +12,7 @@
 struct RenderSystemProps : public SubsystemParams
 {
 	FrameRenderData* renderData;
+	std::shared_ptr<FBO> renderTarget;
 };
 
 class RenderSystem : public SingletonSubsystem<RenderSystem>
@@ -21,6 +23,9 @@ public:
 
 	void OnAppUpdate() override;
 
+	inline std::shared_ptr<FBO> GetRenderTarget() { return m_RenderTarget; }
+
 private:
 	FrameRenderData* m_RenderData;
+	std::shared_ptr<FBO> m_RenderTarget;
 };

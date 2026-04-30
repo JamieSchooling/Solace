@@ -16,7 +16,9 @@ target_sources(${CORE_LIBRARY}
         "src/Rendering/Material.cpp"
         "src/Scenes/Scene.cpp"
         "src/Scenes/SceneSystem.cpp"
-        "src/Rendering/Camera.cpp"
+        "src/Rendering/Camera.cpp"  
+        "src/Rendering/FBO.cpp"
+        "src/Rendering/Texture.cpp"
 
     PUBLIC
     FILE_SET HEADERS
@@ -35,12 +37,14 @@ target_sources(${CORE_LIBRARY}
         "include/Rendering/Material.h"  
         "include/Rendering/ShaderDataTypes.h" 
         "include/Rendering/Camera.h" 
-        "include/Scenes/Scene.h" 
+        "include/Scenes/Scene.h"
         "include/Scenes/SceneSystem.h"  
         "include/Rendering/FrameRenderData.h"  
         "include/Scenes/DefaultScene.h" 
         "include/Rendering/MeshRender.h" 
-        "include/Transform/Transform.h")
+        "include/Transform/Transform.h" 
+        "include/Rendering/FBO.h" 
+        "include/Rendering/Texture.h")
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

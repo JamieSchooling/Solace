@@ -137,6 +137,11 @@ void EditorSystem::HandleLayoutChange()
 {
 	if (m_NewLayout == m_CurrentLayout) return;
 
+	if (m_CurrentLayout == LayoutOption::Active)
+	{
+		ImGui::SaveIniSettingsToDisk((Application::GetConfigPath() / "Layouts" / "Active.ini").string().c_str());
+	}
+
 	switch (m_NewLayout)
 	{
 	case LayoutOption::Default:

@@ -19,6 +19,7 @@ public:
 	void OnEvent(Event& event) override;
 
 	FrameRenderData& GetRenderData() { return m_FrameRenderData; }
+	Scene& GetActiveScene() { return m_ActiveScene; }
 private:
 	Scene m_ActiveScene;
 

@@ -44,7 +44,9 @@ target_sources(${CORE_LIBRARY}
         "include/Rendering/MeshRender.h" 
         "include/Transform/Transform.h" 
         "include/Rendering/FBO.h" 
-        "include/Rendering/Texture.h")
+        "include/Rendering/Texture.h" 
+        "include/Scenes/NameComponent.h"
+)
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

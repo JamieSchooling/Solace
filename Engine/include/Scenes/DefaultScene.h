@@ -6,6 +6,7 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <Rendering/MeshRender.h>
 #include <Transform/Transform.h>
+#include "Scenes/NameComponent.h"
 
 Scene BuildDefaultScene()
 {
@@ -59,6 +60,8 @@ Scene BuildDefaultScene()
 	};
 	std::vector<uint32_t> indices(verts.size() / 3);
 	std::iota(indices.begin(), indices.end(), 0);
+
+	scene.Registry.emplace<NameComponent>(cube).Name = "Cube";
 
 	std::shared_ptr<VAO> geometry = std::make_shared<VAO>(indices);
 	geometry->AddVertexBuffer(verts, { {3, ShaderDataType::Float, false, 0} });

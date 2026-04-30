@@ -22,7 +22,7 @@ void Editor::Initialise()
 
 	{
 		WindowProps props;
-		props.title = "Demo";
+		props.title = "Solace Editor";
 		props.eventSystem = &EventSystem::Get();
 		AddSubsystem<Window>(props);
 	}

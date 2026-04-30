@@ -59,6 +59,9 @@ void Editor::Run()
 
 void Editor::Shutdown()
 {
+	RemoveSubsystem<EditorSystem>();
+	RemoveSubsystem<RenderSystem>();
+	RemoveSubsystem<SceneSystem>();
 	RemoveSubsystem<Window>();
 	RemoveSubsystem<EventSystem>();
 }

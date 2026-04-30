@@ -6,6 +6,12 @@
 #include <memory>
 #include <Rendering/FBO.h>
 
+enum class LayoutOption
+{
+	Default,
+	Active
+};
+
 struct EditorSystemProps : public SubsystemParams
 {
 	GLFWwindow* GLFWInstance;
@@ -23,4 +29,8 @@ public:
 
 private:
 	std::shared_ptr<FBO> m_GameRenderTarget;
+	LayoutOption m_CurrentLayout = LayoutOption::Default;
+	LayoutOption m_NewLayout = LayoutOption::Default;
+
+	void HandleLayoutChange();
 };

@@ -7,6 +7,9 @@
 #include <imgui_impl_glfw.h>
 #include <Scenes/NameComponent.h>
 
+#include <filesystem>
+#include <Core/Application.h>
+
 void EditorSystem::Start(const SubsystemParams& params)
 {
 	const EditorSystemProps& props = static_cast<const EditorSystemProps&>(params);
@@ -19,6 +22,23 @@ void EditorSystem::Start(const SubsystemParams& params)
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
+	io.IniFilename = nullptr;
+
+	if (!std::filesystem::exists(Application::GetConfigPath() / "Layouts"))
+	{
+		std::filesystem::create_directory(Application::GetConfigPath() / "Layouts");
+	}
+
+	if (std::filesystem::exists(Application::GetConfigPath() / "Layouts" / "Active.ini"))
+	{
+		ImGui::LoadIniSettingsFromDisk((Application::GetConfigPath() / "Layouts" / "Active.ini").string().c_str());
+		m_NewLayout = LayoutOption::Active;
+	}
+	else
+	{
+		ImGui::LoadIniSettingsFromDisk((Application::GetResourcePath() / "Layouts" / "Default.ini").string().c_str());
+		m_NewLayout = LayoutOption::Default;
+	}
 
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
@@ -30,14 +50,48 @@ void EditorSystem::Start(const SubsystemParams& params)
 
 void EditorSystem::Shutdown()
 {
+	ImGui::SaveIniSettingsToDisk((Application::GetConfigPath() / "Layouts" / "Active.ini").string().c_str());
 }
 
 void EditorSystem::OnAppUpdate()
 {
+	HandleLayoutChange(); // Done on frame start to preserve docking in layout
+
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 	ImGui::DockSpaceOverViewport(0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingOverCentralNode);
+	
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("File")) {
+			if (ImGui::MenuItem("Menu Item")) 
+			{
+			}
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Edit")) {
+			if (ImGui::MenuItem("Menu Item"))
+			{
+			}
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Layout")) 
+		{
+			if (ImGui::MenuItem("Default", nullptr, m_CurrentLayout == LayoutOption::Default))
+			{
+				m_NewLayout = LayoutOption::Default;
+			}
+
+			if (ImGui::MenuItem("Active", nullptr, m_CurrentLayout == LayoutOption::Active))
+			{
+				m_NewLayout = LayoutOption::Active;
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
+
 
 	ImGui::ShowDemoWindow();
 
@@ -77,4 +131,21 @@ void EditorSystem::OnAppUpdate()
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void EditorSystem::HandleLayoutChange()
+{
+	if (m_NewLayout == m_CurrentLayout) return;
+
+	switch (m_NewLayout)
+	{
+	case LayoutOption::Default:
+		ImGui::LoadIniSettingsFromDisk((Application::GetResourcePath() / "Layouts" / "Default.ini").string().c_str());
+		break;
+	case LayoutOption::Active:
+		ImGui::LoadIniSettingsFromDisk((Application::GetConfigPath() / "Layouts" / "Active.ini").string().c_str());
+		break;
+	}
+
+	m_CurrentLayout = m_NewLayout;
 }

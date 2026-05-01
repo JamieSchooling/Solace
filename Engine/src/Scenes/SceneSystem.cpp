@@ -23,8 +23,8 @@ void SceneSystem::OnAppUpdate()
 {
 	m_FrameRenderData.renderQueue.clear();
 
-	Camera& cam = m_ActiveScene.Registry.get<Camera>(m_ActiveScene.m_MainCamera);
-	Transform& camTransform = m_ActiveScene.Registry.get<Transform>(m_ActiveScene.m_MainCamera);
+	Camera& cam = m_ActiveScene.Registry.get<Camera>(m_ActiveScene.MainCamera);
+	Transform& camTransform = m_ActiveScene.Registry.get<Transform>(m_ActiveScene.MainCamera);
 
 	m_FrameRenderData.cameraProjection = cam.GetProjection();
 	m_FrameRenderData.cameraView = glm::inverse(camTransform.GetTransformMatrix());
@@ -41,6 +41,6 @@ void SceneSystem::OnEvent(Event& event)
 {
 	if (event.type == EventType::WindowResize)
 	{
-		m_ActiveScene.Registry.get<Camera>(m_ActiveScene.m_MainCamera).RecalculateProjection();
+		m_ActiveScene.Registry.get<Camera>(m_ActiveScene.MainCamera).RecalculateProjection();
 	}
 }

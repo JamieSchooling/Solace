@@ -11,8 +11,5 @@ public:
 
 	entt::registry Registry;
 	std::string Name = "Scene";
-private:
-	entt::entity m_MainCamera;
-
-	friend class SceneSystem;
+	entt::entity MainCamera;
 };

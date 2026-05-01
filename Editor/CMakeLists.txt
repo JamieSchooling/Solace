@@ -21,20 +21,24 @@ target_sources(${APPLICATION}
 include(FetchContent)
 
 FetchContent_Declare(imgui
-  URL https://github.com/ocornut/imgui/archive/refs/tags/v1.92.7-docking.zip
+    URL https://github.com/ocornut/imgui/archive/refs/tags/v1.92.7-docking.zip
 )
 
-FetchContent_MakeAvailable(imgui)
+FetchContent_Declare(nfd
+    URL https://github.com/mlabbe/nativefiledialog/archive/refs/tags/release_116.zip
+)
+
+FetchContent_MakeAvailable(imgui nfd)
 
 add_library(imgui STATIC
-  ${imgui_SOURCE_DIR}/imgui.cpp
-  ${imgui_SOURCE_DIR}/imgui_draw.cpp
-  ${imgui_SOURCE_DIR}/imgui_tables.cpp
-  ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-  ${imgui_SOURCE_DIR}/imgui_demo.cpp
-  ${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp
-  ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
-  ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/imgui_demo.cpp
+    ${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
 )
 
 target_link_libraries(imgui PRIVATE glfw)
@@ -44,10 +48,22 @@ target_include_directories(imgui
       ${imgui_SOURCE_DIR}/backends
 )
 
+add_library(nfd STATIC
+  ${nfd_SOURCE_DIR}/src/nfd_common.c
+  ${nfd_SOURCE_DIR}/src/nfd_win.cpp
+)
+
+target_include_directories(nfd
+    PUBLIC
+      ${nfd_SOURCE_DIR}/src
+      ${nfd_SOURCE_DIR}/src/include
+)
+
 set_target_properties(${APPLICATION} PROPERTIES CXX_STANDARD 20)
 
 target_link_libraries(${APPLICATION} PUBLIC Engine)
 target_link_libraries(${APPLICATION} PUBLIC imgui)
+target_link_libraries(${APPLICATION} PRIVATE nfd)
 
 if(WIN32 AND MSVC)
     # Hide console in Release builds

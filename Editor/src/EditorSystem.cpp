@@ -12,6 +12,10 @@
 #include <Core/Application.h>
 #include <Transform/Transform.h>
 
+#include <nfd.h>
+#include <Scenes/SceneSerialiser.h>
+#include <Rendering/Camera.h>
+
 void EditorSystem::Start(const SubsystemParams& params)
 {
 	const EditorSystemProps& props = static_cast<const EditorSystemProps&>(params);
@@ -120,8 +124,28 @@ void EditorSystem::DrawMenuBar()
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File")) {
-			if (ImGui::MenuItem("Menu Item"))
+			if (ImGui::MenuItem("Open"))
 			{
+				nfdchar_t* outPath = nullptr;
+				NFD_OpenDialog("solace", nullptr, &outPath);
+				if (outPath)
+				{
+					std::cout << outPath << std::endl;
+					SceneSerialiser serialiser(SceneSystem::Get().GetActiveScene());
+					serialiser.DeserialiseFrom(outPath);
+				}
+			}
+			ImGui::Separator();
+			if (ImGui::MenuItem("Save As..."))
+			{
+				nfdchar_t* outPath = nullptr;
+				NFD_SaveDialog("solace", nullptr, &outPath);
+				if (outPath)
+				{
+					std::cout << outPath << std::endl;
+					SceneSerialiser serialiser(SceneSystem::Get().GetActiveScene());
+					serialiser.SerialiseTo(outPath);
+				}
 			}
 			ImGui::EndMenu();
 		}

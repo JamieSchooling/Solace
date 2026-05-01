@@ -19,6 +19,8 @@ target_sources(${CORE_LIBRARY}
         "src/Rendering/Camera.cpp"  
         "src/Rendering/FBO.cpp"
         "src/Rendering/Texture.cpp"
+        "src/Scenes/SceneSerialiser.cpp"
+
 
     PUBLIC
     FILE_SET HEADERS
@@ -46,6 +48,7 @@ target_sources(${CORE_LIBRARY}
         "include/Rendering/FBO.h" 
         "include/Rendering/Texture.h" 
         "include/Scenes/NameComponent.h"
+        "include/Scenes/SceneSerialiser.h" 
 )
 
 target_include_directories(${CORE_LIBRARY}
@@ -77,8 +80,14 @@ FetchContent_Declare(entt
 	GIT_TAG			v3.16.0
 )
 
-FetchContent_MakeAvailable(glfw glm entt)
+FetchContent_Declare(json 
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.12.0
+)
+
+FetchContent_MakeAvailable(glfw glm entt json)
 
 target_link_libraries(${CORE_LIBRARY} PUBLIC glfw)
 target_link_libraries(${CORE_LIBRARY} PUBLIC glm)
 target_link_libraries(${CORE_LIBRARY} PUBLIC EnTT)
+target_link_libraries(${CORE_LIBRARY} PUBLIC nlohmann_json::nlohmann_json)

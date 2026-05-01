@@ -343,7 +343,7 @@ void EditorSystem::DrawInspector(entt::registry& registry)
 				ImGui::TextUnformatted("FOV");
 
 				ImGui::TableSetColumnIndex(1);
-				if (ImGui::DragFloat("##FOV", &camera.FOV, 0.1f, 30.0f, 12.0f))
+				if (ImGui::DragFloat("##FOV", &camera.FOV, 0.1f, 30.0f, 120.0f))
 				{
 					camera.RecalculateProjection();
 				}

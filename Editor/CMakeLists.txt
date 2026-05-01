@@ -16,7 +16,8 @@ target_sources(${APPLICATION}
         include
     FILES
         "include/Editor.h" 
-        "include/EditorSystem.h")
+        "include/EditorSystem.h"
+        "include/EditorProperty.h")
 
 include(FetchContent)
 

@@ -15,6 +15,7 @@
 #include <nfd.h>
 #include <Scenes/SceneSerialiser.h>
 #include <Rendering/Camera.h>
+#include <EditorProperty.h>
 
 void EditorSystem::Start(const SubsystemParams& params)
 {
@@ -257,72 +258,24 @@ void EditorSystem::DrawInspector(entt::registry& registry)
 
 			ImGui::Separator();
 			ImGui::TextUnformatted("Transform");
-			if (ImGui::BeginTable("##PosProperty", 2))
+
+			EditorProperty<glm::vec3>("Position", transform.Position).Draw();
+			glm::quat& rotation = transform.Rotation;
+			if (!m_EulerCache.contains(m_SelectedEntity))
 			{
-				ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
-				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-
-				ImGui::TableNextRow();
-
-				ImGui::TableSetColumnIndex(0);
-				ImGui::AlignTextToFramePadding();
-				ImGui::TextUnformatted("Position");
-
-				ImGui::TableSetColumnIndex(1);
-				ImGui::DragFloat3("##Position", &transform.Position.x, 0.1f);
-
-				ImGui::EndTable();
+				m_EulerCache[m_SelectedEntity] = glm::degrees(transform.EulerAngles());
 			}
-			if (ImGui::BeginTable("##RotProperty", 2))
-			{
-				ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
-				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+			glm::vec3 euler = m_EulerCache[m_SelectedEntity];
+			EditorProperty<glm::vec3>("Rotation", euler, [&](glm::vec3& euler) { 
+				glm::vec3 radianAngles = glm::radians(euler);
 
-				ImGui::TableNextRow();
-
-				ImGui::TableSetColumnIndex(0);
-				ImGui::AlignTextToFramePadding();
-				ImGui::TextUnformatted("Rotation");
-
-				ImGui::TableSetColumnIndex(1); 
-				glm::quat& rotation = transform.Rotation;
-
-				if (!m_EulerCache.contains(m_SelectedEntity))
-				{
-					m_EulerCache[m_SelectedEntity] = glm::degrees(transform.EulerAngles());
-				}
-
-				glm::vec3 euler = m_EulerCache[m_SelectedEntity];
-
-				if (ImGui::DragFloat3("##Rotation", &euler.x))
-				{
-					glm::vec3 radianAngles = glm::radians(euler);
-
-					glm::quat x = glm::angleAxis(radianAngles.x, glm::vec3(1, 0, 0));
-					glm::quat y = glm::angleAxis(radianAngles.y, glm::vec3(0, 1, 0));
-					glm::quat z = glm::angleAxis(radianAngles.z, glm::vec3(0, 0, 1));
-					rotation = glm::normalize(x * y * z);
-					m_EulerCache[m_SelectedEntity] = euler;
-				}
-
-				ImGui::EndTable();
-			}
-			if (ImGui::BeginTable("##ScaleProperty", 2))
-			{
-				ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
-				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-
-				ImGui::TableNextRow();
-
-				ImGui::TableSetColumnIndex(0);
-				ImGui::AlignTextToFramePadding();
-				ImGui::TextUnformatted("Scale");
-
-				ImGui::TableSetColumnIndex(1);
-				ImGui::DragFloat3("##Scale", &transform.Scale.x, 0.1f);
-
-				ImGui::EndTable();
-			}
+				glm::quat x = glm::angleAxis(radianAngles.x, glm::vec3(1, 0, 0));
+				glm::quat y = glm::angleAxis(radianAngles.y, glm::vec3(0, 1, 0));
+				glm::quat z = glm::angleAxis(radianAngles.z, glm::vec3(0, 0, 1));
+				rotation = glm::normalize(x * y * z);
+				m_EulerCache[m_SelectedEntity] = euler;
+			}).Draw();
+			EditorProperty<glm::vec3>("Scale", transform.Scale).Draw();
 			ImGui::Separator();
 		}
 		if (registry.all_of<Camera>(m_SelectedEntity))
@@ -331,84 +284,10 @@ void EditorSystem::DrawInspector(entt::registry& registry)
 
 			ImGui::Separator();
 			ImGui::TextUnformatted("Camera");
-			if (ImGui::BeginTable("##FovProperty", 2))
-			{
-				ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
-				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-
-				ImGui::TableNextRow();
-
-				ImGui::TableSetColumnIndex(0);
-				ImGui::AlignTextToFramePadding();
-				ImGui::TextUnformatted("FOV");
-
-				ImGui::TableSetColumnIndex(1);
-				if (ImGui::DragFloat("##FOV", &camera.FOV, 0.1f, 30.0f, 120.0f))
-				{
-					camera.RecalculateProjection();
-				}
-
-				ImGui::EndTable();
-			}
-			if (ImGui::BeginTable("##NearProperty", 2))
-			{
-				ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
-				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-
-				ImGui::TableNextRow();
-
-				ImGui::TableSetColumnIndex(0);
-				ImGui::AlignTextToFramePadding();
-				ImGui::TextUnformatted("Near");
-
-				ImGui::TableSetColumnIndex(1); 
-				if (ImGui::DragFloat("##Near", &camera.Near, 0.1f))
-				{
-					camera.RecalculateProjection();
-				}
-
-				ImGui::EndTable();
-			}
-			if (ImGui::BeginTable("##FarProperty", 2))
-			{
-				ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
-				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-
-				ImGui::TableNextRow();
-
-				ImGui::TableSetColumnIndex(0);
-				ImGui::AlignTextToFramePadding();
-				ImGui::TextUnformatted("Far");
-
-				ImGui::TableSetColumnIndex(1);
-				if (ImGui::DragFloat("##Far", &camera.Far, 0.1f, 0.1f))
-				{
-					camera.RecalculateProjection();
-				}
-
-				ImGui::EndTable();
-			}
-			if (ImGui::BeginTable("##ProjectionTypeProperty", 2))
-			{
-				ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
-				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-
-				ImGui::TableNextRow();
-
-				ImGui::TableSetColumnIndex(0);
-				ImGui::AlignTextToFramePadding();
-				ImGui::TextUnformatted("Projection Type");
-
-				ImGui::TableSetColumnIndex(1);
-				int projectionType = (int)camera.ProjectionType;
-				if (ImGui::SliderInt("##Projection Type", &projectionType, 0, 1))
-				{
-					camera.ProjectionType = (CameraProjectionType)projectionType;
-					camera.RecalculateProjection();
-				}
-
-				ImGui::EndTable();
-			}
+			EditorProperty<float>("FOV", camera.FOV, std::bind(&Camera::RecalculateProjection, &camera)).Draw();
+			EditorProperty<float>("Near", camera.Near, std::bind(&Camera::RecalculateProjection, &camera)).Draw();
+			EditorProperty<float>("Far", camera.Far, std::bind(&Camera::RecalculateProjection, &camera)).Draw();
+			EditorProperty<int>("Projection Type", (int&)camera.ProjectionType, std::bind(&Camera::RecalculateProjection, &camera)).Draw();
 			ImGui::Separator();
 		}
 		ImGui::PopID();

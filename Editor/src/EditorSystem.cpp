@@ -301,6 +301,92 @@ void EditorSystem::DrawInspector(entt::registry& registry)
 			}
 			ImGui::Separator();
 		}
+		if (registry.all_of<Camera>(m_SelectedEntity))
+		{
+			Camera& camera = registry.get<Camera>(m_SelectedEntity);
+
+			ImGui::Separator();
+			ImGui::TextUnformatted("Camera");
+			if (ImGui::BeginTable("##FovProperty", 2))
+			{
+				ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
+				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+
+				ImGui::TableNextRow();
+
+				ImGui::TableSetColumnIndex(0);
+				ImGui::AlignTextToFramePadding();
+				ImGui::TextUnformatted("FOV");
+
+				ImGui::TableSetColumnIndex(1);
+				if (ImGui::DragFloat("##FOV", &camera.FOV, 0.1f, 30.0f, 12.0f))
+				{
+					camera.RecalculateProjection();
+				}
+
+				ImGui::EndTable();
+			}
+			if (ImGui::BeginTable("##NearProperty", 2))
+			{
+				ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
+				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+
+				ImGui::TableNextRow();
+
+				ImGui::TableSetColumnIndex(0);
+				ImGui::AlignTextToFramePadding();
+				ImGui::TextUnformatted("Near");
+
+				ImGui::TableSetColumnIndex(1); 
+				if (ImGui::DragFloat("##Near", &camera.Near, 0.1f))
+				{
+					camera.RecalculateProjection();
+				}
+
+				ImGui::EndTable();
+			}
+			if (ImGui::BeginTable("##FarProperty", 2))
+			{
+				ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
+				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+
+				ImGui::TableNextRow();
+
+				ImGui::TableSetColumnIndex(0);
+				ImGui::AlignTextToFramePadding();
+				ImGui::TextUnformatted("Far");
+
+				ImGui::TableSetColumnIndex(1);
+				if (ImGui::DragFloat("##Far", &camera.Far, 0.1f, 0.1f))
+				{
+					camera.RecalculateProjection();
+				}
+
+				ImGui::EndTable();
+			}
+			if (ImGui::BeginTable("##ProjectionTypeProperty", 2))
+			{
+				ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
+				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+
+				ImGui::TableNextRow();
+
+				ImGui::TableSetColumnIndex(0);
+				ImGui::AlignTextToFramePadding();
+				ImGui::TextUnformatted("Projection Type");
+
+				ImGui::TableSetColumnIndex(1);
+				int projectionType = (int)camera.ProjectionType;
+				if (ImGui::SliderInt("##Projection Type", &projectionType, 0, 1))
+				{
+					camera.ProjectionType = (CameraProjectionType)projectionType;
+					camera.RecalculateProjection();
+				}
+
+				ImGui::EndTable();
+			}
+			ImGui::Separator();
+		}
 		ImGui::PopID();
 	}
 	ImGui::End();

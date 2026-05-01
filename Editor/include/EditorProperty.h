@@ -5,6 +5,7 @@
 #include <string>
 
 #include <imgui.h>
+#include <misc/cpp/imgui_stdlib.h>
 
 template<typename T>
 using PropertyCallback = std::function<void(T&)>;
@@ -86,6 +87,10 @@ bool EditorProperty<T>::DrawPropertyWidget()
 	else if constexpr (std::is_same_v<T, glm::vec4>)
 	{
 		return ImGui::DragFloat4(id, &m_Data.x);
+	}
+	else if constexpr (std::is_same_v<T, std::string>)
+	{
+		return ImGui::InputText(id, &m_Data);
 	}
 	else
 	{

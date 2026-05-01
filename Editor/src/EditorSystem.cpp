@@ -3,7 +3,6 @@
 #include <Scenes/Scene.h>
 #include <Scenes/SceneSystem.h>
 #include <imgui.h>
-#include <misc/cpp/imgui_stdlib.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_glfw.h>
 #include <Scenes/NameComponent.h>
@@ -17,6 +16,7 @@
 #include <Rendering/Camera.h>
 #include <EditorProperty.h>
 #include <TransformInspector.h>
+#include <CameraInspector.h>
 
 void EditorSystem::Start(const SubsystemParams& params)
 {
@@ -131,18 +131,11 @@ void EditorSystem::ConstructInspectors()
 			Transform& transform = registry.get<Transform>(entity);
 			m_Inspectors[entity].push_back(std::make_shared<TransformInspector>(transform));
 		}
-		/*if (registry.all_of<Camera>(m_SelectedEntity))
+		if (registry.all_of<Camera>(entity))
 		{
-			Camera& camera = registry.get<Camera>(m_SelectedEntity);
-
-			ImGui::Separator();
-			ImGui::TextUnformatted("Camera");
-			EditorProperty<float>("FOV", camera.FOV, [&](float v) { camera.RecalculateProjection(); }).Draw();
-			EditorProperty<float>("Near", camera.Near, [&](float v) { camera.RecalculateProjection(); }).Draw();
-			EditorProperty<float>("Far", camera.Far, [&](float v) { camera.RecalculateProjection(); }).Draw();
-			EditorProperty<int>("Projection Type", (int&)camera.ProjectionType,
-				[&](int v) { camera.RecalculateProjection(); }).Draw();
-		}*/
+			Camera& camera = registry.get<Camera>(entity);
+			m_Inspectors[entity].push_back(std::make_shared<CameraInspector>(camera));
+		}
 	}
 }
 
@@ -268,40 +261,13 @@ void EditorSystem::DrawInspector(entt::registry& registry)
 	if (m_SelectedEntity != entt::null)
 	{
 		ImGui::PushID((int)m_SelectedEntity);
+		if (registry.all_of<NameComponent>(m_SelectedEntity))
+		{
+			EditorProperty<std::string>("Name", registry.get<NameComponent>(m_SelectedEntity).Name).Draw();
+		}
 		for (auto& inspector : m_Inspectors[m_SelectedEntity])
 		{
 			inspector->Draw();
-		}
-		if (registry.all_of<NameComponent>(m_SelectedEntity))
-		{
-			if (ImGui::BeginTable("##NameProperty", 2))
-			{
-				ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
-				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-
-				ImGui::TableNextRow();
-
-				ImGui::TableSetColumnIndex(0);
-				ImGui::AlignTextToFramePadding();
-				ImGui::TextUnformatted("Name");
-
-				ImGui::TableSetColumnIndex(1);
-				ImGui::InputText("##Name", &registry.get<NameComponent>(m_SelectedEntity).Name);
-
-				ImGui::EndTable();
-			}
-		}
-		if (registry.all_of<Camera>(m_SelectedEntity))
-		{
-			Camera& camera = registry.get<Camera>(m_SelectedEntity);
-
-			ImGui::Separator();
-			ImGui::TextUnformatted("Camera");
-			EditorProperty<float>("FOV", camera.FOV, [&](float v) { camera.RecalculateProjection(); }).Draw();
-			EditorProperty<float>("Near", camera.Near, [&](float v) { camera.RecalculateProjection(); }).Draw();
-			EditorProperty<float>("Far", camera.Far, [&](float v) { camera.RecalculateProjection(); }).Draw();
-			EditorProperty<int>("Projection Type", (int&)camera.ProjectionType,
-				[&](int v) { camera.RecalculateProjection(); }).Draw();
 		}
 		ImGui::PopID();
 	}

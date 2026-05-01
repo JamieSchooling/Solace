@@ -6,6 +6,10 @@
 #include <memory>
 #include <Rendering/FBO.h>
 
+#include <entt/entt.hpp>
+
+class Scene;
+
 enum class LayoutOption
 {
 	Default,
@@ -25,12 +29,19 @@ public:
 	void Start(const SubsystemParams& params) override;
 	void Shutdown() override;
 
+	void PreAppUpdate() override;
 	void OnAppUpdate() override;
 
 private:
 	std::shared_ptr<FBO> m_GameRenderTarget;
 	LayoutOption m_CurrentLayout = LayoutOption::Default;
 	LayoutOption m_NewLayout = LayoutOption::Default;
+	entt::entity m_SelectedEntity = entt::null;
+	std::unordered_map<entt::entity, glm::vec3> m_EulerCache;
+
 
 	void HandleLayoutChange();
+	void DrawMenuBar();
+	void DrawSceneHierarchy(Scene& scene);
+	void DrawInspector(entt::registry& registry);
 };

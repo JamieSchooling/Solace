@@ -294,7 +294,7 @@ void EditorSystem::DrawInspector(entt::registry& registry)
 
 				glm::vec3 euler = m_EulerCache[m_SelectedEntity];
 
-				if (ImGui::DragFloat3("Rotation", &euler.x))
+				if (ImGui::DragFloat3("##Rotation", &euler.x))
 				{
 					glm::vec3 radianAngles = glm::radians(euler);
 

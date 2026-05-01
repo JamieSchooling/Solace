@@ -9,6 +9,8 @@ target_sources(${APPLICATION}
     PRIVATE
         "src/Editor.cpp"
         "src/EditorSystem.cpp"
+        "src/ComponentInspector.cpp"
+        "src/TransformInspector.cpp"
 
     PRIVATE
     FILE_SET HEADERS
@@ -17,7 +19,9 @@ target_sources(${APPLICATION}
     FILES
         "include/Editor.h" 
         "include/EditorSystem.h"
-        "include/EditorProperty.h")
+        "include/EditorProperty.h"
+        "include/ComponentInspector.h" 
+        "include/TransformInspector.h")
 
 include(FetchContent)
 

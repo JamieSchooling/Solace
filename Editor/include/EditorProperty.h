@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <format>
 #include <string>
 
 #include <imgui.h>
@@ -8,20 +9,26 @@
 template<typename T>
 using PropertyCallback = std::function<void(T&)>;
 
-template<typename T>
-class EditorProperty
+class IEditorProperty
 {
 public:
-	EditorProperty(std::string label, T& data, PropertyCallback<T> callback = nullptr) 
-		: m_Label(label), m_Data(data), m_Callback(callback)
-	{
-	}
+	virtual ~IEditorProperty() = default;
+	virtual void Draw() = 0;
+};
 
-	void Draw();
+template<typename T>
+class EditorProperty : public IEditorProperty
+{
+public:
+	EditorProperty(std::string label, T& data, PropertyCallback<T> onChange = nullptr)
+		: m_Label(label), m_Data(data), m_OnChange(onChange)
+	{}
+
+	void Draw() override;
 private:
-	std::string m_Label;
 	T& m_Data;
-	PropertyCallback<T> m_Callback;
+	std::string m_Label;
+	PropertyCallback<T> m_OnChange;
 
 	bool DrawPropertyWidget();
 };
@@ -41,12 +48,9 @@ inline void EditorProperty<T>::Draw()
 		ImGui::TextUnformatted(m_Label.c_str());
 
 		ImGui::TableSetColumnIndex(1);
-		if (DrawPropertyWidget())
+		if (DrawPropertyWidget() && m_OnChange)
 		{
-			if (m_Callback)
-			{
-				m_Callback(m_Data);
-			}
+			m_OnChange(m_Data);
 		}
 
 		ImGui::EndTable();
@@ -56,7 +60,8 @@ inline void EditorProperty<T>::Draw()
 template<typename T>
 bool EditorProperty<T>::DrawPropertyWidget()
 {
-	const char* id = std::format("##{}", m_Label).c_str();
+	std::string idStr = std::format("##{}", m_Label);
+	const char* id = idStr.c_str();
 
 	if constexpr (std::is_same_v<T, bool>)
 	{

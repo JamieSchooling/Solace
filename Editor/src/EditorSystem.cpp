@@ -30,8 +30,9 @@ void EditorSystem::Start(const SubsystemParams& params)
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	io.IniFilename = nullptr;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
+	io.IniFilename = nullptr;
 	if (!std::filesystem::exists(Application::GetConfigPath() / "Layouts"))
 	{
 		std::filesystem::create_directory(Application::GetConfigPath() / "Layouts");
@@ -48,8 +49,7 @@ void EditorSystem::Start(const SubsystemParams& params)
 		m_NewLayout = LayoutOption::Default;
 	}
 
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-
+	io.Fonts->AddFontFromFileTTF((Application::GetResourcePath()/"Fonts"/"RobotoMono-Regular.ttf").string().c_str(), 16.0f);
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplGlfw_InitForOpenGL(window, true);

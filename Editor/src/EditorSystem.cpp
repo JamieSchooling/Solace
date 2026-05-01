@@ -154,26 +154,30 @@ void EditorSystem::DrawSceneHierarchy(Scene& scene)
 
 	ImGuiTreeNodeFlags baseNodeFlags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_SpanAvailWidth;
 
-	for (auto& entity : scene.Registry.view<entt::entity>())
+	if (ImGui::TreeNodeEx(scene.Name.c_str(), ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow))
 	{
-		std::string name = "Unnamed Entity";
-		if (scene.Registry.all_of<NameComponent>(entity))
+		for (auto& entity : scene.Registry.view<entt::entity>())
 		{
-			name = scene.Registry.get<NameComponent>(entity).Name;
-		}
-		ImGui::PushID((int)entity);
-		ImGuiTreeNodeFlags nodeFlags = baseNodeFlags;
-		if (entity == m_SelectedEntity)
-			nodeFlags |= ImGuiTreeNodeFlags_Selected;
-		if (ImGui::TreeNodeEx(name.c_str(), nodeFlags))
-		{
-			if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+			std::string name = "Unnamed Entity";
+			if (scene.Registry.all_of<NameComponent>(entity))
 			{
-				m_SelectedEntity = entity;
+				name = scene.Registry.get<NameComponent>(entity).Name;
 			}
-			ImGui::TreePop();
+			ImGui::PushID((int)entity);
+			ImGuiTreeNodeFlags nodeFlags = baseNodeFlags;
+			if (entity == m_SelectedEntity)
+				nodeFlags |= ImGuiTreeNodeFlags_Selected;
+			if (ImGui::TreeNodeEx(name.c_str(), nodeFlags))
+			{
+				if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+				{
+					m_SelectedEntity = entity;
+				}
+				ImGui::TreePop();
+			}
+			ImGui::PopID();
 		}
-		ImGui::PopID();
+		ImGui::TreePop();
 	}
 
 	// Check for deselection

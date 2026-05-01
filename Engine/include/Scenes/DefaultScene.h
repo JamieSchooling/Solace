@@ -11,6 +11,7 @@
 Scene BuildDefaultScene()
 {
 	Scene scene;
+	scene.Name = "Default Scene";
 
 	entt::entity cube = scene.Registry.create();
 	// Temp Cube

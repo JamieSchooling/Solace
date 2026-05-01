@@ -41,6 +41,9 @@ void SceneSystem::OnEvent(Event& event)
 {
 	if (event.type == EventType::WindowResize)
 	{
-		m_ActiveScene.Registry.get<Camera>(m_ActiveScene.MainCamera).RecalculateProjection();
+		if (event.WindowResizeArgs.width > 0 && event.WindowResizeArgs.height > 0)
+		{
+			m_ActiveScene.Registry.get<Camera>(m_ActiveScene.MainCamera).RecalculateProjection();
+		}
 	}
 }

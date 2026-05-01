@@ -10,7 +10,7 @@ void Camera::RecalculateProjection()
 	m_Projection = [&]() {
 		switch (ProjectionType)
 		{
-			case CameraProjectionType::Perspective: return glm::perspective(FOV, Window::Get().GetAspectRatio(), Near, Far);
+			case CameraProjectionType::Perspective: return glm::perspective(glm::radians(FOV), Window::Get().GetAspectRatio(), Near, Far);
 			case CameraProjectionType::Orthographic: return glm::ortho(0.0f, Window::Get().GetWidth(), 0.0f, Window::Get().GetHeight(), Near, Far);
 		}
 	}();

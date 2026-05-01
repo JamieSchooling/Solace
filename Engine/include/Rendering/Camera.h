@@ -15,7 +15,7 @@ struct Camera
 public:
 	Camera();
 
-	float FOV = 30.0f;
+	float FOV = 70.0f;
 	float Near = 0.1f;
 	float Far = 100.0f;
 	CameraProjectionType ProjectionType = CameraProjectionType::Perspective;

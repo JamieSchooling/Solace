@@ -9,6 +9,7 @@
 #include "ComponentInspector.h"
 
 #include <entt/entt.hpp>
+#include <ViewportWindow.h>
 
 class Scene;
 
@@ -22,7 +23,7 @@ struct EditorSystemProps : public SubsystemParams
 {
 	GLFWwindow* GLFWInstance;
 	// For later use when viewport windows are implemented
-	//std::shared_ptr<FBO> GameRenderTarget;
+	std::shared_ptr<FBO> GameRenderTarget;
 };
 
 class EditorSystem : public SingletonSubsystem<EditorSystem>
@@ -41,6 +42,7 @@ private:
 	entt::entity m_SelectedEntity = entt::null;
 	std::unordered_map<entt::entity, std::vector<std::shared_ptr<ComponentInspector>>> m_Inspectors;
 	std::unordered_map<entt::entity, glm::vec3> m_EulerCache;
+	std::unique_ptr<ViewportWindow> m_GameView;
 
 	void ConstructInspectors();
 

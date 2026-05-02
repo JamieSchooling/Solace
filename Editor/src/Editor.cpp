@@ -36,7 +36,7 @@ void Editor::Initialise()
 	{
 		RenderSystemProps props;
 		props.renderData = &SceneSystem::Get().GetRenderData();
-		//props.renderTarget = std::make_shared<FBO>(glm::ivec2(Window::Get().GetWidth(), Window::Get().GetHeight()));
+		props.renderTarget = std::make_shared<FBO>(glm::ivec2(Window::Get().GetWidth(), Window::Get().GetHeight()));
 		AddSubsystem<RenderSystem>(props);
 	};	
 	
@@ -44,7 +44,7 @@ void Editor::Initialise()
 		EditorSystemProps props;
 		props.GLFWInstance = Window::Get().GetGLFWInstance();
 		// For later use when viewport windows are implemented
-		//props.GameRenderTarget = RenderSystem::Get().GetRenderTarget();
+		props.GameRenderTarget = RenderSystem::Get().GetRenderTarget();
 		AddSubsystem<EditorSystem>(props);
 	}
 }

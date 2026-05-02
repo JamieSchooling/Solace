@@ -25,7 +25,7 @@ void EditorSystem::Start(const SubsystemParams& params)
 	GLFWwindow* window = props.GLFWInstance;
 	
 	// For later use when viewport windows are implemented
-	//m_GameRenderTarget = props.GameRenderTarget;
+	m_GameRenderTarget = props.GameRenderTarget;
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -55,6 +55,7 @@ void EditorSystem::Start(const SubsystemParams& params)
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 460");
 
+	m_GameView = std::make_unique<ViewportWindow>("Game", m_GameRenderTarget);
 	ConstructInspectors();
 }
 
@@ -73,9 +74,11 @@ void EditorSystem::OnAppUpdate()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	ImGui::DockSpaceOverViewport(0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingOverCentralNode);
+	ImGui::DockSpaceOverViewport();
 
 	DrawMenuBar();
+
+	m_GameView->Draw();
 
 	ImGui::ShowDemoWindow();
 

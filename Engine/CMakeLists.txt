@@ -49,7 +49,9 @@ target_sources(${CORE_LIBRARY}
         "include/Rendering/Texture.h" 
         "include/Scenes/NameComponent.h"
         "include/Scenes/SceneSerialiser.h" 
-)
+        "include/Reflection/Property.h" 
+        "include/Reflection/ComponentReflection.h" 
+        "include/Reflection/ReflectionRegistry.h")
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

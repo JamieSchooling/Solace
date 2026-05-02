@@ -131,11 +131,11 @@ void EditorSystem::ConstructInspectors()
 			Transform& transform = registry.get<Transform>(entity);
 			m_Inspectors[entity].push_back(std::make_shared<TransformInspector>(transform));
 		}
-		if (registry.all_of<Camera>(entity))
+		/*if (registry.all_of<Camera>(entity))
 		{
 			Camera& camera = registry.get<Camera>(entity);
 			m_Inspectors[entity].push_back(std::make_shared<CameraInspector>(camera));
-		}
+		}*/
 	}
 }
 
@@ -268,6 +268,28 @@ void EditorSystem::DrawInspector(entt::registry& registry)
 		for (auto& inspector : m_Inspectors[m_SelectedEntity])
 		{
 			inspector->Draw();
+		}
+		if (registry.all_of<Camera>(m_SelectedEntity)) // Temporary - Just for testing
+		{
+			ImGui::Separator();
+			ImGui::TextUnformatted("Camera");
+			auto ComponentReflections = ReflectionRegistry::Get(registry, m_SelectedEntity);
+			for (auto& reflection : ComponentReflections)
+			{
+				// Do something
+
+				// Or use props:
+				for (auto& property : reflection->GetProperties())
+				{
+					auto* owner = reinterpret_cast<Camera*>(reflection->GetOwner(registry, m_SelectedEntity));
+					// Do something
+					float value = std::any_cast<float>(property->Get(owner));
+					EditorProperty<float>(property->Name(), value).Draw();
+					property->Set(owner, value);
+					owner->RecalculateProjection();
+				}
+			}
+			ImGui::Separator();
 		}
 		ImGui::PopID();
 	}

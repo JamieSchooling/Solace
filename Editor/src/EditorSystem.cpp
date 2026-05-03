@@ -281,12 +281,12 @@ void EditorSystem::DrawInspector(entt::registry& registry)
 				// Or use props:
 				for (auto& property : reflection->GetProperties())
 				{
-					auto* owner = reinterpret_cast<Camera*>(reflection->GetOwner(registry, m_SelectedEntity));
+					Camera* target = reflection->GetTarget<Camera>(registry, m_SelectedEntity);
 					// Do something
-					float value = std::any_cast<float>(property->Get(owner));
+					float value = std::any_cast<float>(property->Get(registry, m_SelectedEntity));
 					EditorProperty<float>(property->Name(), value).Draw();
-					property->Set(owner, value);
-					owner->RecalculateProjection();
+					property->Set(value, registry, m_SelectedEntity);
+					target->RecalculateProjection();
 				}
 			}
 			ImGui::Separator();

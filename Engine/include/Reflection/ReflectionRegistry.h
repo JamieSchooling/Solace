@@ -11,7 +11,7 @@ struct ReflectionRegistry
 
     static std::vector<std::shared_ptr<IComponentReflection>> Get(entt::registry& r, entt::entity e)
     {
-        std::vector<std::shared_ptr<IComponentReflection>> entityHandlers;
+        std::vector<std::shared_ptr<IComponentReflection>> entityHandlers; // TODO: move elsewhere so it's not recreated every call 
         for (auto& handler : handlers)
         {
             if (handler->IsOnEntity(r, e))

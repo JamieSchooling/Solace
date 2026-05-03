@@ -1,33 +1,36 @@
 #pragma once
 
-#include <any> // <-- Not great, find a better 
+#include <any> // <-- Not great, find a better alternative
+
+struct IComponentReflection;
 
 struct IProperty
 {
     virtual ~IProperty() = default;
     virtual const char* Name() const = 0;
-    virtual std::any Get(void* owner) const = 0;
-    virtual void Set(void* owner, const std::any& value) const = 0;
+    virtual std::any Get(entt::registry& r, entt::entity e) const = 0;
+    virtual void Set(const std::any& value, entt::registry& r, entt::entity e) const = 0;
+    virtual void SetReflectionTarget(IComponentReflection* owner) = 0;
 };
 
-template<typename Owner, auto Member>
+template<typename Target, auto Member>
 struct Property : public IProperty
 {
     Property(const char* n) : name(n) {}
 
     const char* name;
     using ValueType = std::remove_reference_t<
-        decltype(std::declval<Owner>().*Member)
+        decltype(std::declval<Target>().*Member)
     >;
 
-    ValueType& Get(Owner& o) const
+    ValueType& Get(Target* o) const
     {
-        return o.*Member;
+        return o->*Member;
     }
 
-    void Set(Owner& o, const ValueType& v) const
+    void Set(Target* o, const ValueType& v) const
     {
-        o.*Member = v;
+        o->*Member = v;
     }
 
     const char* Name() const override
@@ -35,13 +38,21 @@ struct Property : public IProperty
         return name;
     }
 
-    std::any Get(void* owner) const override
+    std::any Get(entt::registry& r, entt::entity e) const override
     {
-        return Get(*reinterpret_cast<Owner*>(owner));
+        return Get(reflectionTarget->template GetTarget<Target>(r, e));
     }
 
-    void Set(void* owner, const std::any& value) const override
+    void Set(const std::any& value, entt::registry& r, entt::entity e) const override
     {
-        Set(*reinterpret_cast<Owner*>(owner), std::any_cast<ValueType>(value));
+        Set(reflectionTarget->template GetTarget<Target>(r, e), std::any_cast<ValueType>(value));
     }
+
+    void SetReflectionTarget(IComponentReflection* target) override
+    {
+        reflectionTarget = target;
+    }
+
+private:
+    IComponentReflection* reflectionTarget = nullptr;
 };

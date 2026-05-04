@@ -25,12 +25,7 @@ struct ComponentReflection : IComponentReflection
 {
     ComponentReflection(std::vector<IProperty*> properties)
         : Properties(properties) 
-    {
-        for (IProperty* prop : properties)
-        {
-            prop->SetReflectionTarget(this);
-        }
-    }
+    {}
 
     const std::vector<IProperty*>& GetProperties() const override
     {

@@ -10,7 +10,6 @@ struct IProperty
     virtual const char* Name() const = 0;
     virtual std::any Get(entt::registry& r, entt::entity e) const = 0;
     virtual void Set(const std::any& value, entt::registry& r, entt::entity e) const = 0;
-    virtual void SetReflectionTarget(IComponentReflection* owner) = 0;
 };
 
 template<typename Target, auto Member>
@@ -23,16 +22,6 @@ struct Property : public IProperty
         decltype(std::declval<Target>().*Member)
     >;
 
-    ValueType& Get(Target* o) const
-    {
-        return o->*Member;
-    }
-
-    void Set(Target* o, const ValueType& v) const
-    {
-        o->*Member = v;
-    }
-
     const char* Name() const override
     {
         return name;
@@ -40,19 +29,13 @@ struct Property : public IProperty
 
     std::any Get(entt::registry& r, entt::entity e) const override
     {
-        return Get(reflectionTarget->template GetTarget<Target>(r, e));
+		Target& o = r.get<Target>(e);
+		return o.*Member;
     }
 
     void Set(const std::any& value, entt::registry& r, entt::entity e) const override
     {
-        Set(reflectionTarget->template GetTarget<Target>(r, e), std::any_cast<ValueType>(value));
+		Target& o = r.get<Target>(e);
+		o.*Member = std::any_cast<ValueType>(value);
     }
-
-    void SetReflectionTarget(IComponentReflection* target) override
-    {
-        reflectionTarget = target;
-    }
-
-private:
-    IComponentReflection* reflectionTarget = nullptr;
 };

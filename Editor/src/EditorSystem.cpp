@@ -273,7 +273,7 @@ void EditorSystem::DrawInspector(entt::registry& registry)
 		{
 			ImGui::Separator();
 			ImGui::TextUnformatted("Camera");
-			auto ComponentReflections = ReflectionRegistry::Get(registry, m_SelectedEntity);
+			auto ComponentReflections = ReflectionRegistry::View(registry, m_SelectedEntity);
 			for (auto& reflection : ComponentReflections)
 			{
 				// Do something

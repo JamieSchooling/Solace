@@ -9,17 +9,12 @@ struct ReflectionRegistry
         return handlers;
     }
 
-    static std::vector<std::shared_ptr<IComponentReflection>> Get(entt::registry& r, entt::entity e)
+    static auto View(entt::registry& r, entt::entity e)
     {
-        std::vector<std::shared_ptr<IComponentReflection>> entityHandlers; // TODO: move elsewhere so it's not recreated every call 
-        for (auto& handler : handlers)
-        {
-            if (handler->IsOnEntity(r, e))
-            {
-                entityHandlers.push_back(handler);
-            }
-        }
-        return entityHandlers;
+		return handlers | std::views::filter([&](std::shared_ptr<IComponentReflection> c)
+		{
+			return c->IsOnEntity(r, e);
+		});
     }
 
 private:

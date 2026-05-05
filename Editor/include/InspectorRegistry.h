@@ -5,7 +5,7 @@
 #include <Reflection/ComponentReflection.h>
 #include <unordered_map>
 
-#include "ComponentInspector.h"
+class ComponentInspector;
 
 struct InspectorRegistry
 {

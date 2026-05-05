@@ -14,9 +14,4 @@ class CameraInspector : public ComponentInspector
 protected:
 	void DrawInspector(entt::registry& r, entt::entity e) override;
 };
-
-static bool cInspectorReg = []()
-{
-	InspectorRegistry::Get()[Hash("Camera")] = &CustomInspector<CameraInspector>;
-	return true;
-}();
+CUSTOM_INSPECTOR(Camera, CameraInspector)

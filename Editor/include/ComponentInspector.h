@@ -5,6 +5,7 @@
 #include "EditorProperty.h"
 
 #include <Reflection/ComponentReflection.h>
+#include "InspectorRegistry.h"
 
 class ComponentInspector
 {
@@ -18,3 +19,10 @@ protected:
 
 	virtual void DrawInspector(entt::registry& r, entt::entity e);
 };
+
+#define CUSTOM_INSPECTOR(Component, Inspector) \
+	static bool _reg_##Inspector = []() \
+	{ \
+		InspectorRegistry::Get()[Hash(#Component)] = &CustomInspector<Inspector>; \
+		return true; \
+	}();

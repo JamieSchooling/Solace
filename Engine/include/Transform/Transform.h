@@ -4,26 +4,22 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
-#include "Reflection/ComponentReflection.h"
-#include "Reflection/Property.h"
-#include "Reflection/ReflectionRegistry.h"
+#include "Reflection/Reflection.h"
 
 struct Transform
 {
+	INIT_REFLECTION(Transform)
+
 	glm::vec3 Position{ glm::vec3(0.f) }; //!< Translation i.e. position
+	PROPERTY(Position, PropertyType::Vec3)
+
 	glm::quat Rotation{ glm::quat(glm::vec3(0.f)) }; //!< Orientation as a quaternion
+	PROPERTY(Rotation, PropertyType::Quaternion)
+
 	glm::vec3 Scale{ glm::vec3(1.f) }; //!< Scale
+	PROPERTY(Scale, PropertyType::Vec3)
 
-	static inline Property<Transform, &Transform::Position> fovProp{ "Position", PropertyType::Vec3 };
-	static inline Property<Transform, &Transform::Rotation> nearProp{ "Rotation", PropertyType::Quaternion };
-	static inline Property<Transform, &Transform::Scale> farProp{ "Scale", PropertyType::Vec3 };
-	static inline std::vector<IProperty*> props = { &fovProp, &nearProp, &farProp };
-
-	static inline bool transformRegistration = []()
-	{
-		ReflectionRegistry::Get().push_back(std::make_shared<ComponentReflection<Transform>>("Transform", props));
-		return true;
-	}();
+	REFLECT(Transform)
 
 	glm::vec3 Right() const
 	{

@@ -71,7 +71,6 @@ void SceneSerialiser::DeserialiseFrom(std::filesystem::path path)
 JSON SceneSerialiser::SerialiseEntity(entt::entity entity)
 {
 	JSON out;
-
 	std::string name = "Unnamed Entity";
 	if (m_Scene.Registry.all_of<NameComponent>(entity))
 	{
@@ -79,23 +78,69 @@ JSON SceneSerialiser::SerialiseEntity(entt::entity entity)
 	}
 	out["Name"] = name;
 
-	if (m_Scene.Registry.all_of<Transform>(entity))
+	auto componentReflections = ReflectionRegistry::View(m_Scene.Registry, entity);
+	for (auto& component : componentReflections)
 	{
-		auto& transform = m_Scene.Registry.get<Transform>(entity);
-		out["Transform"]["Position"] = {transform.Position.x, transform.Position.y, transform.Position.z};
-		out["Transform"]["Rotation"] = {transform.Rotation.w, transform.Rotation.x, transform.Rotation.y, transform.Rotation.z};
-		out["Transform"]["Scale"] = {transform.Scale.x, transform.Scale.y, transform.Scale.z};
+		for (auto property : component->GetProperties())
+		{
+			out[component->Name()].push_back(SerialiseProperty(property, entity));
+		}
 	}
 
-	if (m_Scene.Registry.all_of<Camera>(entity))
-	{
-		auto& camera = m_Scene.Registry.get<Camera>(entity);
-		out["Camera"]["FOV"] = camera.FOV;
-		out["Camera"]["Near"] = camera.Near;
-		out["Camera"]["Far"] = camera.Far;
-		out["Camera"]["ProjectionType"] = camera.ProjectionType;
-	}
+	return out;
+}
 
+JSON SceneSerialiser::SerialiseProperty(IProperty* property, entt::entity entity)
+{
+	JSON out;
+	if (property->Type() == PropertyType::Bool)
+	{
+		bool value = std::any_cast<bool>(property->Get(m_Scene.Registry, entity));
+		out[property->Name()]["Type"] = "bool";
+		out[property->Name()]["Value"] = value;
+	}
+	else if (property->Type() == PropertyType::Int)
+	{
+		int value = std::any_cast<int>(property->Get(m_Scene.Registry, entity));
+		out[property->Name()]["Type"] = "int";
+		out[property->Name()]["Value"] = value;
+	}
+	else if (property->Type() == PropertyType::Float)
+	{
+		float value = std::any_cast<float>(property->Get(m_Scene.Registry, entity));
+		out[property->Name()]["Type"] = "float";
+		out[property->Name()]["Value"] = value;
+	}
+	else if (property->Type() == PropertyType::Vec2)
+	{
+		glm::vec2 value = std::any_cast<glm::vec2>(property->Get(m_Scene.Registry, entity));
+		out[property->Name()]["Type"] = "vec2";
+		out[property->Name()]["Value"] = { value.x, value.y };
+	}
+	else if (property->Type() == PropertyType::Vec3)
+	{
+		glm::vec3 value = std::any_cast<glm::vec3>(property->Get(m_Scene.Registry, entity));
+		out[property->Name()]["Type"] = "vec3";
+		out[property->Name()]["Value"] = { value.x, value.y, value.z };
+	}
+	else if (property->Type() == PropertyType::Vec4)
+	{
+		glm::vec4 value = std::any_cast<glm::vec4>(property->Get(m_Scene.Registry, entity));
+		out[property->Name()]["Type"] = "vec4";
+		out[property->Name()]["Value"] = { value.x, value.y, value.z, value.w };
+	}
+	else if (property->Type() == PropertyType::Quaternion)
+	{
+		glm::quat value = std::any_cast<glm::quat>(property->Get(m_Scene.Registry, entity));
+		out[property->Name()]["Type"] = "quaternion";
+		out[property->Name()]["Value"] = { value.x, value.y, value.z, value.w };
+	}
+	else if (property->Type() == PropertyType::String)
+	{
+		std::string value = std::any_cast<std::string>(property->Get(m_Scene.Registry, entity));
+		out[property->Name()]["Type"] = "string";
+		out[property->Name()]["Value"] = value;
+	}
 	return out;
 }
 
@@ -104,7 +149,17 @@ void SceneSerialiser::DeserialiseEntity(JSON entityData)
 	entt::entity entity = m_Scene.Registry.create();
 	m_Scene.Registry.emplace<NameComponent>(entity).Name = entityData["Name"];
 
-	if (entityData.contains("Transform"))
+	for (auto& [name, compData] : entityData.items())
+	{
+		auto component = ReflectionRegistry::Get(name.c_str());
+		component->Emplace(m_Scene.Registry, entity);
+		for (auto& [name, propData] : compData.items())
+		{
+			auto property = component->GetProperty(name.c_str());
+			DeserialiseProperty(propData, property, entity);
+		}
+	}
+	/*if (entityData.contains("Transform"))
 	{
 		auto& transform = m_Scene.Registry.emplace<Transform>(entity);
 		auto position = entityData["Transform"]["Position"];
@@ -124,5 +179,53 @@ void SceneSerialiser::DeserialiseEntity(JSON entityData)
 		camera.ProjectionType = entityData["Camera"]["ProjectionType"];
 		camera.RecalculateProjection();
 		m_Scene.MainCamera = entity;
+	}*/
+}
+
+void SceneSerialiser::DeserialiseProperty(JSON propertyData, IProperty* property, entt::entity entity)
+{
+	if (propertyData["Type"] == "bool")
+	{
+		bool value = propertyData["Value"].get<bool>();
+		property->Set(value, m_Scene.Registry, entity);
+	}
+	else if (propertyData["Type"] == "int")
+	{
+		int value = propertyData["Value"].get<int>();
+		property->Set(value, m_Scene.Registry, entity);
+	}
+	else if (propertyData["Type"] == "float")
+	{
+		float value = propertyData["Value"].get<float>();
+		property->Set(value, m_Scene.Registry, entity);
+	}
+	else if (propertyData["Type"] == "vec2")
+	{
+		auto value = propertyData["Value"];
+		glm::vec2 vec = glm::vec2(value[0].get<float>(), value[1].get<float>());
+		property->Set(vec, m_Scene.Registry, entity);
+	}
+	else if (propertyData["Type"] == "vec3")
+	{
+		auto value = propertyData["Value"];
+		glm::vec3 vec = glm::vec3(value[0].get<float>(), value[1].get<float>(), value[2].get<float>());
+		property->Set(vec, m_Scene.Registry, entity);
+	}
+	else if (propertyData["Type"] == "vec4")
+	{
+		auto value = propertyData["Value"];
+		glm::vec4 vec = glm::vec4(value[0].get<float>(), value[1].get<float>(), value[2].get<float>(), value[3].get<float>());
+		property->Set(vec, m_Scene.Registry, entity);
+	}
+	else if (propertyData["Type"] == "quaternion")
+	{
+		auto value = propertyData["Value"];
+		glm::quat vec = glm::quat(value[3].get<float>(), value[0].get<float>(), value[1].get<float>(), value[2].get<float>());
+		property->Set(vec, m_Scene.Registry, entity);
+	}
+	else if (propertyData["Type"] == "string")
+	{
+		std::string value = propertyData["Value"].get<std::string>();
+		property->Set(value, m_Scene.Registry, entity);
 	}
 }

@@ -14,6 +14,7 @@ struct IComponentReflection
     virtual IProperty* GetProperty(const char* name) const = 0;
     virtual const std::vector<IProperty*>& GetProperties() const = 0;
     virtual bool IsOnEntity(entt::registry& r, entt::entity e) const = 0;
+    virtual void Emplace(entt::registry& r, entt::entity e) const = 0;
 	virtual TypeID GetTypeID() = 0;
 
     template<typename T>
@@ -58,6 +59,11 @@ struct ComponentReflection : IComponentReflection
     {
         return r.all_of<T>(e);
     }
+
+	void Emplace(entt::registry& r, entt::entity e) const override
+	{
+		r.emplace<T>(e);
+	}
 
 	TypeID GetTypeID()
 	{

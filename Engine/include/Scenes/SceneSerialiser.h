@@ -2,6 +2,7 @@
 
 #include <nlohmann/json.hpp>
 #include "Scenes/Scene.h"
+#include <Reflection/Property.h>
 
 using JSON = nlohmann::ordered_json;
 // Forward declarations
@@ -19,5 +20,7 @@ private:
 	Scene& m_Scene;
 
 	JSON SerialiseEntity(entt::entity entity);
+	JSON SerialiseProperty(IProperty* property, entt::entity entity);
 	void DeserialiseEntity(JSON entityData);
+	void DeserialiseProperty(JSON propertyData, IProperty* property, entt::entity entity);
 };

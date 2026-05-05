@@ -151,35 +151,19 @@ void SceneSerialiser::DeserialiseEntity(JSON entityData)
 
 	for (auto& [name, compData] : entityData.items())
 	{
+		if (name == "Name") continue;
 		auto component = ReflectionRegistry::Get(name.c_str());
 		component->Emplace(m_Scene.Registry, entity);
+		if (name == "Camera")
+		{
+			m_Scene.MainCamera = entity;
+		}
 		for (auto& [name, propData] : compData.items())
 		{
 			auto property = component->GetProperty(name.c_str());
 			DeserialiseProperty(propData, property, entity);
 		}
 	}
-	/*if (entityData.contains("Transform"))
-	{
-		auto& transform = m_Scene.Registry.emplace<Transform>(entity);
-		auto position = entityData["Transform"]["Position"];
-		auto rotation = entityData["Transform"]["Rotation"];
-		auto scale = entityData["Transform"]["Scale"];
-		transform.Position = glm::vec3(position[0].get<float>(), position[1].get<float>(), position[2].get<float>());
-		transform.Rotation = glm::quat(rotation[0].get<float>(), rotation[1].get<float>(), rotation[2].get<float>(), rotation[3].get<float>());
-		transform.Scale = glm::vec3(scale[0].get<float>(), scale[1].get<float>(), scale[2].get<float>());
-	}
-
-	if (entityData.contains("Camera"))
-	{
-		auto& camera = m_Scene.Registry.emplace<Camera>(entity);
-		camera.FOV = entityData["Camera"]["FOV"];
-		camera.Near = entityData["Camera"]["Near"];
-		camera.Far = entityData["Camera"]["Far"];
-		camera.ProjectionType = entityData["Camera"]["ProjectionType"];
-		camera.RecalculateProjection();
-		m_Scene.MainCamera = entity;
-	}*/
 }
 
 void SceneSerialiser::DeserialiseProperty(JSON propertyData, IProperty* property, entt::entity entity)

@@ -83,7 +83,7 @@ JSON SceneSerialiser::SerialiseEntity(entt::entity entity)
 	{
 		for (auto property : component->GetProperties())
 		{
-			out[component->Name()].push_back(SerialiseProperty(property, entity));
+			out[component->Name()][property->Name()] = SerialiseProperty(property, entity);
 		}
 	}
 
@@ -96,50 +96,50 @@ JSON SceneSerialiser::SerialiseProperty(IProperty* property, entt::entity entity
 	if (property->Type() == PropertyType::Bool)
 	{
 		bool value = std::any_cast<bool>(property->Get(m_Scene.Registry, entity));
-		out[property->Name()]["Type"] = "bool";
-		out[property->Name()]["Value"] = value;
+		out["Type"] = "bool";
+		out["Value"] = value;
 	}
 	else if (property->Type() == PropertyType::Int)
 	{
 		int value = std::any_cast<int>(property->Get(m_Scene.Registry, entity));
-		out[property->Name()]["Type"] = "int";
-		out[property->Name()]["Value"] = value;
+		out["Type"] = "int";
+		out["Value"] = value;
 	}
 	else if (property->Type() == PropertyType::Float)
 	{
 		float value = std::any_cast<float>(property->Get(m_Scene.Registry, entity));
-		out[property->Name()]["Type"] = "float";
-		out[property->Name()]["Value"] = value;
+		out["Type"] = "float";
+		out["Value"] = value;
 	}
 	else if (property->Type() == PropertyType::Vec2)
 	{
 		glm::vec2 value = std::any_cast<glm::vec2>(property->Get(m_Scene.Registry, entity));
-		out[property->Name()]["Type"] = "vec2";
-		out[property->Name()]["Value"] = { value.x, value.y };
+		out["Type"] = "vec2";
+		out["Value"] = { value.x, value.y };
 	}
 	else if (property->Type() == PropertyType::Vec3)
 	{
 		glm::vec3 value = std::any_cast<glm::vec3>(property->Get(m_Scene.Registry, entity));
-		out[property->Name()]["Type"] = "vec3";
-		out[property->Name()]["Value"] = { value.x, value.y, value.z };
+		out["Type"] = "vec3";
+		out["Value"] = { value.x, value.y, value.z };
 	}
 	else if (property->Type() == PropertyType::Vec4)
 	{
 		glm::vec4 value = std::any_cast<glm::vec4>(property->Get(m_Scene.Registry, entity));
-		out[property->Name()]["Type"] = "vec4";
-		out[property->Name()]["Value"] = { value.x, value.y, value.z, value.w };
+		out["Type"] = "vec4";
+		out["Value"] = { value.x, value.y, value.z, value.w };
 	}
 	else if (property->Type() == PropertyType::Quaternion)
 	{
 		glm::quat value = std::any_cast<glm::quat>(property->Get(m_Scene.Registry, entity));
-		out[property->Name()]["Type"] = "quaternion";
-		out[property->Name()]["Value"] = { value.x, value.y, value.z, value.w };
+		out["Type"] = "quaternion";
+		out["Value"] = { value.x, value.y, value.z, value.w };
 	}
 	else if (property->Type() == PropertyType::String)
 	{
 		std::string value = std::any_cast<std::string>(property->Get(m_Scene.Registry, entity));
-		out[property->Name()]["Type"] = "string";
-		out[property->Name()]["Value"] = value;
+		out["Type"] = "string";
+		out["Value"] = value;
 	}
 	return out;
 }
@@ -158,9 +158,9 @@ void SceneSerialiser::DeserialiseEntity(JSON entityData)
 		{
 			m_Scene.MainCamera = entity;
 		}
-		for (auto& [name, propData] : compData.items())
+		for (auto& [key, propData] : compData.items())
 		{
-			auto property = component->GetProperty(name.c_str());
+			auto property = component->GetProperty(key.c_str());
 			DeserialiseProperty(propData, property, entity);
 		}
 	}
@@ -204,8 +204,8 @@ void SceneSerialiser::DeserialiseProperty(JSON propertyData, IProperty* property
 	else if (propertyData["Type"] == "quaternion")
 	{
 		auto value = propertyData["Value"];
-		glm::quat vec = glm::quat(value[3].get<float>(), value[0].get<float>(), value[1].get<float>(), value[2].get<float>());
-		property->Set(vec, m_Scene.Registry, entity);
+		glm::quat quat = glm::quat(value[3].get<float>(), value[0].get<float>(), value[1].get<float>(), value[2].get<float>());
+		property->Set(quat, m_Scene.Registry, entity);
 	}
 	else if (propertyData["Type"] == "string")
 	{

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Core/Subsystem.h>
+#include <Events/EventSystem.h>
 
 #include <GLFW/glfw3.h>
 #include <memory>
@@ -21,6 +22,7 @@ enum class LayoutOption
 struct EditorSystemProps : public SubsystemParams
 {
 	GLFWwindow* GLFWInstance;
+	EventSystem* eventSystem;
 	// For later use when viewport windows are implemented
 	//std::shared_ptr<FBO> GameRenderTarget;
 };
@@ -33,6 +35,7 @@ public:
 
 	void PreAppUpdate() override;
 	void OnAppUpdate() override;
+	void OnEvent(Event& e) override;
 
 private:
 	std::shared_ptr<FBO> m_GameRenderTarget;

@@ -43,6 +43,7 @@ void Editor::Initialise()
 	{
 		EditorSystemProps props;
 		props.GLFWInstance = Window::Get().GetGLFWInstance();
+		props.eventSystem = &EventSystem::Get();
 		// For later use when viewport windows are implemented
 		//props.GameRenderTarget = RenderSystem::Get().GetRenderTarget();
 		AddSubsystem<EditorSystem>(props);

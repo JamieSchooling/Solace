@@ -20,8 +20,18 @@ public:
 
 	FrameRenderData& GetRenderData() { return m_FrameRenderData; }
 	Scene& GetActiveScene() { return m_ActiveScene; }
+	void LoadScene(Scene& scene)
+	{
+		m_ActiveScene.Registry.swap(scene.Registry);
+		m_ActiveScene.Name = scene.Name;
+		m_ActiveScene.MainCamera = scene.MainCamera;
+		Event e;
+		e.type = EventType::SceneLoad;
+		m_EventSystem->DispatchEvent(e);
+	}
 private:
 	Scene m_ActiveScene;
+	EventSystem* m_EventSystem;
 
 	FrameRenderData m_FrameRenderData;
 };

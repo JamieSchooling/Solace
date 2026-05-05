@@ -10,7 +10,8 @@ void SceneSystem::Start(const SubsystemParams& params)
 {
 	const SceneSystemProps& props = static_cast<const SceneSystemProps&>(params);
 
-	props.eventSystem->AddListener(this);
+	m_EventSystem = props.eventSystem;
+	m_EventSystem->AddListener(this);
 
 	m_ActiveScene = BuildDefaultScene();
 }

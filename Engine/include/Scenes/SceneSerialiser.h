@@ -10,7 +10,7 @@ namespace std { namespace filesystem { class path; } }
 
 class SceneSerialiser
 {
-public: 
+public:
 	SceneSerialiser(Scene& scene);
 
 	void SerialiseTo(std::filesystem::path path);

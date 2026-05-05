@@ -6,6 +6,7 @@
 	X(WindowMove, int posX; int posY;) \
 	X(WindowFocus) \
 	X(WindowFocusLost) \
+	X(SceneLoad) \
 
 enum class EventType
 {

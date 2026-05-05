@@ -25,6 +25,7 @@ void EditorSystem::Start(const SubsystemParams& params)
 	const EditorSystemProps& props = static_cast<const EditorSystemProps&>(params);
 
 	GLFWwindow* window = props.GLFWInstance;
+	props.eventSystem->AddListener(this);
 	
 	// For later use when viewport windows are implemented
 	//m_GameRenderTarget = props.GameRenderTarget;
@@ -103,8 +104,17 @@ void EditorSystem::OnAppUpdate()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+void EditorSystem::OnEvent(Event& e)
+{
+	if (e.type == EventType::SceneLoad)
+	{
+		ConstructInspectors();
+	}
+}
+
 void EditorSystem::ConstructInspectors()
 {
+	m_Inspectors.clear();
 	auto& registry = SceneSystem::Get().GetActiveScene().Registry;
 	for (auto& entity : registry.view<entt::entity>())
 	{
@@ -159,8 +169,10 @@ void EditorSystem::DrawMenuBar()
 				if (outPath)
 				{
 					std::cout << outPath << std::endl;
-					SceneSerialiser serialiser(SceneSystem::Get().GetActiveScene());
+					Scene scene;
+					SceneSerialiser serialiser(scene);
 					serialiser.DeserialiseFrom(outPath);
+					SceneSystem::Get().LoadScene(scene);
 				}
 			}
 			ImGui::Separator();

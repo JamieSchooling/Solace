@@ -14,7 +14,7 @@ class IEditorProperty
 {
 public:
 	virtual ~IEditorProperty() = default;
-	virtual void Draw() = 0;
+	virtual bool Draw() = 0;
 };
 
 template<typename T>
@@ -25,7 +25,7 @@ public:
 		: m_Label(label), m_Data(data), m_OnChange(onChange)
 	{}
 
-	void Draw() override;
+	bool Draw() override;
 private:
 	T& m_Data;
 	std::string m_Label;
@@ -35,7 +35,7 @@ private:
 };
 
 template<typename T>
-inline void EditorProperty<T>::Draw()
+inline bool EditorProperty<T>::Draw()
 {
 	if (ImGui::BeginTable(std::format("##{}Property", m_Label).c_str(), 2))
 	{
@@ -49,13 +49,18 @@ inline void EditorProperty<T>::Draw()
 		ImGui::TextUnformatted(m_Label.c_str());
 
 		ImGui::TableSetColumnIndex(1);
-		if (DrawPropertyWidget() && m_OnChange)
+		bool changed = DrawPropertyWidget();
+		if (changed && m_OnChange)
 		{
 			m_OnChange(m_Data);
 		}
 
 		ImGui::EndTable();
+
+		return changed;
 	}
+
+	return false;
 }
 
 template<typename T>
@@ -85,6 +90,10 @@ bool EditorProperty<T>::DrawPropertyWidget()
 		return ImGui::DragFloat3(id, &m_Data.x);
 	}
 	else if constexpr (std::is_same_v<T, glm::vec4>)
+	{
+		return ImGui::DragFloat4(id, &m_Data.x);
+	}
+	else if constexpr (std::is_same_v<T, glm::quat>)
 	{
 		return ImGui::DragFloat4(id, &m_Data.x);
 	}

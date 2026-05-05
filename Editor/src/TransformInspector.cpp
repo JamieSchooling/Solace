@@ -1,22 +1,43 @@
 #include "TransformInspector.h"
 
-TransformInspector::TransformInspector(Transform& transform) : m_Transform(transform), ComponentInspector("Transform")
+
+void TransformInspector::DrawInspector(entt::registry& registry, entt::entity entity)
 {
-	m_Properties.push_back(std::make_shared<EditorProperty<glm::vec3>>("Position", m_Transform.Position));
+	if (!m_EulerCached)
+	{
+		m_EulerCache = glm::degrees(m_Component->GetTarget<Transform>(registry, entity)->EulerAngles());
+		m_CurrentEuler = m_EulerCache;
+		m_EulerCached = true;
+	}
 
-	m_EulerCache = glm::degrees(transform.EulerAngles());
-	m_CurrentEuler = m_EulerCache;
-	m_Properties.push_back(std::make_shared<EditorProperty<glm::vec3>>("Rotation", m_CurrentEuler, [this](glm::vec3& v) { OnRotationEdit(v); }));
-	m_Properties.push_back(std::make_shared<EditorProperty<glm::vec3>>("Scale", m_Transform.Scale));
-}
+	if (auto positionProp = m_Component->GetProperty("Position"))
+	{
+		glm::vec3 position = std::any_cast<glm::vec3>(positionProp->Get(registry, entity));
+		if (EditorProperty<glm::vec3>("Position", position).Draw())
+		{
+			positionProp->Set(position, registry, entity);
+		}
+	}
+	if (auto rotationProp = m_Component->GetProperty("Rotation"))
+	{
+		if (EditorProperty<glm::vec3>("Rotation", m_CurrentEuler).Draw())
+		{
+			glm::vec3 radianAngles = glm::radians(m_CurrentEuler);
 
-void TransformInspector::OnRotationEdit(glm::vec3& euler)
-{
-	glm::vec3 radianAngles = glm::radians(euler);
+			glm::quat x = glm::angleAxis(radianAngles.x, glm::vec3(1, 0, 0));
+			glm::quat y = glm::angleAxis(radianAngles.y, glm::vec3(0, 1, 0));
+			glm::quat z = glm::angleAxis(radianAngles.z, glm::vec3(0, 0, 1));
 
-	glm::quat x = glm::angleAxis(radianAngles.x, glm::vec3(1, 0, 0));
-	glm::quat y = glm::angleAxis(radianAngles.y, glm::vec3(0, 1, 0));
-	glm::quat z = glm::angleAxis(radianAngles.z, glm::vec3(0, 0, 1));
-	m_Transform.Rotation = glm::normalize(x * y * z);
-	m_EulerCache = euler;
+			rotationProp->Set(glm::normalize(x * y * z), registry, entity);
+			m_EulerCache = m_CurrentEuler;
+		}
+	}
+	if (auto scaleProp = m_Component->GetProperty("Scale"))
+	{
+		glm::vec3 scale = std::any_cast<glm::vec3>(scaleProp->Get(registry, entity));
+		if (EditorProperty<glm::vec3>("Scale", scale).Draw())
+		{
+			scaleProp->Set(scale, registry, entity);
+		}
+	}
 }

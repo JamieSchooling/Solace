@@ -51,7 +51,8 @@ target_sources(${CORE_LIBRARY}
         "include/Scenes/SceneSerialiser.h" 
         "include/Reflection/Property.h" 
         "include/Reflection/ComponentReflection.h" 
-        "include/Reflection/ReflectionRegistry.h")
+        "include/Reflection/ReflectionRegistry.h" 
+        "include/Reflection/TypeID.h")
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

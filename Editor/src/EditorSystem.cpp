@@ -18,6 +18,8 @@
 #include <TransformInspector.h>
 #include <CameraInspector.h>
 
+#include <iostream>
+
 void EditorSystem::Start(const SubsystemParams& params)
 {
 	const EditorSystemProps& props = static_cast<const EditorSystemProps&>(params);
@@ -107,35 +109,19 @@ void EditorSystem::ConstructInspectors()
 	for (auto& entity : registry.view<entt::entity>())
 	{
 		m_Inspectors[entity] = std::vector<std::shared_ptr<ComponentInspector>>();
-		/*if (registry.all_of<NameComponent>(m_SelectedEntity))
+
+		auto componentReflections = ReflectionRegistry::View(registry, entity);
+		for (auto& component : componentReflections)
 		{
-			if (ImGui::BeginTable("##NameProperty", 2))
+			if (InspectorRegistry::Get().contains(component->GetTypeID()))
 			{
-				ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
-				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-
-				ImGui::TableNextRow();
-
-				ImGui::TableSetColumnIndex(0);
-				ImGui::AlignTextToFramePadding();
-				ImGui::TextUnformatted("Name");
-
-				ImGui::TableSetColumnIndex(1);
-				ImGui::InputText("##Name", &registry.get<NameComponent>(m_SelectedEntity).Name);
-
-				ImGui::EndTable();
+				m_Inspectors[entity].push_back(InspectorRegistry::Get().at(component->GetTypeID())(component));
 			}
-		}*/
-		if (registry.all_of<Transform>(entity))
-		{
-			Transform& transform = registry.get<Transform>(entity);
-			m_Inspectors[entity].push_back(std::make_shared<TransformInspector>(transform));
+			else
+			{
+				m_Inspectors[entity].push_back(std::make_shared<ComponentInspector>(component));
+			}
 		}
-		/*if (registry.all_of<Camera>(entity))
-		{
-			Camera& camera = registry.get<Camera>(entity);
-			m_Inspectors[entity].push_back(std::make_shared<CameraInspector>(camera));
-		}*/
 	}
 }
 
@@ -267,29 +253,7 @@ void EditorSystem::DrawInspector(entt::registry& registry)
 		}
 		for (auto& inspector : m_Inspectors[m_SelectedEntity])
 		{
-			inspector->Draw();
-		}
-		if (registry.all_of<Camera>(m_SelectedEntity)) // Temporary - Just for testing
-		{
-			ImGui::Separator();
-			ImGui::TextUnformatted("Camera");
-			auto ComponentReflections = ReflectionRegistry::View(registry, m_SelectedEntity);
-			for (auto& reflection : ComponentReflections)
-			{
-				// Do something
-
-				// Or use props:
-				for (auto& property : reflection->GetProperties())
-				{
-					Camera* target = reflection->GetTarget<Camera>(registry, m_SelectedEntity);
-					// Do something
-					float value = std::any_cast<float>(property->Get(registry, m_SelectedEntity));
-					EditorProperty<float>(property->Name(), value).Draw();
-					property->Set(value, registry, m_SelectedEntity);
-					target->RecalculateProjection();
-				}
-			}
-			ImGui::Separator();
+			inspector->Draw(registry, m_SelectedEntity);
 		}
 		ImGui::PopID();
 	}

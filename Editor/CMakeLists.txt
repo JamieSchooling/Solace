@@ -24,7 +24,7 @@ target_sources(${APPLICATION}
         "include/ComponentInspector.h" 
         "include/TransformInspector.h"
         "include/CameraInspector.h"
-)
+        "include/InspectorRegistry.h")
 
 include(FetchContent)
 

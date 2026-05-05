@@ -24,13 +24,13 @@ public:
 	float Far = 100.0f;
 	CameraProjectionType ProjectionType = CameraProjectionType::Perspective;
 	
-	static inline Property<Camera, &Camera::FOV> fovProp{ "FOV" };
-	static inline Property<Camera, &Camera::Near> nearProp{ "Near" };
-	static inline Property<Camera, &Camera::Far> farProp{ "Far" };
+	static inline Property<Camera, &Camera::FOV> fovProp{ "FOV", PropertyType::Float };
+	static inline Property<Camera, &Camera::Near> nearProp{ "Near", PropertyType::Float };
+	static inline Property<Camera, &Camera::Far> farProp{ "Far", PropertyType::Float };
 	static inline std::vector<IProperty*> props = { &fovProp, &nearProp, &farProp };
 
 	static inline bool cameraRegistration = []() {
-		ReflectionRegistry::Get().push_back(std::make_shared<ComponentReflection<Camera>>(props));
+		ReflectionRegistry::Get().push_back(std::make_shared<ComponentReflection<Camera>>("Camera", props));
 		return true;
 	}();
 

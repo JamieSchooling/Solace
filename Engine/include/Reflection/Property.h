@@ -1,13 +1,27 @@
 #pragma once
 
 #include <any> // <-- Not great, find a better alternative
+#include <entt/entt.hpp>
 
 struct IComponentReflection;
+
+enum class PropertyType
+{
+	Bool,
+	Int,
+	Float,
+	Vec2,
+	Vec3,
+	Vec4,
+	Quaternion,
+	String
+};
 
 struct IProperty
 {
     virtual ~IProperty() = default;
     virtual const char* Name() const = 0;
+    virtual PropertyType Type() const = 0;
     virtual std::any Get(entt::registry& r, entt::entity e) const = 0;
     virtual void Set(const std::any& value, entt::registry& r, entt::entity e) const = 0;
 };
@@ -15,12 +29,18 @@ struct IProperty
 template<typename Target, auto Member>
 struct Property : public IProperty
 {
-    Property(const char* n) : name(n) {}
+    Property(const char* n, PropertyType type) : name(n), type(type) {}
 
     const char* name;
+    const PropertyType type;
     using ValueType = std::remove_reference_t<
         decltype(std::declval<Target>().*Member)
     >;
+
+	PropertyType Type() const override
+	{
+		return type;
+	}
 
     const char* Name() const override
     {

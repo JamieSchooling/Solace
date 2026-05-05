@@ -4,14 +4,17 @@
 #include <vector>
 #include "EditorProperty.h"
 
+#include <Reflection/ComponentReflection.h>
+
 class ComponentInspector
 {
 public:
-	ComponentInspector(std::string title);
+	ComponentInspector(std::shared_ptr<IComponentReflection> component);
 
-	void Draw();
+	void Draw(entt::registry& r, entt::entity e);
 
 protected:
-	std::string m_Title;
-	std::vector<std::shared_ptr<IEditorProperty>> m_Properties;
+	std::shared_ptr<IComponentReflection> m_Component;
+
+	virtual void DrawInspector(entt::registry& r, entt::entity e);
 };

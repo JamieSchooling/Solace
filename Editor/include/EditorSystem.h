@@ -43,7 +43,6 @@ private:
 	LayoutOption m_NewLayout = LayoutOption::Default;
 	entt::entity m_SelectedEntity = entt::null;
 	std::unordered_map<entt::entity, std::vector<std::shared_ptr<ComponentInspector>>> m_Inspectors;
-	std::unordered_map<entt::entity, glm::vec3> m_EulerCache;
 
 	void ConstructInspectors();
 

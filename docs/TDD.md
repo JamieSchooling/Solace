@@ -42,7 +42,7 @@ The editor is not intended for use within shipped applications and does not prov
 # 2 Architecture
 This section describes the high level structure of the editor, including its relationship to the engine, subsystem organisation, and execution model.
 ## 2.1 Overview
-![UML Class Diagram](/uml.png)
+![UML Class Diagram](uml.png)
 ## 2.2 Relationship to Engine
 The editor is a standalone application that links to the engine as a static library.
 
@@ -514,7 +514,7 @@ Failure cases include:
 - Invalid or malformed JSON data
 - Missing reflected component registrations
 - Unsupported property types
-- Type mismatches during std::any conversion
+- Type mismatches during `std::any` conversion
 - Missing filesystem paths or inaccessible files
 
 The serialisation system currently prioritises simplicity and editor integration over versioning or backwards compatibility. Scene files are expected to match the runtime reflection schema used by the executing engine version.

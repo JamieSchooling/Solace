@@ -27,6 +27,6 @@ cmake --build build --config Release
 
 **Run:**
 ```bash
-build\Demo\Release\Demo.exe
+build\Editor\Release\Editor.exe
 ```
 </details>

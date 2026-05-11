@@ -29,22 +29,20 @@ struct IProperty
 template<typename Target, auto Member>
 struct Property : public IProperty
 {
-    Property(const char* n, PropertyType type) : name(n), type(type) {}
+    Property(const char* n, PropertyType type) : m_name(n), m_type(type) {}
 
-    const char* name;
-    const PropertyType type;
     using ValueType = std::remove_reference_t<
         decltype(std::declval<Target>().*Member)
     >;
 
 	PropertyType Type() const override
 	{
-		return type;
+		return m_type;
 	}
 
     const char* Name() const override
     {
-        return name;
+        return m_name;
     }
 
     std::any Get(entt::registry& r, entt::entity e) const override
@@ -58,4 +56,7 @@ struct Property : public IProperty
 		Target& o = r.get<Target>(e);
 		o.*Member = std::any_cast<ValueType>(value);
     }
+private:
+	const char* m_name;
+	const PropertyType m_type;
 };

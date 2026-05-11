@@ -4,21 +4,21 @@
 #include <glm/gtx/quaternion.hpp>
 
 ComponentInspector::ComponentInspector(std::shared_ptr<IComponentReflection> component)
-	: m_Component(component)
+	: m_component(component)
 {
 }
 
 void ComponentInspector::Draw(entt::registry& r, entt::entity e)
 {
 	ImGui::Separator();
-	ImGui::TextUnformatted(m_Component->Name());
+	ImGui::TextUnformatted(m_component->Name());
 	DrawInspector(r, e);
 	ImGui::Separator();
 }
 
 void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 {
-	for (auto& property : m_Component->GetProperties())
+	for (auto& property : m_component->GetProperties())
 	{
 		if (property->Type() == PropertyType::Bool)
 		{

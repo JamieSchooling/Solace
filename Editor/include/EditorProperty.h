@@ -22,14 +22,14 @@ class EditorProperty : public IEditorProperty
 {
 public:
 	EditorProperty(std::string label, T& data, PropertyCallback<T> onChange = nullptr)
-		: m_Label(label), m_Data(data), m_OnChange(onChange)
+		: m_label(label), m_data(data), m_onChange(onChange)
 	{}
 
 	bool Draw() override;
 private:
-	T& m_Data;
-	std::string m_Label;
-	PropertyCallback<T> m_OnChange;
+	T& m_data;
+	std::string m_label;
+	PropertyCallback<T> m_onChange;
 
 	bool DrawPropertyWidget();
 };
@@ -37,7 +37,7 @@ private:
 template<typename T>
 inline bool EditorProperty<T>::Draw()
 {
-	if (ImGui::BeginTable(std::format("##{}Property", m_Label).c_str(), 2))
+	if (ImGui::BeginTable(std::format("##{}Property", m_label).c_str(), 2))
 	{
 		ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
 		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
@@ -46,13 +46,13 @@ inline bool EditorProperty<T>::Draw()
 
 		ImGui::TableSetColumnIndex(0);
 		ImGui::AlignTextToFramePadding();
-		ImGui::TextUnformatted(m_Label.c_str());
+		ImGui::TextUnformatted(m_label.c_str());
 
 		ImGui::TableSetColumnIndex(1);
 		bool changed = DrawPropertyWidget();
-		if (changed && m_OnChange)
+		if (changed && m_onChange)
 		{
-			m_OnChange(m_Data);
+			m_onChange(m_data);
 		}
 
 		ImGui::EndTable();
@@ -66,40 +66,40 @@ inline bool EditorProperty<T>::Draw()
 template<typename T>
 bool EditorProperty<T>::DrawPropertyWidget()
 {
-	std::string idStr = std::format("##{}", m_Label);
+	std::string idStr = std::format("##{}", m_label);
 	const char* id = idStr.c_str();
 
 	if constexpr (std::is_same_v<T, bool>)
 	{
-		return ImGui::Checkbox(id, &m_Data);
+		return ImGui::Checkbox(id, &m_data);
 	}
 	else if constexpr (std::is_same_v<T, int>)
 	{
-		return ImGui::DragInt(id, &m_Data);
+		return ImGui::DragInt(id, &m_data);
 	}
 	else if constexpr (std::is_same_v<T, float>)
 	{
-		return ImGui::DragFloat(id, &m_Data);
+		return ImGui::DragFloat(id, &m_data);
 	}
 	else if constexpr (std::is_same_v<T, glm::vec2>)
 	{
-		return ImGui::DragFloat2(id, &m_Data.x);
+		return ImGui::DragFloat2(id, &m_data.x);
 	}
 	else if constexpr (std::is_same_v<T, glm::vec3>)
 	{
-		return ImGui::DragFloat3(id, &m_Data.x);
+		return ImGui::DragFloat3(id, &m_data.x);
 	}
 	else if constexpr (std::is_same_v<T, glm::vec4>)
 	{
-		return ImGui::DragFloat4(id, &m_Data.x);
+		return ImGui::DragFloat4(id, &m_data.x);
 	}
 	else if constexpr (std::is_same_v<T, glm::quat>)
 	{
-		return ImGui::DragFloat4(id, &m_Data.x);
+		return ImGui::DragFloat4(id, &m_data.x);
 	}
 	else if constexpr (std::is_same_v<T, std::string>)
 	{
-		return ImGui::InputText(id, &m_Data);
+		return ImGui::InputText(id, &m_data);
 	}
 	else
 	{

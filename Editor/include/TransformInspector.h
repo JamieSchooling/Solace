@@ -12,8 +12,8 @@ class TransformInspector : public ComponentInspector
 protected:
 	void DrawInspector(entt::registry& r, entt::entity e) override;
 private:
-	bool m_EulerCached = false;
-	glm::vec3 m_CurrentEuler;
-	glm::vec3 m_EulerCache;
+	bool m_eulerCached = false;
+	glm::vec3 m_currentEuler;
+	glm::vec3 m_eulerCache;
 };
 CUSTOM_INSPECTOR(Transform, TransformInspector)

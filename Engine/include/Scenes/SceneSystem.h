@@ -6,7 +6,7 @@
 
 struct SceneSystemProps : public SubsystemParams
 {
-	EventSystem* eventSystem = nullptr;
+	EventSystem* EventSystem = nullptr;
 };
 
 class SceneSystem : public SingletonSubsystem<SceneSystem>
@@ -18,20 +18,20 @@ public:
 
 	void OnEvent(Event& event) override;
 
-	FrameRenderData& GetRenderData() { return m_FrameRenderData; }
-	Scene& GetActiveScene() { return m_ActiveScene; }
+	FrameRenderData& GetRenderData() { return m_frameRenderData; }
+	Scene& GetActiveScene() { return m_activeScene; }
 	void LoadScene(Scene& scene)
 	{
-		m_ActiveScene.Registry.swap(scene.Registry);
-		m_ActiveScene.Name = scene.Name;
-		m_ActiveScene.MainCamera = scene.MainCamera;
+		m_activeScene.Registry.swap(scene.Registry);
+		m_activeScene.Name = scene.Name;
+		m_activeScene.MainCamera = scene.MainCamera;
 		Event e;
-		e.type = EventType::SceneLoad;
-		m_EventSystem->DispatchEvent(e);
+		e.Type = EventType::SceneLoad;
+		m_eventSystem->DispatchEvent(e);
 	}
 private:
-	Scene m_ActiveScene;
-	EventSystem* m_EventSystem;
+	Scene m_activeScene;
+	EventSystem* m_eventSystem;
 
-	FrameRenderData m_FrameRenderData;
+	FrameRenderData m_frameRenderData;
 };

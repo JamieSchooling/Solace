@@ -22,14 +22,14 @@ void Editor::Initialise()
 
 	{
 		WindowProps props;
-		props.title = "Solace Editor";
-		props.eventSystem = &EventSystem::Get();
+		props.Title = "Solace Editor";
+		props.EventSystem = &EventSystem::Get();
 		AddSubsystem<Window>(props);
 	}
 
 	{
 		SceneSystemProps props;
-		props.eventSystem = &EventSystem::Get();
+		props.EventSystem = &EventSystem::Get();
 		AddSubsystem<SceneSystem>(props);
 	}
 
@@ -43,7 +43,7 @@ void Editor::Initialise()
 	{
 		EditorSystemProps props;
 		props.GLFWInstance = Window::Get().GetGLFWInstance();
-		props.eventSystem = &EventSystem::Get();
+		props.EventSystem = &EventSystem::Get();
 		// For later use when viewport windows are implemented
 		//props.GameRenderTarget = RenderSystem::Get().GetRenderTarget();
 		AddSubsystem<EditorSystem>(props);

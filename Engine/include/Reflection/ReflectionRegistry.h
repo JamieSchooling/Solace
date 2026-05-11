@@ -10,8 +10,8 @@ struct ReflectionRegistry
 {
     static std::vector<std::shared_ptr<IComponentReflection>>& Get()
     {
-		static std::vector<std::shared_ptr<IComponentReflection>> handlers;
-        return handlers;
+		static std::vector<std::shared_ptr<IComponentReflection>> components;
+        return components;
     }
 
     static auto View(entt::registry& r, entt::entity e)

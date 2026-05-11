@@ -22,7 +22,7 @@ enum class LayoutOption
 struct EditorSystemProps : public SubsystemParams
 {
 	GLFWwindow* GLFWInstance;
-	EventSystem* eventSystem;
+	EventSystem* EventSystem;
 	// For later use when viewport windows are implemented
 	//std::shared_ptr<FBO> GameRenderTarget;
 };
@@ -38,11 +38,11 @@ public:
 	void OnEvent(Event& e) override;
 
 private:
-	std::shared_ptr<FBO> m_GameRenderTarget;
-	LayoutOption m_CurrentLayout = LayoutOption::Default;
-	LayoutOption m_NewLayout = LayoutOption::Default;
-	entt::entity m_SelectedEntity = entt::null;
-	std::unordered_map<entt::entity, std::vector<std::shared_ptr<ComponentInspector>>> m_Inspectors;
+	std::shared_ptr<FBO> m_gameRenderTarget;
+	LayoutOption m_currentLayout = LayoutOption::Default;
+	LayoutOption m_newLayout = LayoutOption::Default;
+	entt::entity m_selectedEntity = entt::null;
+	std::unordered_map<entt::entity, std::vector<std::shared_ptr<ComponentInspector>>> m_inspectors;
 
 	void ConstructInspectors();
 

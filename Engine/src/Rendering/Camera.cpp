@@ -7,7 +7,7 @@ Camera::Camera()
 
 void Camera::RecalculateProjection()
 {
-	m_Projection = [&]() {
+	m_projection = [&]() {
 		switch (ProjectionType)
 		{
 			case CameraProjectionType::Perspective: return glm::perspective(glm::radians(FOV), Window::Get().GetAspectRatio(), Near, Far);
@@ -18,5 +18,5 @@ void Camera::RecalculateProjection()
 
 const glm::mat4& Camera::GetProjection() const
 {
-	return m_Projection;
+	return m_projection;
 }

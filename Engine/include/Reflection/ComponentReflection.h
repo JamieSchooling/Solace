@@ -11,7 +11,7 @@ struct IComponentReflection
 {
 	virtual ~IComponentReflection() = default;
 	virtual const char* Name() const = 0;
-    virtual IProperty* GetProperty(const char* name) const = 0;
+    virtual IProperty* GetProperty(const char* m_name) const = 0;
     virtual const std::vector<IProperty*>& GetProperties() const = 0;
     virtual bool IsOnEntity(entt::registry& r, entt::entity e) const = 0;
     virtual void Emplace(entt::registry& r, entt::entity e) const = 0;
@@ -32,27 +32,24 @@ struct IComponentReflection
 template<typename T>
 struct ComponentReflection : IComponentReflection
 {
-    ComponentReflection(const char* name, std::vector<IProperty*> properties)
-        : name(name), typeID(Hash(name)), Properties(properties) 
+    ComponentReflection(const char* m_name, std::vector<IProperty*> properties)
+        : m_name(m_name), m_typeID(Hash(m_name)), m_properties(properties) 
     {}
-
-	const char* name;
-	TypeID typeID;
 
 	const char* Name() const override
 	{
-		return name;
+		return m_name;
 	}
 
-	IProperty* GetProperty(const char* name) const override
+	IProperty* GetProperty(const char* m_name) const override
 	{
-		auto it = std::find_if(Properties.begin(), Properties.end(), [&](IProperty* p) { return std::string(p->Name()) == std::string(name); });
-		return it != Properties.end() ? *it : nullptr;
+		auto it = std::find_if(m_properties.begin(), m_properties.end(), [&](IProperty* p) { return std::string(p->Name()) == std::string(m_name); });
+		return it != m_properties.end() ? *it : nullptr;
 	}
 
     const std::vector<IProperty*>& GetProperties() const override
     {
-        return Properties;
+        return m_properties;
     }
 
     bool IsOnEntity(entt::registry& r, entt::entity e) const override
@@ -67,7 +64,7 @@ struct ComponentReflection : IComponentReflection
 
 	TypeID GetTypeID()
 	{
-		return typeID;
+		return m_typeID;
 	}
 
 	void* GetTarget(entt::registry& r, entt::entity e) const override
@@ -78,5 +75,7 @@ struct ComponentReflection : IComponentReflection
 		return &r.get<T>(e);
 	}
 private:
-    std::vector<IProperty*> Properties;
+	const char* m_name;
+	TypeID m_typeID;
+    std::vector<IProperty*> m_properties;
 };

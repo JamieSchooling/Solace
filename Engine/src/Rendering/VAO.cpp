@@ -4,34 +4,34 @@
 
 VAO::VAO(const std::vector<uint32_t>& indices)
 {
-	glCreateVertexArrays(1, &m_ID);
+	glCreateVertexArrays(1, &m_id);
 
-	glCreateBuffers(1, &m_EBO);
-	glNamedBufferStorage(m_EBO, sizeof(uint32_t) * indices.size(), indices.data(), GL_DYNAMIC_STORAGE_BIT);
-	glVertexArrayElementBuffer(m_ID, m_EBO);
+	glCreateBuffers(1, &m_ebo);
+	glNamedBufferStorage(m_ebo, sizeof(uint32_t) * indices.size(), indices.data(), GL_DYNAMIC_STORAGE_BIT);
+	glVertexArrayElementBuffer(m_id, m_ebo);
 
-	m_Count = indices.size();
+	m_count = indices.size();
 }
 
 void VAO::AddVertexBuffer(const std::vector<float>& vertices, const std::vector<VertexAttribute>& attributes)
 {
-	uint32_t vbo = m_VBOs.emplace_back();
+	uint32_t vbo = m_vbos.emplace_back();
 	glCreateBuffers(1, &vbo);
 	glNamedBufferStorage(vbo, sizeof(float) * vertices.size(), vertices.data(), GL_DYNAMIC_STORAGE_BIT);
 
-	glVertexArrayVertexBuffer(m_ID, 0, vbo, 0, CalculateStride(attributes));
+	glVertexArrayVertexBuffer(m_id, 0, vbo, 0, CalculateStride(attributes));
 
 	for (size_t i = 0; i < attributes.size(); ++i)
 	{
-		glEnableVertexArrayAttrib(m_ID, i);
-		glVertexArrayAttribFormat(m_ID, i, attributes[i].size, attributes[i].type, attributes[i].normalised ? GL_TRUE : GL_FALSE, attributes[i].offset);
-		glVertexArrayAttribBinding(m_ID, i, 0);
+		glEnableVertexArrayAttrib(m_id, i);
+		glVertexArrayAttribFormat(m_id, i, attributes[i].Size, attributes[i].Type, attributes[i].Normalised ? GL_TRUE : GL_FALSE, attributes[i].Offset);
+		glVertexArrayAttribBinding(m_id, i, 0);
 	}
 }
 
 void VAO::Use() const
 {
-	glBindVertexArray(m_ID);
+	glBindVertexArray(m_id);
 }
 
 uint32_t VAO::CalculateStride(const std::vector<VertexAttribute>& attributes)
@@ -40,7 +40,7 @@ uint32_t VAO::CalculateStride(const std::vector<VertexAttribute>& attributes)
 	for (auto& attr : attributes)
 	{
 		uint32_t typeSize = 0;
-		switch (attr.type)
+		switch (attr.Type)
 		{
 		case Short:
 			typeSize = sizeof(short);
@@ -64,7 +64,7 @@ uint32_t VAO::CalculateStride(const std::vector<VertexAttribute>& attributes)
 			break;
 		}
 
-		stride += attr.size * typeSize;
+		stride += attr.Size * typeSize;
 	}
 
 	return stride;

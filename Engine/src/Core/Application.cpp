@@ -13,15 +13,15 @@ void Application::ExecuteLifecycle()
 
 void Application::UpdateSubsystems()
 {
-	for (auto subsystem : m_Subsystems)
+	for (auto subsystem : m_subsystems)
 	{
 		subsystem->PreAppUpdate();
 	}
-	for (auto subsystem : m_Subsystems)
+	for (auto subsystem : m_subsystems)
 	{
 		subsystem->OnAppUpdate();
 	}
-	for (auto subsystem : m_Subsystems)
+	for (auto subsystem : m_subsystems)
 	{
 		subsystem->PostAppUpdate();
 	}

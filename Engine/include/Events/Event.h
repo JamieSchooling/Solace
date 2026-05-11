@@ -2,8 +2,8 @@
 
 #define EVENT_TYPES \
 	X(WindowClose) \
-	X(WindowResize, int width; int height;) \
-	X(WindowMove, int posX; int posY;) \
+	X(WindowResize, int Width; int Height;) \
+	X(WindowMove, int PosX; int PosY;) \
 	X(WindowFocus) \
 	X(WindowFocusLost) \
 	X(SceneLoad) \
@@ -11,19 +11,19 @@
 enum class EventType
 {
 	None,
-#define X(name, fields) name,
+#define X(m_name, fields) m_name,
 	EVENT_TYPES
 #undef X
 };
 
 struct Event
 {
-	EventType type;
-	bool handled = false;
+	EventType Type;
+	bool Handled = false;
 	
 	union
 	{
-#define X(name, fields) struct name##Data { fields } name##Args;
+#define X(m_name, fields) struct m_name##Data { fields } m_name##Args;
 		EVENT_TYPES
 #undef X
 	};

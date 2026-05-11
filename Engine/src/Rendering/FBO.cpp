@@ -6,14 +6,14 @@
 
 FBO::FBO(glm::ivec2 size)
 {
-	glCreateFramebuffers(1, &m_ID);
+	glCreateFramebuffers(1, &m_id);
 
-	m_Size = size;
+	m_size = size;
 
-	m_Target = std::make_shared<Texture>(m_Size);
-	glNamedFramebufferTexture(m_ID, GL_COLOR_ATTACHMENT0, m_Target->GetID(), 0);
+	m_target = std::make_shared<Texture>(m_size);
+	glNamedFramebufferTexture(m_id, GL_COLOR_ATTACHMENT0, m_target->GetID(), 0);
 
-	GLenum status = glCheckNamedFramebufferStatus(m_ID, GL_FRAMEBUFFER);
+	GLenum status = glCheckNamedFramebufferStatus(m_id, GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
 		std::cout << "Framebuffer error: ";
 
@@ -31,12 +31,12 @@ FBO::FBO(glm::ivec2 size)
 
 FBO::~FBO()
 {
-	if (m_ID > 0) glDeleteFramebuffers(1, &m_ID);
+	if (m_id > 0) glDeleteFramebuffers(1, &m_id);
 }
 
 void FBO::Use() const
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, m_ID);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_id);
 }
 
 void FBO::Unbind() const
@@ -46,12 +46,12 @@ void FBO::Unbind() const
 
 void FBO::Resize(glm::ivec2 size)
 {
-	m_Size = size;
-	m_Target->Recreate(m_Size);
-	glNamedFramebufferTexture(m_ID, GL_COLOR_ATTACHMENT0, m_Target->GetID(), 0);
+	m_size = size;
+	m_target->Recreate(m_size);
+	glNamedFramebufferTexture(m_id, GL_COLOR_ATTACHMENT0, m_target->GetID(), 0);
 }
 
 std::shared_ptr<Texture> FBO::GetTarget()
 {
-	return m_Target;
+	return m_target;
 }

@@ -25,7 +25,7 @@ protected:
 	{
 		T& subsystem = T::Get();
 		subsystem.Start(params);
-		m_Subsystems.push_back(&subsystem);
+		m_subsystems.push_back(&subsystem);
 	}
 
 	template<typename T, typename = std::enable_if_t<std::is_base_of<SingletonSubsystem<T>, T>::value>>
@@ -33,11 +33,11 @@ protected:
 	{
 		T& subsystem = T::Get();
 		subsystem.Shutdown();
-		m_Subsystems.erase(std::find(m_Subsystems.begin(), m_Subsystems.end(), &subsystem));
+		m_subsystems.erase(std::find(m_subsystems.begin(), m_subsystems.end(), &subsystem));
 	}
 	void UpdateSubsystems();
 private:
-	std::vector<Subsystem*> m_Subsystems;
+	std::vector<Subsystem*> m_subsystems;
 };
 
 extern Application* CreateApplication();

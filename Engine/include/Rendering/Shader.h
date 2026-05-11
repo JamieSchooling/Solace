@@ -22,9 +22,9 @@ class Shader
 public:
 	Shader(const char* vertexPath, const char* fragmentPath);
 	void Use();
-	inline unsigned int GetID() const { return m_ID; }
+	inline unsigned int GetID() const { return m_id; }
 
-	void SetUniform(const std::string& name, UniformData uniformData);
+	void SetUniform(const std::string& m_name, UniformData uniformData);
 
 private:
 	void UploadUniform(uint32_t location, bool value) const;
@@ -38,8 +38,8 @@ private:
 	void CheckCompileErrors(uint32_t shader, const char* type);
 
 private:
-	uint32_t m_ID;
-	std::unordered_map<std::string, UniformDescription> m_UniformLookup;
+	uint32_t m_id;
+	std::unordered_map<std::string, UniformDescription> m_uniformLookup;
 
 	friend class Material;
 };

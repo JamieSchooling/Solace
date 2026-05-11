@@ -32,7 +32,7 @@ public:
 	
 	REFLECT(Camera)
 private:
-	glm::mat4 m_Projection = glm::mat4(1.0f);
+	glm::mat4 m_projection = glm::mat4(1.0f);
 
 public:
 	void RecalculateProjection();

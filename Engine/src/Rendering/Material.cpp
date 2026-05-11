@@ -1,19 +1,19 @@
 #include "Rendering/Material.h"
 
-Material::Material(std::shared_ptr<Shader> shader) : m_Shader(shader)
+Material::Material(std::shared_ptr<Shader> shader) : m_shader(shader)
 {
-	for (auto& pair : m_Shader->m_UniformLookup)
+	for (auto& pair : m_shader->m_uniformLookup)
 	{
-		m_UniformData.try_emplace(pair.first);
+		m_uniformData.try_emplace(pair.first);
 	}
 }
 
 void Material::Use()
 {
-	m_Shader->Use();
+	m_shader->Use();
 
-	for (auto& [name, uniform] : m_UniformData)
+	for (auto& [m_name, uniform] : m_uniformData)
 	{
-		m_Shader->SetUniform(name, uniform);
+		m_shader->SetUniform(m_name, uniform);
 	}	
 }

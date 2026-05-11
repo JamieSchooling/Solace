@@ -12,7 +12,7 @@ void Window::Start(const SubsystemParams& params)
 {
 	const WindowProps& props = static_cast<const WindowProps&>(params);
 
-    m_EventSystem = props.eventSystem;
+    m_eventSystem = props.EventSystem;
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -21,21 +21,21 @@ void Window::Start(const SubsystemParams& params)
 	// Request a depth buffer with at least 24 bits
 	glfwWindowHint(GLFW_DEPTH_BITS, 24);
 
-	m_GLFWInstance = glfwCreateWindow(props.width, props.height, props.title, NULL, NULL);
-	glfwSetWindowUserPointer(m_GLFWInstance, static_cast<void*>(this));
+	m_glfwInstance = glfwCreateWindow(props.Width, props.Height, props.Title, NULL, NULL);
+	glfwSetWindowUserPointer(m_glfwInstance, static_cast<void*>(this));
 
-	m_Title = props.title;
-    m_Width = props.width;
-    m_Height = props.height;
-    m_AspectRatio = m_Width / m_Height;
+	m_title = props.Title;
+    m_width = props.Width;
+    m_height = props.Height;
+    m_aspectRatio = m_width / m_height;
 
-    if (m_GLFWInstance == nullptr)
+    if (m_glfwInstance == nullptr)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return;
     }
-    glfwMakeContextCurrent(m_GLFWInstance);
+    glfwMakeContextCurrent(m_glfwInstance);
 
     if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress))
     {
@@ -43,44 +43,44 @@ void Window::Start(const SubsystemParams& params)
         return;
     }
 
-    glViewport(0, 0, props.width, props.height);
+    glViewport(0, 0, props.Width, props.Height);
     glEnable(GL_CULL_FACE);
 
-    glfwSetWindowCloseCallback(m_GLFWInstance, [](GLFWwindow* window) {
+    glfwSetWindowCloseCallback(m_glfwInstance, [](GLFWwindow* window) {
         auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
         Event e;
-        e.type = EventType::WindowClose;
-        self->m_EventSystem->DispatchEvent(e);
+        e.Type = EventType::WindowClose;
+        self->m_eventSystem->DispatchEvent(e);
     });
 
-    glfwSetFramebufferSizeCallback(m_GLFWInstance, [](GLFWwindow* window, int width, int height) {
+    glfwSetFramebufferSizeCallback(m_glfwInstance, [](GLFWwindow* window, int width, int height) {
         auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
         glViewport(0, 0, width, height);
-        self->m_Width = width;
-        self->m_Height = height;
-        self->m_AspectRatio = self->m_Width / self->m_Height;
+        self->m_width = width;
+        self->m_height = height;
+        self->m_aspectRatio = self->m_width / self->m_height;
 
         Event e;
-        e.type = EventType::WindowResize;
-        e.WindowResizeArgs.width = width;
-        e.WindowResizeArgs.height = height;        
-        self->m_EventSystem->DispatchEvent(e);
+        e.Type = EventType::WindowResize;
+        e.WindowResizeArgs.Width = width;
+        e.WindowResizeArgs.Height = height;        
+        self->m_eventSystem->DispatchEvent(e);
     });
 
-    glfwSetWindowPosCallback(m_GLFWInstance, [](GLFWwindow* window, int x, int y) {
+    glfwSetWindowPosCallback(m_glfwInstance, [](GLFWwindow* window, int x, int y) {
         auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
         Event e;
-        e.type = EventType::WindowMove;
-        e.WindowMoveArgs.posX = x;
-        e.WindowMoveArgs.posY = y;
-        self->m_EventSystem->DispatchEvent(e);
+        e.Type = EventType::WindowMove;
+        e.WindowMoveArgs.PosX = x;
+        e.WindowMoveArgs.PosY = y;
+        self->m_eventSystem->DispatchEvent(e);
     });
 
-    glfwSetWindowFocusCallback(m_GLFWInstance, [](GLFWwindow* window, int focused) {
+    glfwSetWindowFocusCallback(m_glfwInstance, [](GLFWwindow* window, int focused) {
         auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
         Event e;
-        e.type = focused == GLFW_TRUE ? EventType::WindowFocus : EventType::WindowFocusLost;
-        self->m_EventSystem->DispatchEvent(e);
+        e.Type = focused == GLFW_TRUE ? EventType::WindowFocus : EventType::WindowFocusLost;
+        self->m_eventSystem->DispatchEvent(e);
     });
 }
 
@@ -96,11 +96,11 @@ void Window::PreAppUpdate()
 
 void Window::PostAppUpdate()
 {
-    glfwSwapBuffers(m_GLFWInstance);
+    glfwSwapBuffers(m_glfwInstance);
     glfwPollEvents();
 }
 
 bool Window::IsOpen()
 {
-    return !glfwWindowShouldClose(m_GLFWInstance);
+    return !glfwWindowShouldClose(m_glfwInstance);
 }

@@ -15,7 +15,7 @@ public:
 	void Draw(entt::registry& r, entt::entity e);
 
 protected:
-	std::shared_ptr<IComponentReflection> m_Component;
+	std::shared_ptr<IComponentReflection> m_component;
 
 	virtual void DrawInspector(entt::registry& r, entt::entity e);
 };

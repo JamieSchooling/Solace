@@ -20,5 +20,5 @@ public:
 
 	// TODO: Implement event queue for deferred events (e.g. End of frame, Next frame, in 0.5 secs) <- No idea how to schedule like that yet though
 private:
-	std::vector<Subsystem*> m_ListenerSystems;
+	std::vector<Subsystem*> m_listenerSystems;
 };

@@ -7,10 +7,10 @@ class EventSystem;
 
 struct WindowProps : public SubsystemParams
 {
-	const char* title = "Solace";
-	int width = 1280;
-	int height = 720;
-	EventSystem* eventSystem = nullptr;
+	const char* Title = "Solace";
+	int Width = 1280;
+	int Height = 720;
+	EventSystem* EventSystem = nullptr;
 };
 
 class Window : public SingletonSubsystem<Window>
@@ -24,16 +24,16 @@ public:
 
 	bool IsOpen();
 
-	inline float GetWidth() const { return m_Width; }
-	inline float GetHeight() const { return m_Height; }
-	inline float GetAspectRatio() const { return m_AspectRatio; }
+	inline float GetWidth() const { return m_width; }
+	inline float GetHeight() const { return m_height; }
+	inline float GetAspectRatio() const { return m_aspectRatio; }
 
-	inline GLFWwindow* GetGLFWInstance() { return m_GLFWInstance; }
+	inline GLFWwindow* GetGLFWInstance() { return m_glfwInstance; }
 private:
-	GLFWwindow* m_GLFWInstance;
-	EventSystem* m_EventSystem;
-	const char* m_Title;
-	float m_Width;
-	float m_Height;
-	float m_AspectRatio;
+	GLFWwindow* m_glfwInstance;
+	EventSystem* m_eventSystem;
+	const char* m_title;
+	float m_width;
+	float m_height;
+	float m_aspectRatio;
 };

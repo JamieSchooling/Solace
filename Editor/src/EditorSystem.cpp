@@ -25,10 +25,10 @@ void EditorSystem::Start(const SubsystemParams& params)
 	const EditorSystemProps& props = static_cast<const EditorSystemProps&>(params);
 
 	GLFWwindow* window = props.GLFWInstance;
-	props.eventSystem->AddListener(this);
+	props.EventSystem->AddListener(this);
 	
 	// For later use when viewport windows are implemented
-	//m_GameRenderTarget = props.GameRenderTarget;
+	//m_gameRenderTarget = props.GameRenderTarget;
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -44,12 +44,12 @@ void EditorSystem::Start(const SubsystemParams& params)
 	if (std::filesystem::exists(Application::GetConfigPath() / "Layouts" / "Active.ini"))
 	{
 		ImGui::LoadIniSettingsFromDisk((Application::GetConfigPath() / "Layouts" / "Active.ini").string().c_str());
-		m_NewLayout = LayoutOption::Active;
+		m_newLayout = LayoutOption::Active;
 	}
 	else
 	{
 		ImGui::LoadIniSettingsFromDisk((Application::GetResourcePath() / "Layouts" / "Default.ini").string().c_str());
-		m_NewLayout = LayoutOption::Default;
+		m_newLayout = LayoutOption::Default;
 	}
 
 	io.Fonts->AddFontFromFileTTF((Application::GetResourcePath()/"Fonts"/"RobotoMono-Regular.ttf").string().c_str(), 16.0f);
@@ -89,7 +89,7 @@ void EditorSystem::OnAppUpdate()
 	// Framework is there to make game render to an ImGui window (Editor Viewport Window), 
 	// for now I use a dockspace with a passthrough central node, with the scene rendered to the default framebuffer
 	//ImGui::Begin("Game");
-	//GLuint textureID = m_GameRenderTarget->GetTarget()->GetID();
+	//GLuint textureID = m_gameRenderTarget->GetTarget()->GetID();
 	//ImVec2 uv0 = ImVec2(0.0f, 1.0f);  // Top-left (flipped)
 	//ImVec2 uv1 = ImVec2(1.0f, 0.0f);  // Bottom-right (flipped)
 	//ImVec2 imageSize = ImGui::GetContentRegionAvail();  // (width, height)
@@ -106,7 +106,7 @@ void EditorSystem::OnAppUpdate()
 
 void EditorSystem::OnEvent(Event& e)
 {
-	if (e.type == EventType::SceneLoad)
+	if (e.Type == EventType::SceneLoad)
 	{
 		ConstructInspectors();
 	}
@@ -114,22 +114,22 @@ void EditorSystem::OnEvent(Event& e)
 
 void EditorSystem::ConstructInspectors()
 {
-	m_Inspectors.clear();
+	m_inspectors.clear();
 	auto& registry = SceneSystem::Get().GetActiveScene().Registry;
 	for (auto& entity : registry.view<entt::entity>())
 	{
-		m_Inspectors[entity] = std::vector<std::shared_ptr<ComponentInspector>>();
+		m_inspectors[entity] = std::vector<std::shared_ptr<ComponentInspector>>();
 
 		auto componentReflections = ReflectionRegistry::View(registry, entity);
 		for (auto& component : componentReflections)
 		{
 			if (InspectorRegistry::Get().contains(component->GetTypeID()))
 			{
-				m_Inspectors[entity].push_back(InspectorRegistry::Get().at(component->GetTypeID())(component));
+				m_inspectors[entity].push_back(InspectorRegistry::Get().at(component->GetTypeID())(component));
 			}
 			else
 			{
-				m_Inspectors[entity].push_back(std::make_shared<ComponentInspector>(component));
+				m_inspectors[entity].push_back(std::make_shared<ComponentInspector>(component));
 			}
 		}
 	}
@@ -137,14 +137,14 @@ void EditorSystem::ConstructInspectors()
 
 void EditorSystem::HandleLayoutChange()
 {
-	if (m_NewLayout == m_CurrentLayout) return;
+	if (m_newLayout == m_currentLayout) return;
 
-	if (m_CurrentLayout == LayoutOption::Active)
+	if (m_currentLayout == LayoutOption::Active)
 	{
 		ImGui::SaveIniSettingsToDisk((Application::GetConfigPath() / "Layouts" / "Active.ini").string().c_str());
 	}
 
-	switch (m_NewLayout)
+	switch (m_newLayout)
 	{
 	case LayoutOption::Default:
 		ImGui::LoadIniSettingsFromDisk((Application::GetResourcePath() / "Layouts" / "Default.ini").string().c_str());
@@ -154,7 +154,7 @@ void EditorSystem::HandleLayoutChange()
 		break;
 	}
 
-	m_CurrentLayout = m_NewLayout;
+	m_currentLayout = m_newLayout;
 }
 
 void EditorSystem::DrawMenuBar()
@@ -197,14 +197,14 @@ void EditorSystem::DrawMenuBar()
 		}
 		if (ImGui::BeginMenu("Layout"))
 		{
-			if (ImGui::MenuItem("Default", nullptr, m_CurrentLayout == LayoutOption::Default))
+			if (ImGui::MenuItem("Default", nullptr, m_currentLayout == LayoutOption::Default))
 			{
-				m_NewLayout = LayoutOption::Default;
+				m_newLayout = LayoutOption::Default;
 			}
 
-			if (ImGui::MenuItem("Active", nullptr, m_CurrentLayout == LayoutOption::Active))
+			if (ImGui::MenuItem("Active", nullptr, m_currentLayout == LayoutOption::Active))
 			{
-				m_NewLayout = LayoutOption::Active;
+				m_newLayout = LayoutOption::Active;
 			}
 			ImGui::EndMenu();
 		}
@@ -222,20 +222,20 @@ void EditorSystem::DrawSceneHierarchy(Scene& scene)
 	{
 		for (auto& entity : scene.Registry.view<entt::entity>())
 		{
-			std::string name = "Unnamed Entity";
+			std::string m_name = "Unnamed Entity";
 			if (scene.Registry.all_of<NameComponent>(entity))
 			{
-				name = scene.Registry.get<NameComponent>(entity).Name;
+				m_name = scene.Registry.get<NameComponent>(entity).Name;
 			}
 			ImGui::PushID((int)entity);
 			ImGuiTreeNodeFlags nodeFlags = baseNodeFlags;
-			if (entity == m_SelectedEntity)
+			if (entity == m_selectedEntity)
 				nodeFlags |= ImGuiTreeNodeFlags_Selected;
-			if (ImGui::TreeNodeEx(name.c_str(), nodeFlags))
+			if (ImGui::TreeNodeEx(m_name.c_str(), nodeFlags))
 			{
 				if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
 				{
-					m_SelectedEntity = entity;
+					m_selectedEntity = entity;
 				}
 				ImGui::TreePop();
 			}
@@ -247,7 +247,7 @@ void EditorSystem::DrawSceneHierarchy(Scene& scene)
 	// Check for deselection
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered())
 	{
-		m_SelectedEntity = entt::null;
+		m_selectedEntity = entt::null;
 	}
 
 	ImGui::End();
@@ -256,16 +256,16 @@ void EditorSystem::DrawSceneHierarchy(Scene& scene)
 void EditorSystem::DrawInspector(entt::registry& registry)
 {
 	ImGui::Begin("Inspector");
-	if (m_SelectedEntity != entt::null)
+	if (m_selectedEntity != entt::null)
 	{
-		ImGui::PushID((int)m_SelectedEntity);
-		if (registry.all_of<NameComponent>(m_SelectedEntity))
+		ImGui::PushID((int)m_selectedEntity);
+		if (registry.all_of<NameComponent>(m_selectedEntity))
 		{
-			EditorProperty<std::string>("Name", registry.get<NameComponent>(m_SelectedEntity).Name).Draw();
+			EditorProperty<std::string>("Name", registry.get<NameComponent>(m_selectedEntity).Name).Draw();
 		}
-		for (auto& inspector : m_Inspectors[m_SelectedEntity])
+		for (auto& inspector : m_inspectors[m_selectedEntity])
 		{
-			inspector->Draw(registry, m_SelectedEntity);
+			inspector->Draw(registry, m_selectedEntity);
 		}
 		ImGui::PopID();
 	}

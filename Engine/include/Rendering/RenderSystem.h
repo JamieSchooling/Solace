@@ -23,9 +23,9 @@ public:
 
 	void OnAppUpdate() override;
 
-	inline std::shared_ptr<FBO> GetRenderTarget() { return m_RenderTarget; }
+	inline std::shared_ptr<FBO> GetRenderTarget() { return m_renderTarget; }
 
 private:
-	FrameRenderData* m_RenderData;
-	std::shared_ptr<FBO> m_RenderTarget;
+	FrameRenderData* m_renderData;
+	std::shared_ptr<FBO> m_renderTarget;
 };

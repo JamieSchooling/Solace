@@ -17,7 +17,7 @@ public:
 	void DeserialiseFrom(std::filesystem::path path);
 
 private:
-	Scene& m_Scene;
+	Scene& m_scene;
 
 	JSON SerialiseEntity(entt::entity entity);
 	JSON SerialiseProperty(IProperty* property, entt::entity entity);

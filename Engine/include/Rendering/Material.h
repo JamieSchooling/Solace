@@ -10,20 +10,20 @@ public:
 	Material(std::shared_ptr<Shader> shader);
 
 	template<typename T>
-	void SetValue(const std::string& name, T data)
+	void SetValue(const std::string& m_name, T data)
 	{
-		if (!m_UniformData.contains(name))
+		if (!m_uniformData.contains(m_name))
 		{
-			std::cout << "Material value [" << name << "] not set, uniform not found in shader." << std::endl;
+			std::cout << "Material value [" << m_name << "] not set, uniform not found in shader." << std::endl;
 			return;
 		}
 
-		m_UniformData[name] = data;
+		m_uniformData[m_name] = data;
 	}
 
 	void Use();
 
 private:
-	std::shared_ptr<Shader> m_Shader;
-	std::unordered_map<std::string, UniformData> m_UniformData;
+	std::shared_ptr<Shader> m_shader;
+	std::unordered_map<std::string, UniformData> m_uniformData;
 };

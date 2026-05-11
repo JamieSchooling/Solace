@@ -1,4 +1,4 @@
-﻿#include "Editor.h"
+﻿#include "Core/Editor.h"
 
 #include <Core/EntryPoint.h>
 #include <Events/EventSystem.h>
@@ -9,7 +9,7 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <Scenes/SceneSystem.h>
 
-#include "EditorSystem.h"
+#include "Core/EditorSystem.h"
 
 Application* CreateApplication()
 {

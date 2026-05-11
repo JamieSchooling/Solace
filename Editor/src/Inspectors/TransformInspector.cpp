@@ -1,4 +1,4 @@
-#include "TransformInspector.h"
+#include "Inspectors/TransformInspector.h"
 
 
 void TransformInspector::DrawInspector(entt::registry& registry, entt::entity entity)

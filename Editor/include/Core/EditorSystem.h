@@ -7,7 +7,7 @@
 #include <memory>
 #include <Rendering/FBO.h>
 
-#include "ComponentInspector.h"
+#include "Inspectors/ComponentInspector.h"
 
 #include <entt/entt.hpp>
 

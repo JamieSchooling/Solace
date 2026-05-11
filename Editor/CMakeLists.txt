@@ -7,24 +7,25 @@ add_executable (${APPLICATION})
 
 target_sources(${APPLICATION}
     PRIVATE
-        "src/Editor.cpp"
-        "src/EditorSystem.cpp"
-        "src/ComponentInspector.cpp"
-        "src/TransformInspector.cpp"
-        "src/CameraInspector.cpp"
+        "src/Core/Editor.cpp"
+        "src/Core/EditorSystem.cpp"
+        "src/Inspectors/ComponentInspector.cpp"
+        "src/Inspectors/TransformInspector.cpp"
+        "src/Inspectors/CameraInspector.cpp"
 
     PRIVATE
     FILE_SET HEADERS
     BASE_DIRS
         include
     FILES
-        "include/Editor.h" 
-        "include/EditorSystem.h"
-        "include/EditorProperty.h"
-        "include/ComponentInspector.h" 
-        "include/TransformInspector.h"
-        "include/CameraInspector.h"
-        "include/InspectorRegistry.h")
+        "include/Core/Editor.h" 
+        "include/Core/EditorSystem.h"
+        "include/Inspectors/EditorProperty.h"
+        "include/Inspectors/ComponentInspector.h" 
+        "include/Inspectors/TransformInspector.h"
+        "include/Inspectors/CameraInspector.h"
+        "include/Inspectors/InspectorRegistry.h" 
+)
 
 include(FetchContent)
 

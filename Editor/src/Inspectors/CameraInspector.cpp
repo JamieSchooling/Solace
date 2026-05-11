@@ -1,4 +1,4 @@
-#include "CameraInspector.h"
+#include "Inspectors/CameraInspector.h"
 
 void CameraInspector::DrawInspector(entt::registry& registry, entt::entity entity)
 {

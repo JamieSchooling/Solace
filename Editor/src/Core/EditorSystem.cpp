@@ -1,4 +1,4 @@
-#include "EditorSystem.h"
+#include "Core/EditorSystem.h"
 
 #include <Scenes/Scene.h>
 #include <Scenes/SceneSystem.h>
@@ -14,9 +14,6 @@
 #include <nfd.h>
 #include <Scenes/SceneSerialiser.h>
 #include <Rendering/Camera.h>
-#include <EditorProperty.h>
-#include <TransformInspector.h>
-#include <CameraInspector.h>
 
 #include <iostream>
 

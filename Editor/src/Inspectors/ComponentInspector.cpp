@@ -1,4 +1,4 @@
-#include "ComponentInspector.h"
+#include "Inspectors/ComponentInspector.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>

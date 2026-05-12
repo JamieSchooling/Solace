@@ -1,16 +1,18 @@
 #pragma once
 
+#include <algorithm>
 #include <string>
 #include <sstream>
 #include <functional>
 #include <memory>
-#include <unordered_map>
+#include <vector>
 
 struct MenuNode
 {
-	std::string Name;
+	std::string Name; 
+	uint16_t Priority = UINT16_MAX;
 	std::function<void()> Action;
-	std::unordered_map<std::string, std::unique_ptr<MenuNode>> Children;
+	std::vector<std::unique_ptr<MenuNode>> Children;
 };
 
 class MenuRegistry
@@ -22,7 +24,7 @@ public:
 		return root;
 	}
 
-	static void Register(const char* path, std::function<void()> action)
+	static void Register(const char* path, uint16_t priority, std::function<void()> action)
 	{
 		std::stringstream ss(path);
 
@@ -32,26 +34,63 @@ public:
 
 		while (std::getline(ss, segment, '/'))
 		{
-			auto& child = current->Children[segment];
+			MenuNode* child = GetChild(*current, segment);
 
 			if (!child)
 			{
-				child = std::make_unique<MenuNode>();
+				current->Children.push_back(std::make_unique<MenuNode>());
+				child = current->Children.back().get();
 				child->Name = segment;
 			}
 
-			current = child.get();
+			child->Priority = std::min(current->Priority, priority);
+			current = child;
 		}
 
 		current->Action = std::move(action);
+
+		Sort(Root());
+	}
+
+private:
+	static MenuNode* GetChild(MenuNode& node, std::string_view name)
+	{
+		for (auto& child : node.Children)
+		{
+			if (child->Name == name)
+			{
+				return child.get();
+			}
+		}
+
+		return nullptr;
+	}
+
+	static void Sort(MenuNode& node)
+	{
+		std::sort(node.Children.begin(), node.Children.end(),
+		[](const std::unique_ptr<MenuNode>& a, const std::unique_ptr<MenuNode>& b)
+		{
+			if (a->Priority == b->Priority)
+			{
+				return a->Name < b->Name;
+			}
+
+			return a->Priority < b->Priority;
+		});
+
+		for (auto&& child : node.Children)
+		{
+			Sort(*child);
+		}
 	}
 
 };
 
-#define MENU_ITEM(path, action) \
+#define MENU_ITEM(path, priority, action) \
 	static inline bool _reg_item_##action = []() \
 	{ \
-		MenuRegistry::Register(path, action); \
+		MenuRegistry::Register(path, priority, action); \
 		return true; \
 	}();
 

@@ -6,5 +6,5 @@ class EditMenu
 {
 public:
 	static void Placeholder();
-	MENU_ITEM("Edit/Placeholder", Placeholder)
+	MENU_ITEM("Edit/Placeholder", 200, Placeholder)
 };

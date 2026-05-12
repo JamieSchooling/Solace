@@ -146,7 +146,7 @@ void EditorSystem::DrawMenuBar()
 {
 	if (ImGui::BeginMainMenuBar())
 	{
-		for (auto& [_, child] : MenuRegistry::Root().Children)
+		for (auto&& child : MenuRegistry::Root().Children)
 		{
 			DrawMenuNode(*child);
 		}
@@ -188,7 +188,7 @@ void EditorSystem::DrawMenuNode(MenuNode& node)
 
 	if (ImGui::BeginMenu(node.Name.c_str()))
 	{
-		for (auto& [_, child] : node.Children)
+		for (auto&& child : node.Children)
 		{
 			DrawMenuNode(*child);
 		}

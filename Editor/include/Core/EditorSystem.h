@@ -11,6 +11,8 @@
 
 #include <entt/entt.hpp>
 
+#include "Windows/EditorWindow.h"
+
 class Scene;
 
 enum class LayoutOption
@@ -43,11 +45,11 @@ private:
 	LayoutOption m_newLayout = LayoutOption::Default;
 	entt::entity m_selectedEntity = entt::null;
 	std::unordered_map<entt::entity, std::vector<std::shared_ptr<ComponentInspector>>> m_inspectors;
+	std::vector<std::unique_ptr<EditorWindow>> m_windows;
 
 	void ConstructInspectors();
 
 	void HandleLayoutChange();
 	void DrawMenuBar();
-	void DrawSceneHierarchy(Scene& scene);
 	void DrawInspector(entt::registry& registry);
 };

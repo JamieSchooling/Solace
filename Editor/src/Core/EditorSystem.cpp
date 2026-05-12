@@ -16,6 +16,7 @@
 #include <Rendering/Camera.h>
 
 #include <iostream>
+#include <Windows/SceneHierarchy.h>
 
 void EditorSystem::Start(const SubsystemParams& params)
 {
@@ -56,6 +57,8 @@ void EditorSystem::Start(const SubsystemParams& params)
 	ImGui_ImplOpenGL3_Init("#version 460");
 
 	ConstructInspectors();
+
+	m_windows.push_back(std::make_unique<SceneHierarchy>());
 }
 
 void EditorSystem::Shutdown()
@@ -83,6 +86,12 @@ void EditorSystem::OnAppUpdate()
 	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 	ImGui::End();
 
+	Scene& scene = SceneSystem::Get().GetActiveScene();
+	for (auto&& window : m_windows)
+	{
+		window->Draw(m_selectedEntity, scene);
+	}
+
 	// Framework is there to make game render to an ImGui window (Editor Viewport Window), 
 	// for now I use a dockspace with a passthrough central node, with the scene rendered to the default framebuffer
 	//ImGui::Begin("Game");
@@ -93,8 +102,6 @@ void EditorSystem::OnAppUpdate()
 	//ImGui::Image((void*)(intptr_t)textureID, imageSize, uv0, uv1);
 	//ImGui::End();
 
-	Scene& scene = SceneSystem::Get().GetActiveScene();
-	DrawSceneHierarchy(scene);
 	DrawInspector(scene.Registry);
 
 	ImGui::Render();
@@ -207,47 +214,6 @@ void EditorSystem::DrawMenuBar()
 		}
 		ImGui::EndMainMenuBar();
 	}
-}
-
-void EditorSystem::DrawSceneHierarchy(Scene& scene)
-{
-	ImGui::Begin("Hierarchy");
-
-	ImGuiTreeNodeFlags baseNodeFlags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_SpanAvailWidth;
-
-	if (ImGui::TreeNodeEx(scene.Name.c_str(), ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow))
-	{
-		for (auto& entity : scene.Registry.view<entt::entity>())
-		{
-			std::string m_name = "Unnamed Entity";
-			if (scene.Registry.all_of<NameComponent>(entity))
-			{
-				m_name = scene.Registry.get<NameComponent>(entity).Name;
-			}
-			ImGui::PushID((int)entity);
-			ImGuiTreeNodeFlags nodeFlags = baseNodeFlags;
-			if (entity == m_selectedEntity)
-				nodeFlags |= ImGuiTreeNodeFlags_Selected;
-			if (ImGui::TreeNodeEx(m_name.c_str(), nodeFlags))
-			{
-				if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
-				{
-					m_selectedEntity = entity;
-				}
-				ImGui::TreePop();
-			}
-			ImGui::PopID();
-		}
-		ImGui::TreePop();
-	}
-
-	// Check for deselection
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered())
-	{
-		m_selectedEntity = entt::null;
-	}
-
-	ImGui::End();
 }
 
 void EditorSystem::DrawInspector(entt::registry& registry)

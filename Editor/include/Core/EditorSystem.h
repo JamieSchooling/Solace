@@ -12,6 +12,7 @@
 #include <entt/entt.hpp>
 
 #include "Windows/EditorWindow.h"
+#include "Menu/MenuRegistry.h"
 
 class Scene;
 
@@ -48,4 +49,5 @@ private:
 
 	void HandleLayoutChange();
 	void DrawMenuBar();
+	void DrawMenuNode(MenuNode& node);
 };

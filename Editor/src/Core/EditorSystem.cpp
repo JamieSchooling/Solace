@@ -9,11 +9,6 @@
 
 #include <filesystem>
 #include <Core/Application.h>
-#include <Transform/Transform.h>
-
-#include <nfd.h>
-#include <Scenes/SceneSerialiser.h>
-#include <Rendering/Camera.h>
 
 #include <iostream>
 
@@ -151,6 +146,12 @@ void EditorSystem::DrawMenuBar()
 {
 	if (ImGui::BeginMainMenuBar())
 	{
+		for (auto& [_, child] : MenuRegistry::Root().Children)
+		{
+			DrawMenuNode(*child);
+		}
+
+		/*ImGui::EndMainMenuBar();
 		if (ImGui::BeginMenu("File")) {
 			if (ImGui::MenuItem("Open"))
 			{
@@ -197,7 +198,35 @@ void EditorSystem::DrawMenuBar()
 				m_newLayout = LayoutOption::Active;
 			}
 			ImGui::EndMenu();
-		}
+		}*/
 		ImGui::EndMainMenuBar();
+	}
+}
+
+void EditorSystem::DrawMenuNode(MenuNode& node)
+{
+	bool leaf = node.Children.empty();
+
+	if (leaf)
+	{
+		if (ImGui::MenuItem(node.Name.c_str()))
+		{
+			if (node.Action)
+			{
+				node.Action();
+			}
+		}
+
+		return;
+	}
+
+	if (ImGui::BeginMenu(node.Name.c_str()))
+	{
+		for (auto& [_, child] : node.Children)
+		{
+			DrawMenuNode(*child);
+		}
+
+		ImGui::EndMenu();
 	}
 }

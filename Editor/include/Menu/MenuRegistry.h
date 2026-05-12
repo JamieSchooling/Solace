@@ -54,3 +54,4 @@ public:
 		MenuRegistry::Register(path, action); \
 		return true; \
 	}();
+

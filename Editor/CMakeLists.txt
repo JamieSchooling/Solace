@@ -16,6 +16,7 @@ target_sources(${APPLICATION}
         "src/Windows/SceneHierarchy.cpp"
         "src/Windows/InspectorWindow.cpp"
         "src/Menu/FileMenu.cpp"
+        "src/Menu/EditMenu.cpp"
 
     PRIVATE
     FILE_SET HEADERS
@@ -34,7 +35,7 @@ target_sources(${APPLICATION}
         "include/Windows/InspectorWindow.h"
         "include/Menu/MenuRegistry.h"
         "include/Menu/FileMenu.h"
-)
+        "include/Menu/EditMenu.h")
 
 include(FetchContent)
 

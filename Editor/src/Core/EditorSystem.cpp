@@ -151,41 +151,6 @@ void EditorSystem::DrawMenuBar()
 			DrawMenuNode(*child);
 		}
 
-		/*ImGui::EndMainMenuBar();
-		if (ImGui::BeginMenu("File")) {
-			if (ImGui::MenuItem("Open"))
-			{
-				nfdchar_t* outPath = nullptr;
-				NFD_OpenDialog("solace", nullptr, &outPath);
-				if (outPath)
-				{
-					std::cout << outPath << std::endl;
-					Scene scene;
-					SceneSerialiser serialiser(scene);
-					serialiser.DeserialiseFrom(outPath);
-					SceneSystem::Get().LoadScene(scene);
-				}
-			}
-			ImGui::Separator();
-			if (ImGui::MenuItem("Save As..."))
-			{
-				nfdchar_t* outPath = nullptr;
-				NFD_SaveDialog("solace", nullptr, &outPath);
-				if (outPath)
-				{
-					std::cout << outPath << std::endl;
-					SceneSerialiser serialiser(SceneSystem::Get().GetActiveScene());
-					serialiser.SerialiseTo(outPath);
-				}
-			}
-			ImGui::EndMenu();
-		}
-		if (ImGui::BeginMenu("Edit")) {
-			if (ImGui::MenuItem("Menu Item"))
-			{
-			}
-			ImGui::EndMenu();
-		}
 		if (ImGui::BeginMenu("Layout"))
 		{
 			if (ImGui::MenuItem("Default", nullptr, m_currentLayout == LayoutOption::Default))
@@ -198,7 +163,8 @@ void EditorSystem::DrawMenuBar()
 				m_newLayout = LayoutOption::Active;
 			}
 			ImGui::EndMenu();
-		}*/
+		}
+
 		ImGui::EndMainMenuBar();
 	}
 }

@@ -40,6 +40,8 @@ public:
 	void OnAppUpdate() override;
 	void OnEvent(Event& e) override;
 
+	LayoutOption GetLayout() const { return m_currentLayout; }
+	void SetLayout(LayoutOption layout) { m_newLayout = layout; }
 private:
 	std::shared_ptr<FBO> m_gameRenderTarget;
 	LayoutOption m_currentLayout = LayoutOption::Default;

@@ -12,6 +12,7 @@ struct MenuNode
 	std::string Name; 
 	uint16_t Priority = UINT16_MAX;
 	std::function<void()> Action;
+	std::function<bool()> SelectedCondition = nullptr;
 	std::vector<std::unique_ptr<MenuNode>> Children;
 };
 
@@ -24,7 +25,7 @@ public:
 		return root;
 	}
 
-	static void Register(const char* path, uint16_t priority, std::function<void()> action)
+	static void Register(const char* path, uint16_t priority, std::function<void()> action, std::function<bool()> selectedCondition = nullptr)
 	{
 		std::stringstream ss(path);
 
@@ -48,6 +49,7 @@ public:
 		}
 
 		current->Action = std::move(action);
+		current->SelectedCondition = selectedCondition;
 
 		Sort(Root());
 	}
@@ -91,6 +93,13 @@ private:
 	static inline bool _reg_item_##action = []() \
 	{ \
 		MenuRegistry::Register(path, priority, action); \
+		return true; \
+	}();
+
+#define MENU_ITEM_SELECTION(path, priority, action, selectedCondition) \
+	static inline bool _reg_item_##action = []() \
+	{ \
+		MenuRegistry::Register(path, priority, action, selectedCondition); \
 		return true; \
 	}();
 

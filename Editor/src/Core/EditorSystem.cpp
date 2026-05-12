@@ -151,20 +151,6 @@ void EditorSystem::DrawMenuBar()
 			DrawMenuNode(*child);
 		}
 
-		if (ImGui::BeginMenu("Layout"))
-		{
-			if (ImGui::MenuItem("Default", nullptr, m_currentLayout == LayoutOption::Default))
-			{
-				m_newLayout = LayoutOption::Default;
-			}
-
-			if (ImGui::MenuItem("Active", nullptr, m_currentLayout == LayoutOption::Active))
-			{
-				m_newLayout = LayoutOption::Active;
-			}
-			ImGui::EndMenu();
-		}
-
 		ImGui::EndMainMenuBar();
 	}
 }
@@ -175,7 +161,8 @@ void EditorSystem::DrawMenuNode(MenuNode& node)
 
 	if (leaf)
 	{
-		if (ImGui::MenuItem(node.Name.c_str()))
+		bool hasCondition = node.SelectedCondition != nullptr;
+		if (ImGui::MenuItem(node.Name.c_str(), nullptr, hasCondition ? node.SelectedCondition() : false))
 		{
 			if (node.Action)
 			{

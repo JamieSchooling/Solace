@@ -17,6 +17,7 @@ target_sources(${APPLICATION}
         "src/Windows/InspectorWindow.cpp"
         "src/Menu/FileMenu.cpp"
         "src/Menu/EditMenu.cpp"
+        "src/Menu/LayoutMenu.cpp"
 
     PRIVATE
     FILE_SET HEADERS
@@ -35,7 +36,8 @@ target_sources(${APPLICATION}
         "include/Windows/InspectorWindow.h"
         "include/Menu/MenuRegistry.h"
         "include/Menu/FileMenu.h"
-        "include/Menu/EditMenu.h")
+        "include/Menu/EditMenu.h" 
+        "include/Menu/LayoutMenu.h")
 
 include(FetchContent)
 
@@ -71,6 +73,7 @@ add_library(nfd STATIC
   ${nfd_SOURCE_DIR}/src/nfd_common.c
   ${nfd_SOURCE_DIR}/src/nfd_win.cpp
 )
+message(DEBUG "PATH:" ${nfd_SOURCE_DIR})
 
 target_include_directories(nfd
     PUBLIC

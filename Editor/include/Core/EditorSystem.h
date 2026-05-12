@@ -2,6 +2,7 @@
 
 #include <Core/Subsystem.h>
 #include <Events/EventSystem.h>
+#include <Scenes/SceneSystem.h>
 
 #include <GLFW/glfw3.h>
 #include <memory>
@@ -39,6 +40,22 @@ public:
 	void PreAppUpdate() override;
 	void OnAppUpdate() override;
 	void OnEvent(Event& e) override;
+
+	template<typename T, typename = std::enable_if_t<std::is_base_of_v<EditorWindow, T>>>
+	inline void OpenWindow()
+	{
+		auto it = std::find_if(m_windows.begin(), m_windows.end(), [](const std::unique_ptr<EditorWindow>& window)
+		{
+			return dynamic_cast<T*>(window.get()) != nullptr;
+		});
+
+		bool instanceExists = it != m_windows.end();
+		if (!instanceExists)
+		{
+			m_windows.push_back(std::make_unique<T>());
+			m_windows.back()->Initialise(SceneSystem::Get().GetActiveScene());
+		}
+	}
 
 	LayoutOption GetLayout() const { return m_currentLayout; }
 	void SetLayout(LayoutOption layout) { m_newLayout = layout; }

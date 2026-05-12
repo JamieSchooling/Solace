@@ -1,7 +1,6 @@
 #include "Core/EditorSystem.h"
 
 #include <Scenes/Scene.h>
-#include <Scenes/SceneSystem.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_glfw.h>
@@ -53,8 +52,8 @@ void EditorSystem::Start(const SubsystemParams& params)
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 460");
 
-	m_windows.push_back(std::make_unique<SceneHierarchy>());
-	m_windows.push_back(std::make_unique<InspectorWindow>());
+	OpenWindow<SceneHierarchy>();
+	OpenWindow<InspectorWindow>();
 
 	Scene& scene = SceneSystem::Get().GetActiveScene();
 	for (auto&& window : m_windows)

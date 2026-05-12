@@ -4,6 +4,12 @@
 #include <Scenes/NameComponent.h>
 #include <Inspectors/EditorProperty.h>
 #include <Reflection/ReflectionRegistry.h>
+#include "Core/EditorSystem.h"
+
+void InspectorWindow::Open()
+{
+	EditorSystem::Get().OpenWindow<InspectorWindow>();
+}
 
 void InspectorWindow::Initialise(Scene& scene)
 {

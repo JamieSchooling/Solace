@@ -3,6 +3,13 @@
 #include <imgui.h>
 #include <Scenes/NameComponent.h>
 
+#include "Core/EditorSystem.h"
+
+void SceneHierarchy::Open()
+{
+	EditorSystem::Get().OpenWindow<SceneHierarchy>();
+}
+
 void SceneHierarchy::DrawContent(entt::entity& selected, Scene& scene)
 {
 	ImGuiTreeNodeFlags baseNodeFlags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_SpanAvailWidth;

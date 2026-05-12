@@ -16,7 +16,9 @@
 #include <Rendering/Camera.h>
 
 #include <iostream>
-#include <Windows/SceneHierarchy.h>
+
+#include "Windows/SceneHierarchy.h"
+#include "Windows/InspectorWindow.h"
 
 void EditorSystem::Start(const SubsystemParams& params)
 {
@@ -56,9 +58,14 @@ void EditorSystem::Start(const SubsystemParams& params)
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 460");
 
-	ConstructInspectors();
-
 	m_windows.push_back(std::make_unique<SceneHierarchy>());
+	m_windows.push_back(std::make_unique<InspectorWindow>());
+
+	Scene& scene = SceneSystem::Get().GetActiveScene();
+	for (auto&& window : m_windows)
+	{
+		window->Initialise(scene);
+	}
 }
 
 void EditorSystem::Shutdown()
@@ -102,8 +109,6 @@ void EditorSystem::OnAppUpdate()
 	//ImGui::Image((void*)(intptr_t)textureID, imageSize, uv0, uv1);
 	//ImGui::End();
 
-	DrawInspector(scene.Registry);
-
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -112,29 +117,10 @@ void EditorSystem::OnEvent(Event& e)
 {
 	if (e.Type == EventType::SceneLoad)
 	{
-		ConstructInspectors();
-	}
-}
-
-void EditorSystem::ConstructInspectors()
-{
-	m_inspectors.clear();
-	auto& registry = SceneSystem::Get().GetActiveScene().Registry;
-	for (auto& entity : registry.view<entt::entity>())
-	{
-		m_inspectors[entity] = std::vector<std::shared_ptr<ComponentInspector>>();
-
-		auto componentReflections = ReflectionRegistry::View(registry, entity);
-		for (auto& component : componentReflections)
+		Scene& scene = SceneSystem::Get().GetActiveScene();
+		for (auto&& window : m_windows)
 		{
-			if (InspectorRegistry::Get().contains(component->GetTypeID()))
-			{
-				m_inspectors[entity].push_back(InspectorRegistry::Get().at(component->GetTypeID())(component));
-			}
-			else
-			{
-				m_inspectors[entity].push_back(std::make_shared<ComponentInspector>(component));
-			}
+			window->Initialise(scene);
 		}
 	}
 }
@@ -214,23 +200,4 @@ void EditorSystem::DrawMenuBar()
 		}
 		ImGui::EndMainMenuBar();
 	}
-}
-
-void EditorSystem::DrawInspector(entt::registry& registry)
-{
-	ImGui::Begin("Inspector");
-	if (m_selectedEntity != entt::null)
-	{
-		ImGui::PushID((int)m_selectedEntity);
-		if (registry.all_of<NameComponent>(m_selectedEntity))
-		{
-			EditorProperty<std::string>("Name", registry.get<NameComponent>(m_selectedEntity).Name).Draw();
-		}
-		for (auto& inspector : m_inspectors[m_selectedEntity])
-		{
-			inspector->Draw(registry, m_selectedEntity);
-		}
-		ImGui::PopID();
-	}
-	ImGui::End();
 }

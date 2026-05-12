@@ -44,12 +44,8 @@ private:
 	LayoutOption m_currentLayout = LayoutOption::Default;
 	LayoutOption m_newLayout = LayoutOption::Default;
 	entt::entity m_selectedEntity = entt::null;
-	std::unordered_map<entt::entity, std::vector<std::shared_ptr<ComponentInspector>>> m_inspectors;
 	std::vector<std::unique_ptr<EditorWindow>> m_windows;
-
-	void ConstructInspectors();
 
 	void HandleLayoutChange();
 	void DrawMenuBar();
-	void DrawInspector(entt::registry& registry);
 };

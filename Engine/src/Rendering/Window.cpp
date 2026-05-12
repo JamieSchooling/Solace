@@ -45,6 +45,7 @@ void Window::Start(const SubsystemParams& params)
 
     glViewport(0, 0, props.Width, props.Height);
     glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 
     glfwSetWindowCloseCallback(m_glfwInstance, [](GLFWwindow* window) {
         auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));

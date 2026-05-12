@@ -14,7 +14,7 @@ class IEditorProperty
 {
 public:
 	virtual ~IEditorProperty() = default;
-	virtual bool Draw() = 0;
+	virtual bool Draw(bool samelineAfterDraw = false) = 0;
 };
 
 template<typename T>
@@ -25,7 +25,7 @@ public:
 		: m_label(label), m_data(data), m_onChange(onChange)
 	{}
 
-	bool Draw() override;
+	bool Draw(bool samelineAfterDraw = false) override;
 private:
 	T& m_data;
 	std::string m_label;
@@ -35,7 +35,7 @@ private:
 };
 
 template<typename T>
-inline bool EditorProperty<T>::Draw()
+inline bool EditorProperty<T>::Draw(bool samelineAfterDraw)
 {
 	if (ImGui::BeginTable(std::format("##{}Property", m_label).c_str(), 2))
 	{
@@ -55,7 +55,18 @@ inline bool EditorProperty<T>::Draw()
 			m_onChange(m_data);
 		}
 
+		if (samelineAfterDraw)
+		{
+			ImGui::SameLine();
+		}
+		ImVec2 endPos = ImGui::GetCursorScreenPos();
+
 		ImGui::EndTable();
+
+		if (samelineAfterDraw)
+		{
+			ImGui::SetCursorScreenPos(endPos);
+		}
 
 		return changed;
 	}

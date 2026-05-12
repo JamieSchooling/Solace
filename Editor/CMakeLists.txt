@@ -18,6 +18,7 @@ target_sources(${APPLICATION}
         "src/Menu/FileMenu.cpp"
         "src/Menu/EditMenu.cpp"
         "src/Menu/LayoutMenu.cpp"
+        "src/Inspectors/MeshRenderInspector.cpp"
 
     PRIVATE
     FILE_SET HEADERS
@@ -37,7 +38,9 @@ target_sources(${APPLICATION}
         "include/Menu/MenuRegistry.h"
         "include/Menu/FileMenu.h"
         "include/Menu/EditMenu.h" 
-        "include/Menu/LayoutMenu.h")
+        "include/Menu/LayoutMenu.h"
+        "include/Inspectors/MeshRenderInspector.h"
+)
 
 include(FetchContent)
 

@@ -89,9 +89,19 @@ FetchContent_Declare(json
     GIT_TAG v3.12.0
 )
 
-FetchContent_MakeAvailable(glfw glm entt json)
+FetchContent_Declare(assimp
+    GIT_REPOSITORY https://github.com/assimp/assimp.git
+    GIT_TAG v6.0.5
+)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INJECT_DEBUG_POSTFIX OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(glfw glm entt json assimp)
 
 target_link_libraries(${CORE_LIBRARY} PUBLIC glfw)
 target_link_libraries(${CORE_LIBRARY} PUBLIC glm)
 target_link_libraries(${CORE_LIBRARY} PUBLIC EnTT)
 target_link_libraries(${CORE_LIBRARY} PUBLIC nlohmann_json::nlohmann_json)
+target_link_libraries(${CORE_LIBRARY} PUBLIC assimp)

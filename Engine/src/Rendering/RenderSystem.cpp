@@ -27,7 +27,10 @@ void RenderSystem::OnAppUpdate()
 	for (RenderItem& item : m_renderData->RenderQueue)
 	{
 		// Render
+		//if (!item.Geometry) { continue; }
 		item.Geometry->Use();
+
+		//if (!item.Material) { continue; }
 		item.Material->SetValue("u_Model", item.Transform);
 		item.Material->SetValue("u_MVP", m_renderData->CameraProjection * m_renderData->CameraView * item.Transform);
 		item.Material->Use();

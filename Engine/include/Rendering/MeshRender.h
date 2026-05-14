@@ -14,5 +14,7 @@ struct MeshRenderComponent
 	std::string Mesh;
 	PROPERTY(Mesh, PropertyType::String)
 
+	void Initialise();
+
 	REFLECT(MeshRenderComponent)
 };

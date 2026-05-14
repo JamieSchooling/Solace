@@ -21,48 +21,10 @@ void MeshRenderInspector::DrawInspector(entt::registry& r, entt::entity e)
 	{
 		nfdchar_t* outPath = nullptr;
 		NFD_OpenDialog("fbx;obj;glTF;dae", nullptr, &outPath);
-		if (outPath)
+		if (outPath && meshProp)
 		{
 			meshProp->Set(std::string(outPath), r, e);
-			auto* target = m_component->GetTarget<MeshRenderComponent>(r, e);
-			std::cout << outPath << std::endl;
-
-			Assimp::Importer importer;
-			const aiScene* scene = importer.ReadFile(outPath,
-			aiProcess_Triangulate |
-			aiProcess_GenNormals |
-			aiProcess_JoinIdenticalVertices |
-			aiProcess_SortByPType);
-
-			std::vector<uint32_t> indices;
-			std::vector<float> verts;
-
-			const aiMesh* mesh = scene->mMeshes[0];
-
-			for (size_t i = 0; i < mesh->mNumFaces; ++i)
-			{
-				aiFace face = mesh->mFaces[i];
-				for (size_t j = 0; j < face.mNumIndices; ++j)
-				{
-					indices.push_back(face.mIndices[j]);
-				}
-			}
-			target->Geometry = std::make_shared<VAO>(indices);
-
-			for (size_t i = 0; i < mesh->mNumVertices; ++i)
-			{
-				// Positions
-				verts.push_back(mesh->mVertices[i].x);
-				verts.push_back(mesh->mVertices[i].y);
-				verts.push_back(mesh->mVertices[i].z);
-
-				// Normals
-				verts.push_back(mesh->mNormals[i].x);
-				verts.push_back(mesh->mNormals[i].y);
-				verts.push_back(mesh->mNormals[i].z);
-			}
-			
-			target->Geometry->AddVertexBuffer(verts, { { 3, ShaderDataType::Float, false, 0 }, { 3, ShaderDataType::Float, false, 3 * sizeof(float) } });
+			m_component->Initialise(r, e);
 		}
 	}
 

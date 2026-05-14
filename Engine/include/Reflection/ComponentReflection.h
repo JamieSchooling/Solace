@@ -15,6 +15,7 @@ struct IComponentReflection
     virtual const std::vector<IProperty*>& GetProperties() const = 0;
     virtual bool IsOnEntity(entt::registry& r, entt::entity e) const = 0;
     virtual void Emplace(entt::registry& r, entt::entity e) const = 0;
+    virtual void Initialise(entt::registry& r, entt::entity e) const = 0;
 	virtual TypeID GetTypeID() = 0;
 
     template<typename T>
@@ -25,8 +26,6 @@ struct IComponentReflection
 
         return &r.get<T>(e);
     }
-
-	virtual void* GetTarget(entt::registry& r, entt::entity e) const = 0;
 };
 
 template<typename T>
@@ -62,17 +61,18 @@ struct ComponentReflection : IComponentReflection
 		r.emplace<T>(e);
 	}
 
+	void Initialise(entt::registry& r, entt::entity e) const override
+	{
+		T* component = GetTarget<T>(r, e);
+		if constexpr (requires { component->Initialise(); })
+		{
+			component->Initialise();
+		}
+	}
+
 	TypeID GetTypeID()
 	{
 		return m_typeID;
-	}
-
-	void* GetTarget(entt::registry& r, entt::entity e) const override
-	{
-		if (!IsOnEntity(r, e))
-			return nullptr;
-
-		return &r.get<T>(e);
 	}
 private:
 	const char* m_name;

@@ -20,7 +20,7 @@ target_sources(${CORE_LIBRARY}
         "src/Rendering/FBO.cpp"
         "src/Rendering/Texture.cpp"
         "src/Scenes/SceneSerialiser.cpp"
-
+        "src/Rendering/MeshRender.cpp"
 
     PUBLIC
     FILE_SET HEADERS

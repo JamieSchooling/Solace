@@ -19,6 +19,11 @@ struct Transform
 	glm::vec3 Scale{ glm::vec3(1.f) }; //!< Scale
 	PROPERTY(Scale, PropertyType::Vec3)
 
+private:
+	glm::vec3 m_EulerAngles{glm::vec3(0.f)};
+	PROPERTY(m_EulerAngles, PropertyType::Vec3)
+
+public:
 	REFLECT(Transform)
 
 	glm::vec3 Right() const

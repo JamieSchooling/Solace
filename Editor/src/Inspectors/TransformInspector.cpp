@@ -6,6 +6,12 @@ void TransformInspector::DrawInspector(entt::registry& registry, entt::entity en
 	if (!m_eulerCached)
 	{
 		m_eulerCache = glm::degrees(m_component->GetTarget<Transform>(registry, entity)->EulerAngles());
+
+		if (auto eulerProp = m_component->GetProperty("m_EulerAngles"))
+		{
+			glm::vec3 euler = std::any_cast<glm::vec3>(eulerProp->Get(registry, entity));
+			if (euler != glm::vec3(0.0f) && euler != m_eulerCache) { m_eulerCache = euler; } // Get saved euler angles if they exist
+		}
 		m_currentEuler = m_eulerCache;
 		m_eulerCached = true;
 	}
@@ -28,8 +34,12 @@ void TransformInspector::DrawInspector(entt::registry& registry, entt::entity en
 			glm::quat y = glm::angleAxis(radianAngles.y, glm::vec3(0, 1, 0));
 			glm::quat z = glm::angleAxis(radianAngles.z, glm::vec3(0, 0, 1));
 
-			rotationProp->Set(glm::normalize(x * y * z), registry, entity);
+			rotationProp->Set(glm::normalize(x * y * z), registry, entity); 
 			m_eulerCache = m_currentEuler;
+			if (auto eulerProp = m_component->GetProperty("m_EulerAngles"))
+			{
+				eulerProp->Set(m_eulerCache, registry, entity);
+			}
 		}
 	}
 	if (auto scaleProp = m_component->GetProperty("Scale"))

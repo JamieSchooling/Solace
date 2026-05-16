@@ -22,7 +22,7 @@ void MeshRenderInspector::DrawInspector(entt::registry& r, entt::entity e)
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset_Item"))
 			{
 				const wchar_t* pathString = (const wchar_t*)payload->Data;
-				auto path = Application::GetResourcePath() / pathString;
+				std::filesystem::path path = pathString;
 				Assimp::Importer importer;
 				if (importer.IsExtensionSupported(path.extension().string().c_str()))
 				{

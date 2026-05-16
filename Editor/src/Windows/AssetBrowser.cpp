@@ -71,20 +71,19 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 	std::vector<std::filesystem::path> filePaths;
 	for (auto& directoryEntry : std::filesystem::directory_iterator(m_currentDirectory))
 	{
-		std::filesystem::path relativePath = std::filesystem::relative(directoryEntry.path(), m_baseDirectory);
 		if (directoryEntry.is_directory())
 		{
-			directoryPaths.push_back(relativePath);
+			directoryPaths.push_back(directoryEntry.path());
 		}
 		else
 		{
-			filePaths.push_back(relativePath);
+			filePaths.push_back(directoryEntry.path());
 		}
 	}
 
 	for (const auto& directoryPath : directoryPaths)
 	{
-		if (ImGui::Button(directoryPath.string().c_str()))
+		if (ImGui::Button(directoryPath.filename().string().c_str()))
 		{
 			// This will set selected *asset* rather than selected entity to display inspector info
 		}

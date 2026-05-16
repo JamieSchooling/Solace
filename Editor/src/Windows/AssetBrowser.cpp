@@ -19,7 +19,7 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 {
 	if (m_currentDirectory != m_baseDirectory)
 	{
-		if (ImGui::Button("<-"))
+		if (ImGui::ArrowButton("##Back", ImGuiDir_Left))
 		{
 			m_currentDirectory = m_currentDirectory.parent_path();
 		}

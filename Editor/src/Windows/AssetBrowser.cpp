@@ -15,6 +15,9 @@ void AssetBrowser::Initialise(Scene& scene)
 	// TODO: Change this once projects are eventually implemented
 	m_baseDirectory = Application::GetResourcePath();
 	m_currentDirectory = m_baseDirectory;
+
+	m_directoryIcon = std::make_unique<Texture>(Application::GetResourcePath() / "Icons" / "DirectoryIcon.png");
+	m_fileIcon = std::make_unique<Texture>(Application::GetResourcePath() / "Icons" / "FileIcon.png");
 }
 
 void AssetBrowser::OnEvent(Event& e)
@@ -83,7 +86,7 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 
 	for (const auto& directoryPath : directoryPaths)
 	{
-		if (ImGui::Button(directoryPath.filename().string().c_str()))
+		if (ImGui::ImageButton(directoryPath.filename().string().c_str(), (ImTextureRef)m_directoryIcon->GetID(), thumbnailSize))
 		{
 			// This will set selected *asset* rather than selected entity to display inspector info
 		}
@@ -91,11 +94,12 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 		{
 			m_currentDirectory /= directoryPath.filename();
 		}
+		ImGui::Text(directoryPath.filename().string().c_str());
 	}
 
 	for (const auto& filePath : filePaths)
 	{
-		if (ImGui::Button(filePath.filename().string().c_str()))
+		if (ImGui::ImageButton(filePath.filename().string().c_str(), m_fileIcon->GetID(), thumbnailSize))
 		{
 			// This will set selected *asset* rather than selected entity to display inspector info
 		}
@@ -107,5 +111,7 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 			ImGui::SetDragDropPayload("Asset_Item", itemPath, pathSize, ImGuiCond_Once);
 			ImGui::EndDragDropSource();
 		}
+
+		ImGui::Text(filePath.filename().string().c_str());
 	}
 }

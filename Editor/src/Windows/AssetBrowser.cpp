@@ -35,8 +35,23 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 	{
 		for (const auto& file : m_droppedFiles)
 		{
+			auto target = m_currentDirectory / file.filename();
+			if (std::filesystem::exists(target))
+			{
+				const auto stem = target.stem().string();
+				const auto extension = target.extension().string();
+
+				int index = 1;
+				do
+				{
+					target = m_currentDirectory /
+						std::format("{} {}{}", stem, index, extension);
+
+					++index;
+				} while (std::filesystem::exists(target));
+			}
 			std::ifstream src(file, std::ios::binary);
-			std::ofstream dst(m_currentDirectory / file.filename(), std::ios::binary);
+			std::ofstream dst(target, std::ios::binary);
 
 			dst << src.rdbuf();
 		}

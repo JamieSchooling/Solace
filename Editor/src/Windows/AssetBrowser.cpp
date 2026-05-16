@@ -34,6 +34,8 @@ void AssetBrowser::OnEvent(Event& e)
 
 void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 {
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+
 	if (ImGui::IsWindowHovered() && !m_droppedFiles.empty())
 	{
 		for (const auto& file : m_droppedFiles)
@@ -62,13 +64,29 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 		m_droppedFiles.clear();
 	}
 
-	if (m_currentDirectory != m_baseDirectory)
+	ImGui::BeginChild("##Toolbar", ImVec2(0, 22), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoDecoration);
+
+	std::filesystem::path full = m_currentDirectory.lexically_normal();
+	std::vector<std::filesystem::path> parts(full.begin(), full.end());
+	std::filesystem::path target;
+	for (int i = 0; i < parts.size(); ++i)
 	{
-		if (ImGui::ArrowButton("##Back", ImGuiDir_Left))
+		if (i > 0) { ImGui::SameLine(); }
+
+		target /= parts[i];
+
+		if (ImGui::SmallButton(parts[i].string().c_str()))
 		{
-			m_currentDirectory = m_currentDirectory.parent_path();
+			m_currentDirectory = target;
+		}
+		if (i < parts.size() - 1)
+		{
+			ImGui::SameLine();
+			ImGui::Text(">");
 		}
 	}
+
+	ImGui::EndChild();
 
 	std::vector<std::filesystem::path> directoryPaths;
 	std::vector<std::filesystem::path> filePaths;
@@ -114,4 +132,6 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 
 		ImGui::Text(filePath.filename().string().c_str());
 	}
+
+	ImGui::PopStyleColor();
 }

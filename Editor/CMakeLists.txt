@@ -19,6 +19,7 @@ target_sources(${APPLICATION}
         "src/Menu/EditMenu.cpp"
         "src/Menu/LayoutMenu.cpp"
         "src/Inspectors/MeshRenderInspector.cpp"
+        "src/Windows/AssetBrowser.cpp"
 
     PRIVATE
     FILE_SET HEADERS
@@ -40,7 +41,7 @@ target_sources(${APPLICATION}
         "include/Menu/EditMenu.h" 
         "include/Menu/LayoutMenu.h"
         "include/Inspectors/MeshRenderInspector.h"
-)
+        "include/Windows/AssetBrowser.h")
 
 include(FetchContent)
 

@@ -67,34 +67,46 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 		}
 	}
 
+	std::vector<std::filesystem::path> directoryPaths;
+	std::vector<std::filesystem::path> filePaths;
 	for (auto& directoryEntry : std::filesystem::directory_iterator(m_currentDirectory))
 	{
 		std::filesystem::path relativePath = std::filesystem::relative(directoryEntry.path(), m_baseDirectory);
 		if (directoryEntry.is_directory())
 		{
-			if (ImGui::Button(relativePath.string().c_str()))
-			{
-				// This will set selected *asset* rather than selected entity to display inspector info
-			}
-			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-			{
-				m_currentDirectory /= relativePath.filename();
-			}
+			directoryPaths.push_back(relativePath);
 		}
 		else
 		{
-			if (ImGui::Button(relativePath.filename().string().c_str())) 
-			{
-				// This will set selected *asset* rather than selected entity to display inspector info
-			}
+			filePaths.push_back(relativePath);
+		}
+	}
 
-			if (ImGui::BeginDragDropSource())
-			{
-				const auto itemPath = relativePath.c_str();
-				const size_t pathSize = (wcslen(itemPath) + 1) * sizeof(std::filesystem::path::value_type);
-				ImGui::SetDragDropPayload("Asset_Item", itemPath, pathSize, ImGuiCond_Once);
-				ImGui::EndDragDropSource();
-			}
+	for (const auto& directoryPath : directoryPaths)
+	{
+		if (ImGui::Button(directoryPath.string().c_str()))
+		{
+			// This will set selected *asset* rather than selected entity to display inspector info
+		}
+		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+		{
+			m_currentDirectory /= directoryPath.filename();
+		}
+	}
+
+	for (const auto& filePath : filePaths)
+	{
+		if (ImGui::Button(filePath.filename().string().c_str()))
+		{
+			// This will set selected *asset* rather than selected entity to display inspector info
+		}
+
+		if (ImGui::BeginDragDropSource())
+		{
+			const auto itemPath = filePath.c_str();
+			const size_t pathSize = (wcslen(itemPath) + 1) * sizeof(std::filesystem::path::value_type);
+			ImGui::SetDragDropPayload("Asset_Item", itemPath, pathSize, ImGuiCond_Once);
+			ImGui::EndDragDropSource();
 		}
 	}
 }

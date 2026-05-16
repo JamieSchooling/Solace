@@ -56,12 +56,6 @@ void EditorSystem::Start(const SubsystemParams& params)
 	OpenWindow<SceneHierarchy>();
 	OpenWindow<InspectorWindow>();
 	OpenWindow<AssetBrowser>();
-
-	Scene& scene = SceneSystem::Get().GetActiveScene();
-	for (auto&& window : m_windows)
-	{
-		window->Initialise(scene);
-	}
 }
 
 void EditorSystem::Shutdown()

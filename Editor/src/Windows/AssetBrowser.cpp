@@ -32,6 +32,10 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 		{
 			if (ImGui::Button(relativePath.string().c_str()))
 			{
+				// This will set selected *asset* rather than selected entity to display inspector info
+			}
+			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+			{
 				m_currentDirectory /= relativePath.filename();
 			}
 		}

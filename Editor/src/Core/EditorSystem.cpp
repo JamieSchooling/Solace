@@ -119,6 +119,10 @@ void EditorSystem::OnEvent(Event& e)
 			window->Initialise(scene);
 		}
 	}
+	for (auto&& window : m_windows)
+	{
+		window->OnEvent(e);
+	}
 }
 
 void EditorSystem::HandleLayoutChange()

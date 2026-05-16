@@ -6,6 +6,7 @@
 	X(WindowMove, int PosX; int PosY;) \
 	X(WindowFocus) \
 	X(WindowFocusLost) \
+	X(WindowFileDropped, int Count; const char** Paths;) \
 	X(SceneLoad) \
 
 enum class EventType

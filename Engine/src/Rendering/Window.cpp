@@ -83,6 +83,15 @@ void Window::Start(const SubsystemParams& params)
         e.Type = focused == GLFW_TRUE ? EventType::WindowFocus : EventType::WindowFocusLost;
         self->m_eventSystem->DispatchEvent(e);
     });
+
+    glfwSetDropCallback(m_glfwInstance, [](GLFWwindow* window, int count, const char** paths) {
+        auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+        Event e;
+		e.Type = EventType::WindowFileDropped;
+		e.WindowFileDroppedArgs.Count = count;
+		e.WindowFileDroppedArgs.Paths = paths;
+        self->m_eventSystem->DispatchEvent(e);
+    });
 }
 
 void Window::Shutdown()

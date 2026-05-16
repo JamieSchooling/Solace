@@ -3,6 +3,8 @@
 #include "Core/EditorSystem.h"
 #include "Core/Application.h"
 
+#include <fstream>
+
 void AssetBrowser::Open()
 {
 	EditorSystem::Get().OpenWindow<AssetBrowser>();
@@ -15,8 +17,33 @@ void AssetBrowser::Initialise(Scene& scene)
 	m_currentDirectory = m_baseDirectory;
 }
 
+void AssetBrowser::OnEvent(Event& e)
+{
+	if (e.Type == EventType::WindowFileDropped)
+	{
+		m_droppedFiles.clear();
+		for (int i = 0; i < e.WindowFileDroppedArgs.Count; i++)
+		{
+			m_droppedFiles.emplace_back(e.WindowFileDroppedArgs.Paths[i]);
+		}
+	}
+}
+
 void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 {
+	if (ImGui::IsWindowHovered() && !m_droppedFiles.empty())
+	{
+		for (const auto& file : m_droppedFiles)
+		{
+			std::ifstream src(file, std::ios::binary);
+			std::ofstream dst(m_currentDirectory / file.filename(), std::ios::binary);
+
+			dst << src.rdbuf();
+		}
+
+		m_droppedFiles.clear();
+	}
+
 	if (m_currentDirectory != m_baseDirectory)
 	{
 		if (ImGui::ArrowButton("##Back", ImGuiDir_Left))

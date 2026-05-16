@@ -6,6 +6,7 @@
 #include <Rendering/MeshRender.h>
 #include <Reflection/TypeID.h>
 
+#include <filesystem>
 #include <iostream>
 
 class MeshRenderInspector : public ComponentInspector

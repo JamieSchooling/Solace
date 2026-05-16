@@ -41,7 +41,18 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 		}
 		else
 		{
-			if (ImGui::Button(relativePath.filename().string().c_str())) {}
+			if (ImGui::Button(relativePath.filename().string().c_str())) 
+			{
+				// This will set selected *asset* rather than selected entity to display inspector info
+			}
+
+			if (ImGui::BeginDragDropSource())
+			{
+				const auto itemPath = relativePath.c_str();
+				const size_t pathSize = (wcslen(itemPath) + 1) * sizeof(std::filesystem::path::value_type);
+				ImGui::SetDragDropPayload("Asset_Item", itemPath, pathSize, ImGuiCond_Once);
+				ImGui::EndDragDropSource();
+			}
 		}
 	}
 }

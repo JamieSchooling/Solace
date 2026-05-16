@@ -30,7 +30,7 @@ void Application::UpdateSubsystems()
 
 std::filesystem::path Application::GetResourcePath()
 {
-	return std::filesystem::path("./resources");
+	return std::filesystem::path("./resources").make_preferred();
 }
 
 #ifdef _WIN32

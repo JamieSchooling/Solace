@@ -24,7 +24,9 @@ private:
 	std::filesystem::path m_baseDirectory;
 	std::filesystem::path m_currentDirectory;
 	std::vector<std::filesystem::path> m_droppedFiles;
-	ImVec2 thumbnailSize = { 64.0f, 64.0f };
+	ImVec2 m_thumbnailSize = { 75.0f, 75.0f };
 	std::unique_ptr<Texture> m_directoryIcon;
 	std::unique_ptr<Texture> m_fileIcon;
+
+	void DrawTruncatedPath(const std::filesystem::path& path, float maxWidth);
 };

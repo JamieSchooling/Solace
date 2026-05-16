@@ -102,36 +102,79 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 		}
 	}
 
-	for (const auto& directoryPath : directoryPaths)
+	ImGuiStyle& style = ImGui::GetStyle();
+	float cellWidth = m_thumbnailSize.x + style.CellPadding.x * 2.0f;
+	float availableWidth = ImGui::GetContentRegionAvail().x;
+	availableWidth -= style.ScrollbarSize;
+
+	int columnCount = availableWidth / cellWidth;
+	columnCount = std::max(columnCount, 1);
+	if (ImGui::BeginTable("##Files", columnCount, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY, {0.0f, ImGui::GetContentRegionAvail().y - 44.0f}))
 	{
-		if (ImGui::ImageButton(directoryPath.filename().string().c_str(), (ImTextureRef)m_directoryIcon->GetID(), thumbnailSize))
+		for (int i = 0; i < columnCount; ++i)
 		{
-			// This will set selected *asset* rather than selected entity to display inspector info
+			ImGui::TableSetupColumn(nullptr, ImGuiTableColumnFlags_WidthFixed, cellWidth);
 		}
-		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+
+		ImGui::TableNextColumn();
+
+		for (const auto& directoryPath : directoryPaths)
 		{
-			m_currentDirectory /= directoryPath.filename();
+			if (ImGui::ImageButton(directoryPath.filename().string().c_str(), (ImTextureRef)m_directoryIcon->GetID(), m_thumbnailSize))
+			{
+				// This will set selected *asset* rather than selected entity to display inspector info
+			}
+			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+			{
+				m_currentDirectory /= directoryPath.filename();
+			}
+
+			DrawTruncatedPath(directoryPath.filename(), cellWidth);
+
+			ImGui::TableNextColumn();
 		}
-		ImGui::Text(directoryPath.filename().string().c_str());
+
+		for (const auto& filePath : filePaths)
+		{
+			if (ImGui::ImageButton(filePath.filename().string().c_str(), m_fileIcon->GetID(), m_thumbnailSize))
+			{
+				// This will set selected *asset* rather than selected entity to display inspector info
+			}
+
+			if (ImGui::BeginDragDropSource())
+			{
+				const auto itemPath = filePath.c_str();
+				const size_t pathSize = (wcslen(itemPath) + 1) * sizeof(std::filesystem::path::value_type);
+				ImGui::SetDragDropPayload("Asset_Item", itemPath, pathSize, ImGuiCond_Once);
+				ImGui::EndDragDropSource();
+			}
+
+			DrawTruncatedPath(filePath.filename(), cellWidth);
+			
+			ImGui::TableNextColumn();
+		}
+		ImGui::EndTable();
 	}
 
-	for (const auto& filePath : filePaths)
+	if (ImGui::SliderFloat("Thumnail Size", &m_thumbnailSize.x, 10.0f, 512.0f))
 	{
-		if (ImGui::ImageButton(filePath.filename().string().c_str(), m_fileIcon->GetID(), thumbnailSize))
-		{
-			// This will set selected *asset* rather than selected entity to display inspector info
-		}
-
-		if (ImGui::BeginDragDropSource())
-		{
-			const auto itemPath = filePath.c_str();
-			const size_t pathSize = (wcslen(itemPath) + 1) * sizeof(std::filesystem::path::value_type);
-			ImGui::SetDragDropPayload("Asset_Item", itemPath, pathSize, ImGuiCond_Once);
-			ImGui::EndDragDropSource();
-		}
-
-		ImGui::Text(filePath.filename().string().c_str());
+		m_thumbnailSize.y = m_thumbnailSize.x;
 	}
 
 	ImGui::PopStyleColor();
+}
+
+void AssetBrowser::DrawTruncatedPath(const std::filesystem::path& path, float maxWidth)
+{
+	std::string text = path.string();
+
+	while (!text.empty() && ImGui::CalcTextSize((text + "...").c_str()).x > maxWidth)
+	{
+		text.pop_back();
+	}
+
+	if (text != path.string())
+		text += "...";
+
+	ImGui::TextUnformatted(text.c_str());
 }

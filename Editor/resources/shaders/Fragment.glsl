@@ -2,11 +2,34 @@
 
 layout(location = 0) out vec4 colour;
 
-uniform vec3 u_Colour;
+struct directionalLight
+{
+	vec3 colour;
+	vec3 direction;
+};
 
-in vec3 vColour;
+uniform directionalLight u_dLight;
+uniform vec3 u_colour;
+uniform vec3 u_viewPos;
+
+in vec3 posWorldSpace;
+in vec3 normal;
+
+vec3 getDirectionalLight()
+{
+	float ambientStrength = 0.4;
+	vec3 ambient = ambientStrength * u_dLight.colour;
+	float diff = max(dot(normal, -u_dLight.direction), 0.0);
+	vec3 diffuse = diff * u_dLight.colour;
+	float specularStrength = 0.8;
+	vec3 viewDir = normalize(u_viewPos - posWorldSpace);
+	vec3 reflectDir = reflect(u_dLight.direction, normal);  
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64);
+	vec3 specular = specularStrength * spec * u_dLight.colour;      
+	return ambient + diffuse + specular;
+}
 
 void main()
 {
-	colour = vec4(u_Colour * vColour, 1.0);
+	colour = vec4(u_colour * getDirectionalLight(), 1.0);
 }

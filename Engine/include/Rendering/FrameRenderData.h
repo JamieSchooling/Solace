@@ -15,6 +15,7 @@ using RenderQueue = std::vector<RenderItem>;
 struct FrameRenderData
 {
 	RenderQueue RenderQueue;
+	glm::vec3 CameraPosition = glm::vec3(0.0f);
 	glm::mat4 CameraView = glm::mat4(1.0f);
 	glm::mat4 CameraProjection = glm::mat4(1.0f);
 };

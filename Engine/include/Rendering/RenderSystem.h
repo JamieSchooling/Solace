@@ -3,6 +3,7 @@
 #include "Core/Subsystem.h"
 #include "Rendering/FrameRenderData.h"
 #include "Rendering/FBO.h"
+#include "Rendering/UBO.h"
 
 #include <memory>
 #include <vector>
@@ -28,4 +29,6 @@ public:
 private:
 	FrameRenderData* m_renderData;
 	std::shared_ptr<FBO> m_renderTarget;
+	std::unique_ptr<UBO> m_cameraUBO;
+	std::unique_ptr<UBO> m_lightUBO;
 };

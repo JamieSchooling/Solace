@@ -21,6 +21,7 @@ target_sources(${CORE_LIBRARY}
         "src/Rendering/Texture.cpp"
         "src/Scenes/SceneSerialiser.cpp"
         "src/Rendering/MeshRender.cpp"
+        "src/Rendering/UBO.cpp"
 
     PUBLIC
     FILE_SET HEADERS
@@ -53,7 +54,8 @@ target_sources(${CORE_LIBRARY}
         "include/Reflection/ComponentReflection.h" 
         "include/Reflection/ReflectionRegistry.h" 
         "include/Reflection/TypeID.h" 
-        "include/Reflection/Reflection.h")
+        "include/Reflection/Reflection.h" 
+        "include/Rendering/UBO.h")
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

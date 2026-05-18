@@ -78,6 +78,12 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
 
 	for (size_t i = 0; i < count; i++)
 	{
+		GLint blockIndex = -1;
+		GLuint index = i;
+		glGetActiveUniformsiv(m_id, 1, &index, GL_UNIFORM_BLOCK_INDEX, &blockIndex);
+
+		if (blockIndex != -1) { continue; } // ignore UBO members
+
 		glGetActiveUniform(m_id, i, bufSize, &length, &size, &type, m_name);
 		uint32_t location = glGetUniformLocation(m_id, m_name);
 		m_uniformLookup[m_name] = { location, (ShaderDataType)type }; // TODO: Implement check that m_type is supported

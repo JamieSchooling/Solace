@@ -8,9 +8,19 @@ struct directionalLight
 	vec3 direction;
 };
 
-uniform directionalLight u_dLight;
+layout (std140, binding = 0) uniform b_camera
+{
+    mat4 u_projection;
+    mat4 u_view;
+    vec3 u_viewPos;
+};
+
+layout (std140, binding = 1) uniform b_lights
+{
+	uniform directionalLight u_dLight;
+};
+
 uniform vec3 u_colour;
-uniform vec3 u_viewPos;
 
 in vec3 posWorldSpace;
 in vec3 normal;

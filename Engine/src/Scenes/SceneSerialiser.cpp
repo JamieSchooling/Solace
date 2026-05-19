@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <sstream>
 #include <fstream>
+#include <Rendering/Colour.h>
 
 SceneSerialiser::SceneSerialiser(Scene& scene) : m_scene(scene)
 {
@@ -141,6 +142,13 @@ JSON SceneSerialiser::SerialiseProperty(IProperty* property, entt::entity entity
 		out["Type"] = "string";
 		out["Value"] = value;
 	}
+	else if (property->Type() == PropertyType::Colour)
+	{
+		Colour colour = std::any_cast<Colour>(property->Get(m_scene.Registry, entity));
+		glm::vec4 value = colour.ColourValue;
+		out["Type"] = "colour";
+		out["Value"] = { value.r, value.g, value.b, value.a };
+	}
 	return out;
 }
 
@@ -212,5 +220,11 @@ void SceneSerialiser::DeserialiseProperty(JSON propertyData, IProperty* property
 	{
 		std::string value = propertyData["Value"].get<std::string>();
 		property->Set(value, m_scene.Registry, entity);
+	}
+	else if (propertyData["Type"] == "colour")
+	{
+		auto value = propertyData["Value"];
+		Colour colour = glm::vec4(value[0].get<float>(), value[1].get<float>(), value[2].get<float>(), value[3].get<float>());
+		property->Set(colour, m_scene.Registry, entity);
 	}
 }

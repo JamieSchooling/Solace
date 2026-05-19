@@ -7,6 +7,8 @@
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 
+#include <Rendering/Colour.h>
+
 template<typename T>
 using PropertyCallback = std::function<void(T&)>;
 
@@ -111,6 +113,10 @@ bool EditorProperty<T>::DrawPropertyWidget()
 	else if constexpr (std::is_same_v<T, std::string>)
 	{
 		return ImGui::InputText(id, &m_data);
+	}
+	else if constexpr (std::is_same_v<T, Colour>)
+	{
+		return ImGui::ColorEdit4(id, &m_data.ColourValue.r);
 	}
 	else
 	{

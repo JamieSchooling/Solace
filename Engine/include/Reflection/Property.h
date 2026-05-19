@@ -14,7 +14,8 @@ enum class PropertyType
 	Vec3,
 	Vec4,
 	Quaternion,
-	String
+	String,
+	Colour,
 };
 
 struct IProperty

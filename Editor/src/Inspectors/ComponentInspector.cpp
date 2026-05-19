@@ -84,5 +84,13 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 				property->Set(value, r, e);
 			}
 		}
+		else if (property->Type() == PropertyType::Colour)
+		{
+			Colour value = std::any_cast<Colour>(property->Get(r, e));
+			if (EditorProperty<Colour>(property->Name(), value).Draw())
+			{
+				property->Set(value, r, e);
+			}
+		}
 	}
 }

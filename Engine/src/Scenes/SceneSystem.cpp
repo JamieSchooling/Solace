@@ -40,7 +40,7 @@ void SceneSystem::OnAppUpdate()
 		auto lightEntity = lightView.front();
 		Light& light = m_activeScene.Registry.get<Light>(lightEntity);
 		Transform& lightTransform = m_activeScene.Registry.get<Transform>(lightEntity);
-		m_frameRenderData.Lights.DLight.Colour = glm::vec4(light.Colour, 1.0f);
+		m_frameRenderData.Lights.DLight.Colour = light.Colour.ColourValue;
 		m_frameRenderData.Lights.DLight.Direction = glm::vec4(lightTransform.Forward(), 0.0f);
 	}
 

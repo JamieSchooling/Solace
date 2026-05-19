@@ -11,17 +11,17 @@ struct Transform
 	INIT_REFLECTION(Transform)
 
 	glm::vec3 Position{ glm::vec3(0.f) }; //!< Translation i.e. position
-	PROPERTY(Position, PropertyType::Vec3)
+	PROPERTY(Position)
 
 	glm::quat Rotation{ glm::quat(glm::vec3(0.f)) }; //!< Orientation as a quaternion
-	PROPERTY(Rotation, PropertyType::Quaternion)
+	PROPERTY(Rotation)
 
 	glm::vec3 Scale{ glm::vec3(1.f) }; //!< Scale
-	PROPERTY(Scale, PropertyType::Vec3)
+	PROPERTY(Scale)
 
 private:
 	glm::vec3 m_EulerAngles{glm::vec3(0.f)};
-	PROPERTY(m_EulerAngles, PropertyType::Vec3)
+	PROPERTY(m_EulerAngles)
 
 public:
 	REFLECT(Transform)

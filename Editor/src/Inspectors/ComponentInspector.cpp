@@ -3,6 +3,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
+#include <magic_enum/magic_enum.hpp>
+
 ComponentInspector::ComponentInspector(std::shared_ptr<IComponentReflection> component)
 	: m_component(component)
 {
@@ -88,6 +90,14 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 		{
 			Colour value = std::any_cast<Colour>(property->Get(r, e));
 			if (EditorProperty<Colour>(property->Name(), value).Draw())
+			{
+				property->Set(value, r, e);
+			}
+		}
+		else if (property->Type() == PropertyType::Enum)
+		{
+			EnumInfo value = std::any_cast<EnumInfo>(property->Get(r, e));
+			if (EditorProperty<EnumInfo>(property->Name(), value).Draw())
 			{
 				property->Set(value, r, e);
 			}

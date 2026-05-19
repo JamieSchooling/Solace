@@ -58,6 +58,7 @@ target_sources(${CORE_LIBRARY}
         "include/Rendering/UBO.h" 
         "include/Rendering/Light.h"
         "include/Rendering/Colour.h"
+        "include/Reflection/PropertyType.h"
 )
 
 target_include_directories(${CORE_LIBRARY}
@@ -103,10 +104,16 @@ set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(ASSIMP_INJECT_DEBUG_POSTFIX OFF CACHE BOOL "" FORCE)
 set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
 
-FetchContent_MakeAvailable(glfw glm entt json assimp)
+FetchContent_Declare(magic_enum
+    GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
+    GIT_TAG v0.9.8
+)
+
+FetchContent_MakeAvailable(glfw glm entt json assimp magic_enum)
 
 target_link_libraries(${CORE_LIBRARY} PUBLIC glfw)
 target_link_libraries(${CORE_LIBRARY} PUBLIC glm)
 target_link_libraries(${CORE_LIBRARY} PUBLIC EnTT)
 target_link_libraries(${CORE_LIBRARY} PUBLIC nlohmann_json::nlohmann_json)
 target_link_libraries(${CORE_LIBRARY} PUBLIC assimp)
+target_link_libraries(${CORE_LIBRARY} PUBLIC magic_enum::magic_enum)

@@ -12,7 +12,7 @@ struct MeshRenderComponent
 	std::shared_ptr<Material> Material;
 	std::shared_ptr<VAO> Geometry;
 	std::string Mesh;
-	PROPERTY(Mesh, PropertyType::String)
+	PROPERTY(Mesh)
 
 	void Initialise();
 

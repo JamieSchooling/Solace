@@ -20,15 +20,19 @@ public:
 	INIT_REFLECTION(Camera)
 
 	float FOV = 70.0f;
-	PROPERTY(FOV, PropertyType::Float)
+	PROPERTY(FOV)
+
+	float Size = 2.0f;
+	PROPERTY(Size)
 
 	float Near = 0.1f;
-	PROPERTY(Near, PropertyType::Float)
+	PROPERTY(Near)
 
 	float Far = 100.0f;
-	PROPERTY(Far, PropertyType::Float)
+	PROPERTY(Far)
 
 	CameraProjectionType ProjectionType = CameraProjectionType::Perspective;
+	PROPERTY(ProjectionType);
 	
 	REFLECT(Camera)
 private:

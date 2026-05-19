@@ -3,9 +3,12 @@
 #include <glm/glm.hpp>
 #include <format>
 #include <string>
+#include <iostream>
 
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
+
+#include <Reflection/Property.h>
 
 #include <Rendering/Colour.h>
 
@@ -117,6 +120,34 @@ bool EditorProperty<T>::DrawPropertyWidget()
 	else if constexpr (std::is_same_v<T, Colour>)
 	{
 		return ImGui::ColorEdit4(id, &m_data.ColourValue.r);
+	}
+	else if constexpr (std::is_same_v<T, EnumInfo>)
+	{
+		std::vector<const char*> names;
+
+		int currentIndex = 0;
+
+		for (int i = 0; i < m_data.Entries.size(); i++)
+		{
+			names.push_back(m_data.Entries[i].Name.c_str());
+
+			if (m_data.Entries[i].Value == m_data.CurrentValue)
+			{
+				currentIndex = i;
+			}
+		}
+
+		if (ImGui::Combo(id, &currentIndex, names.data(), (int)names.size()))
+		{
+			m_data.CurrentValue =
+				m_data.Entries[currentIndex].Value;
+
+			m_data.SetValue(m_data.CurrentValue);
+
+			return true;
+		}
+
+		return false;
 	}
 	else
 	{

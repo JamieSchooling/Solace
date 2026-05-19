@@ -8,8 +8,8 @@
     using COMPONENT = Component; \
     static inline std::vector<IProperty*> props;
 
-#define PROPERTY(Member, Type) \
-    static inline Property<COMPONENT, &COMPONENT::Member> prop_##Member{#Member, Type}; \
+#define PROPERTY(Member) \
+    static inline Property<COMPONENT, &COMPONENT::Member> prop_##Member{#Member}; \
     static inline bool _reg_##Member = []() { \
         props.push_back(&prop_##Member); \
         return true; \

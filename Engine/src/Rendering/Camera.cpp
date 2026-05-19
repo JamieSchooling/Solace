@@ -11,7 +11,7 @@ void Camera::RecalculateProjection()
 		switch (ProjectionType)
 		{
 			case CameraProjectionType::Perspective: return glm::perspective(glm::radians(FOV), Window::Get().GetAspectRatio(), Near, Far);
-			case CameraProjectionType::Orthographic: return glm::ortho(0.0f, Window::Get().GetWidth(), 0.0f, Window::Get().GetHeight(), Near, Far);
+			case CameraProjectionType::Orthographic: return glm::ortho(-Window::Get().GetAspectRatio() * Size, Window::Get().GetAspectRatio() * Size, -Size, Size, Near, Far);
 		}
 	}();
 }

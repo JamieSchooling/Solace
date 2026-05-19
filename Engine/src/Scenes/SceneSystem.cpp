@@ -1,8 +1,9 @@
 #include "Scenes/SceneSystem.h"
 
 #include "Rendering/Camera.h"
-#include "Transform/Transform.h"
+#include "Rendering/Light.h"
 #include "Rendering/MeshRender.h"
+#include "Transform/Transform.h"
 
 #include "Scenes/DefaultScene.h"
 
@@ -27,8 +28,21 @@ void SceneSystem::OnAppUpdate()
 	Camera& cam = m_activeScene.Registry.get<Camera>(m_activeScene.MainCamera);
 	Transform& camTransform = m_activeScene.Registry.get<Transform>(m_activeScene.MainCamera);
 
-	m_frameRenderData.CameraProjection = cam.GetProjection();
-	m_frameRenderData.CameraView = glm::inverse(camTransform.GetTransformMatrix());
+	// Set camera data
+	m_frameRenderData.Camera.Projection = cam.GetProjection();
+	m_frameRenderData.Camera.View = glm::inverse(camTransform.GetTransformMatrix());
+	m_frameRenderData.Camera.Position = glm::vec4(camTransform.Position, 0.0f);
+
+	// Set light data
+	auto lightView = m_activeScene.Registry.view<Light>();
+	if (lightView.size() > 0)
+	{
+		auto lightEntity = lightView.front();
+		Light& light = m_activeScene.Registry.get<Light>(lightEntity);
+		Transform& lightTransform = m_activeScene.Registry.get<Transform>(lightEntity);
+		m_frameRenderData.Lights.DLight.Colour = glm::vec4(light.Colour, 1.0f);
+		m_frameRenderData.Lights.DLight.Direction = glm::vec4(lightTransform.Forward(), 0.0f);
+	}
 
 	const auto& view = m_activeScene.Registry.view<MeshRenderComponent, Transform>();
 

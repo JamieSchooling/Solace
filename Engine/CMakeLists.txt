@@ -55,7 +55,7 @@ target_sources(${CORE_LIBRARY}
         "include/Reflection/ReflectionRegistry.h" 
         "include/Reflection/TypeID.h" 
         "include/Reflection/Reflection.h" 
-        "include/Rendering/UBO.h")
+        "include/Rendering/UBO.h" "include/Rendering/Light.h")
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

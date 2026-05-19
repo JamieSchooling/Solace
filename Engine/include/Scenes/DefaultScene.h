@@ -74,7 +74,7 @@ Scene BuildDefaultScene()
 	std::shared_ptr<VAO> geometry = std::make_shared<VAO>(indices);
 	geometry->AddVertexBuffer(verts, { {3, ShaderDataType::Float, false, 0}, {3, ShaderDataType::Float, false, 3 * sizeof(float)}});
 
-	std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl"); 
+	std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl");
 	std::shared_ptr<Material> material = std::make_shared<Material>(shader);
 	material->SetValue("u_colour", glm::vec3(1.0));
 

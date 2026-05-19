@@ -33,7 +33,7 @@ vec3 getDirectionalLight()
 	vec3 diffuse = diff * u_dLight.colour;
 	float specularStrength = 0.8;
 	vec3 viewDir = normalize(u_viewPos - posWorldSpace);
-	vec3 reflectDir = reflect(u_dLight.direction, normal);  
+	vec3 reflectDir = reflect(-u_dLight.direction, normal);  
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64);
 	vec3 specular = specularStrength * spec * u_dLight.colour;      
 	return ambient + diffuse + specular;

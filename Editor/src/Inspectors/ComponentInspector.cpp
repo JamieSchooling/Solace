@@ -99,7 +99,7 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 			EnumInfo value = std::any_cast<EnumInfo>(property->Get(r, e));
 			if (EditorProperty<EnumInfo>(property->Name(), value).Draw())
 			{
-				property->Set(value, r, e);
+				property->Set(value.CurrentValue, r, e);
 			}
 		}
 	}

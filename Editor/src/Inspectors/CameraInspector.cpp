@@ -6,7 +6,7 @@ void CameraInspector::DrawInspector(entt::registry& registry, entt::entity entit
 	EnumInfo projectionInfo = std::any_cast<EnumInfo>(projTypeProp->Get(registry, entity));
 	if (EditorProperty<EnumInfo>("Projection Type", projectionInfo).Draw())
 	{
-		projTypeProp->Set(projectionInfo, registry, entity);
+		projTypeProp->Set(projectionInfo.CurrentValue, registry, entity);
 		m_component->GetTarget<Camera>(registry, entity)->RecalculateProjection();
 	}
 

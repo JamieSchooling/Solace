@@ -2,6 +2,11 @@
 
 Camera::Camera()
 {
+	Initialise();
+}
+
+void Camera::Initialise()
+{
 	RecalculateProjection();
 }
 

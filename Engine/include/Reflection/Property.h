@@ -70,8 +70,9 @@ struct Property : public IProperty
 		Target& o = r.get<Target>(e);
 		if constexpr (std::is_enum_v<ValueType>)
 		{
-			EnumInfo enumInfo = std::any_cast<EnumInfo>(value);
-			enumInfo.SetValue(enumInfo.CurrentValue);
+			EnumInfo enumInfo = GetEnumInfo(r, e);
+			int newVal = std::any_cast<int>(value);
+			enumInfo.SetValue(newVal);
 		}
 		else
 		{

@@ -35,6 +35,8 @@ public:
 	PROPERTY(ProjectionType);
 	
 	REFLECT(Camera)
+
+	void Initialise();
 private:
 	glm::mat4 m_projection = glm::mat4(1.0f);
 

@@ -149,6 +149,13 @@ JSON SceneSerialiser::SerialiseProperty(IProperty* property, entt::entity entity
 		out["Type"] = "colour";
 		out["Value"] = { value.r, value.g, value.b, value.a };
 	}
+	else if (property->Type() == PropertyType::Enum)
+	{
+		EnumInfo enumInfo = std::any_cast<EnumInfo>(property->Get(m_scene.Registry, entity));
+		int value = enumInfo.CurrentValue;
+		out["Type"] = "enum";
+		out["Value"] = value;
+	}
 	return out;
 }
 
@@ -226,5 +233,10 @@ void SceneSerialiser::DeserialiseProperty(JSON propertyData, IProperty* property
 		auto value = propertyData["Value"];
 		Colour colour = glm::vec4(value[0].get<float>(), value[1].get<float>(), value[2].get<float>(), value[3].get<float>());
 		property->Set(colour, m_scene.Registry, entity);
+	}
+	else if (propertyData["Type"] == "enum")
+	{
+		auto value = propertyData["Value"];
+		property->Set(value.get<int>(), m_scene.Registry, entity);
 	}
 }

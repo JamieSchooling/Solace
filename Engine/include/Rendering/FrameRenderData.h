@@ -24,11 +24,23 @@ struct alignas(16) DirectionalLightData
 {
 	glm::vec4 Colour;
 	glm::vec4 Direction;
+	float Intensity;
 };
 
+struct alignas(16) PointLightData
+{
+	glm::vec4 Colour;
+	glm::vec4 Position;
+	float Radius;
+	float Intensity;
+};
+
+constexpr int MAX_POINT_LIGHTS = 32;
 struct alignas(16) LightData
 {
 	DirectionalLightData DLight;
+	PointLightData PLights[MAX_POINT_LIGHTS];
+	int NumPointLights;
 };
 
 struct FrameRenderData

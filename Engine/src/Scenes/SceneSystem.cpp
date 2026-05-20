@@ -34,15 +34,28 @@ void SceneSystem::OnAppUpdate()
 	m_frameRenderData.Camera.Position = glm::vec4(camTransform.Position, 0.0f);
 
 	// Set light data
-	auto lightView = m_activeScene.Registry.view<Light>();
-	if (lightView.size() > 0)
+	m_frameRenderData.Lights = LightData();
+
+	const auto& lightView = m_activeScene.Registry.view<Light, Transform>();
+	int pLightCount = 0;
+	for (auto [entity, light, transform] : lightView.each())
 	{
-		auto lightEntity = lightView.front();
-		Light& light = m_activeScene.Registry.get<Light>(lightEntity);
-		Transform& lightTransform = m_activeScene.Registry.get<Transform>(lightEntity);
-		m_frameRenderData.Lights.DLight.Colour = light.Colour.ColourValue;
-		m_frameRenderData.Lights.DLight.Direction = glm::vec4(lightTransform.Forward(), 0.0f);
+		if (light.Type == LightType::Directional)
+		{
+			m_frameRenderData.Lights.DLight.Colour = light.Colour.ColourValue;
+			m_frameRenderData.Lights.DLight.Direction = glm::vec4(transform.Forward(), 0.0f);
+			m_frameRenderData.Lights.DLight.Intensity = light.Intensity;
+		}
+		if (light.Type == LightType::Point)
+		{
+			m_frameRenderData.Lights.PLights[pLightCount].Colour = light.Colour.ColourValue;
+			m_frameRenderData.Lights.PLights[pLightCount].Position = glm::vec4(transform.Position, 0.0f);
+			m_frameRenderData.Lights.PLights[pLightCount].Radius = light.Radius;
+			m_frameRenderData.Lights.PLights[pLightCount].Intensity = light.Intensity;
+			pLightCount++;
+		}
 	}
+	m_frameRenderData.Lights.NumPointLights = pLightCount;
 
 	const auto& view = m_activeScene.Registry.view<MeshRenderComponent, Transform>();
 

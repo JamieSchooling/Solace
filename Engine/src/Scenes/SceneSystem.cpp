@@ -30,7 +30,7 @@ void SceneSystem::OnAppUpdate()
 
 	// Set camera data
 	m_frameRenderData.Camera.Projection = cam.GetProjection();
-	m_frameRenderData.Camera.View = glm::inverse(camTransform.GetTransformMatrix());
+	m_frameRenderData.Camera.View = cam.GetView(camTransform);
 	m_frameRenderData.Camera.Position = glm::vec4(camTransform.Position, 0.0f);
 
 	// Set light data

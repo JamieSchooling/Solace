@@ -10,6 +10,11 @@ void Camera::Initialise()
 	RecalculateProjection();
 }
 
+glm::mat4 Camera::GetView(Transform& transform)
+{
+	return glm::lookAt(transform.Position, transform.Position + transform.Forward(), glm::vec3(0.0f, 1.0f, 0.0f));
+}
+
 void Camera::RecalculateProjection()
 {
 	m_projection = [&]() {

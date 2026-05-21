@@ -5,6 +5,7 @@
 #include "Rendering/Window.h"
 
 #include "Reflection/Reflection.h"
+#include <Transform/Transform.h>
 
 enum class CameraProjectionType
 {
@@ -37,6 +38,8 @@ public:
 	REFLECT(Camera)
 
 	void Initialise();
+
+	glm::mat4 GetView(Transform& transform);
 private:
 	glm::mat4 m_projection = glm::mat4(1.0f);
 

@@ -44,20 +44,8 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 		for (const auto& file : m_droppedFiles)
 		{
 			auto target = m_currentDirectory / file.filename();
-			if (std::filesystem::exists(target))
-			{
-				const auto stem = target.stem().string();
-				const auto extension = target.extension().string();
+			AppendDuplicateCount(target);
 
-				int index = 1;
-				do
-				{
-					target = m_currentDirectory /
-						std::format("{} {}{}", stem, index, extension);
-
-					++index;
-				} while (std::filesystem::exists(target));
-			}
 			std::ifstream src(file, std::ios::binary);
 			std::ofstream dst(target, std::ios::binary);
 
@@ -187,7 +175,9 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 			std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl");
 			std::shared_ptr<Material> material = std::make_shared<Material>(shader, InitWithDefaultValues);
 			MaterialSerialiser ms;
-			ms.SerialiseTo(material, m_currentDirectory / "Material.mat");
+			auto path = m_currentDirectory / "Material.mat";
+			AppendDuplicateCount(path);
+			ms.SerialiseTo(material, path);
 		}
 		ImGui::EndPopup();
 	}
@@ -227,5 +217,23 @@ void AssetBrowser::DrawFilenameEdit(const std::filesystem::path& path)
 	{
 		std::filesystem::rename(path, m_currentEditFilepath);
 		m_editingFilename = false;
+	}
+}
+
+void AssetBrowser::AppendDuplicateCount(std::filesystem::path& target)
+{
+	if (std::filesystem::exists(target))
+	{
+		const auto stem = target.stem().string();
+		const auto extension = target.extension().string();
+
+		int index = 1;
+		do
+		{
+			target = m_currentDirectory /
+				std::format("{} {}{}", stem, index, extension);
+
+			++index;
+		} while (std::filesystem::exists(target));
 	}
 }

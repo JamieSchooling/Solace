@@ -32,4 +32,6 @@ private:
 
 	void DrawTruncatedPath(const std::filesystem::path& path, float maxWidth);
 	void DrawFilenameEdit(const std::filesystem::path& path);
+
+	void AppendDuplicateCount(std::filesystem::path& target);
 };

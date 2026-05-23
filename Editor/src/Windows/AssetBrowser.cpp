@@ -6,6 +6,7 @@
 #include <fstream>
 #include <Assets/MaterialSerialiser.h>
 #include <Rendering/Material.h>
+#include <Windows/MaterialWindow.h>
 
 void AssetBrowser::Open()
 {
@@ -141,6 +142,10 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 			if (ImGui::ImageButton(filePath.filename().string().c_str(), m_fileIcon->GetID(), m_thumbnailSize))
 			{
 				// This will set selected *asset* rather than selected entity to display inspector info
+				if (filePath.extension() == ".mat")
+				{
+					MaterialWindow::Open(filePath);
+				}
 			}
 
 			if (ImGui::BeginDragDropSource())

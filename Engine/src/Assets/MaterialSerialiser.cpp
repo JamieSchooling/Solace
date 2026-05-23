@@ -8,8 +8,8 @@ void MaterialSerialiser::SerialiseTo(std::shared_ptr<Material> material, std::fi
 	auto [vertexPath, fragmentPath] = material->GetShaderPaths();
 
 	JSON out;
-	out["VertexPath"] = vertexPath;
-	out["FragmentPath"] = fragmentPath;
+	out["VertexPath"] = std::string(vertexPath);
+	out["FragmentPath"] = std::string(fragmentPath);
 	for (auto [name, data] : material->GetUniformData())
 	{
 		if (std::holds_alternative<std::monostate>(data))

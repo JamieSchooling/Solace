@@ -13,8 +13,12 @@ struct MeshRenderComponent
 	std::shared_ptr<VAO> Geometry;
 	std::string Mesh;
 	PROPERTY(Mesh)
+	std::string MaterialAsset;
+	PROPERTY(MaterialAsset)
 
 	void Initialise();
+	void ReloadMesh();
+	void ReloadMaterial();
 
 	REFLECT(MeshRenderComponent)
 };

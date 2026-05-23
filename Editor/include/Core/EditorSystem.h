@@ -42,19 +42,26 @@ public:
 	void OnEvent(Event& e) override;
 
 	template<typename T, typename = std::enable_if_t<std::is_base_of_v<EditorWindow, T>>>
-	inline void OpenWindow()
+	inline T& OpenWindow()
 	{
-		auto it = std::find_if(m_windows.begin(), m_windows.end(), [](const std::unique_ptr<EditorWindow>& window)
-		{
-			return dynamic_cast<T*>(window.get()) != nullptr;
-		});
+		auto it = std::find_if(m_windows.begin(), m_windows.end(), 
+			[](const std::unique_ptr<EditorWindow>& window)
+			{
+				return dynamic_cast<T*>(window.get()) != nullptr;
+			}
+		);
 
 		bool instanceExists = it != m_windows.end();
-		if (!instanceExists)
+		if (instanceExists)
 		{
-			m_windows.push_back(std::make_unique<T>());
-			m_windows.back()->Initialise(SceneSystem::Get().GetActiveScene());
+			return *dynamic_cast<T*>(it->get());
 		}
+
+		auto window = std::make_unique<T>();
+		T& windowRef = *window;
+		m_windows.push_back(std::move(window));
+		m_windows.back()->Initialise(SceneSystem::Get().GetActiveScene());
+		return windowRef;
 	}
 
 	LayoutOption GetLayout() const { return m_currentLayout; }

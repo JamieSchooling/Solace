@@ -3,14 +3,17 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <Assets/MaterialSerialiser.h>
 
 void MeshRenderComponent::Initialise()
 {
-	std::cout << "Mesh Initialise: " << Mesh << std::endl;
+	ReloadMesh();
+	ReloadMaterial();
+}
 
-	std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl");
-	Material = std::make_shared<::Material>(shader);
-	Material->SetValue("u_prop_colour", glm::vec3(1.0));
+void MeshRenderComponent::ReloadMesh()
+{
+	std::cout << "Mesh Initialise: " << Mesh << std::endl;
 
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(Mesh,
@@ -48,4 +51,18 @@ void MeshRenderComponent::Initialise()
 	}
 
 	Geometry->AddVertexBuffer(verts, { { 3, ShaderDataType::Float, false, 0 }, { 3, ShaderDataType::Float, false, 3 * sizeof(float) } });
+}
+
+void MeshRenderComponent::ReloadMaterial()
+{
+	if (MaterialAsset.empty())
+	{
+		std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl");
+		Material = std::make_shared<::Material>(shader);
+		Material->SetValue("u_prop_colour", glm::vec3(1.0));
+		return;
+	}
+	
+	MaterialSerialiser ms;
+	Material = ms.DeserialiseFrom(MaterialAsset);
 }

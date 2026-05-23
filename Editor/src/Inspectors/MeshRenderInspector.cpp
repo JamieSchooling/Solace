@@ -27,7 +27,32 @@ void MeshRenderInspector::DrawInspector(entt::registry& r, entt::entity e)
 				if (importer.IsExtensionSupported(path.extension().string().c_str()))
 				{
 					meshProp->Set(path.string(), r, e);
-					m_component->Initialise(r, e);
+					m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMesh();
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+	}
+
+	auto materialProp = m_component->GetProperty("MaterialAsset");
+	if (materialProp)
+	{
+		std::string materialPath = std::any_cast<std::string>(materialProp->Get(r, e));
+		if (EditorProperty<std::string>("Material", materialPath).Draw())
+		{
+			materialProp->Set(materialPath, r, e);
+		}
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset_Item"))
+			{
+				const wchar_t* pathString = (const wchar_t*)payload->Data;
+				std::filesystem::path path = pathString;
+				if (path.extension() == ".mat")
+				{
+					materialProp->Set(path.string(), r, e);
+					m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMaterial();
 				}
 			}
 			ImGui::EndDragDropTarget();

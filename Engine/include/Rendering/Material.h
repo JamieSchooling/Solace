@@ -30,7 +30,7 @@ public:
 	void Use();
 
 
-	std::pair<const char*, const char*> GetShaderPaths() const { return m_shader->GetShaderPaths(); }
+	std::pair<std::string, std::string> GetShaderPaths() const { return m_shader->GetShaderPaths(); }
 	std::unordered_map<std::string, UniformData> GetUniformData() const { return m_uniformData; }
 	UniformDescription GetUniformDescription(const std::string& name) { return m_shader->m_uniformLookup.at(name); }
 

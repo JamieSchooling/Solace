@@ -21,6 +21,7 @@ target_sources(${APPLICATION}
         "src/Inspectors/MeshRenderInspector.cpp"
         "src/Windows/AssetBrowser.cpp"
         "src/Inspectors/LightInspector.cpp"
+        "src/Windows/MaterialWindow.cpp"
 
     PRIVATE
     FILE_SET HEADERS
@@ -42,7 +43,10 @@ target_sources(${APPLICATION}
         "include/Menu/EditMenu.h" 
         "include/Menu/LayoutMenu.h"
         "include/Inspectors/MeshRenderInspector.h"
-        "include/Windows/AssetBrowser.h" "include/Inspectors/LightInspector.h")
+        "include/Windows/AssetBrowser.h" 
+        "include/Inspectors/LightInspector.h"
+        "include/Windows/MaterialWindow.h"
+)
 
 include(FetchContent)
 

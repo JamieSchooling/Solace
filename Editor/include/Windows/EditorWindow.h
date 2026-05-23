@@ -16,6 +16,8 @@ public:
 	void Draw(entt::entity& selected, Scene& scene);
 protected:
 	virtual void DrawContent(entt::entity& selected, Scene& scene) = 0;
+	void ShowUnsaved(bool isUnsaved = true) { m_showUnsaved = isUnsaved; }
 private:
 	const char* m_title;
+	bool m_showUnsaved = false;
 };

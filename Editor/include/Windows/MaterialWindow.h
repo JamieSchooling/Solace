@@ -1,0 +1,26 @@
+#pragma once
+
+#include "Windows/EditorWindow.h"
+#include "Menu/MenuRegistry.h"
+
+#include <Rendering/Material.h>
+#include <filesystem>
+
+class MaterialWindow : public EditorWindow
+{
+public:
+	MaterialWindow() : EditorWindow("Material") {}
+
+	static void Open();
+	MENU_ITEM("Window/General/Material", 400, Open);
+	
+	static void Open(std::filesystem::path materialPath);
+protected:
+	void DrawContent(entt::entity& selected, Scene& scene) override;
+
+private:
+	std::shared_ptr<Material> m_material;
+	std::filesystem::path m_materialPath;
+
+	bool DrawProperty(const std::string& name, UniformData data, UniformDescription desc);
+};

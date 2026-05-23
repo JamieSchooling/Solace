@@ -55,7 +55,7 @@ void MeshRenderComponent::ReloadMesh()
 
 void MeshRenderComponent::ReloadMaterial()
 {
-	if (MaterialAsset.empty())
+	if (MaterialAsset.empty() || !std::filesystem::exists(MaterialAsset))
 	{
 		std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl");
 		Material = std::make_shared<::Material>(shader);

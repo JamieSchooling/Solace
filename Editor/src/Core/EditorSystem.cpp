@@ -117,6 +117,15 @@ void EditorSystem::OnEvent(Event& e)
 	{
 		window->OnEvent(e);
 	}
+
+	if (e.Type == EventType::InputKey && ImGui::GetIO().WantCaptureKeyboard)
+	{
+		e.Handled = true;
+	}
+	else if (e.Type == EventType::InputMouseButton && ImGui::GetIO().WantCaptureMouse)
+	{
+		e.Handled = true;
+	}
 }
 
 void EditorSystem::HandleLayoutChange()

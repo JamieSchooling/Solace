@@ -92,6 +92,35 @@ void Window::Start(const SubsystemParams& params)
 		e.WindowFileDroppedArgs.Paths = paths;
         self->m_eventSystem->DispatchEvent(e);
     });
+
+    glfwSetKeyCallback(m_glfwInstance, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+        auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+        Event e;
+		e.Type = EventType::InputKey;
+		e.InputKeyArgs.Key = key;
+		e.InputKeyArgs.Action = action;
+        self->m_eventSystem->DispatchEvent(e);
+    }); 
+	
+	glfwSetMouseButtonCallback(m_glfwInstance, [](GLFWwindow* window, int button, int action, int mods)
+	{
+		auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+		Event e;
+		e.Type = EventType::InputMouseButton;
+		e.InputMouseButtonArgs.Button = button;
+		e.InputMouseButtonArgs.Action = action;
+		self->m_eventSystem->DispatchEvent(e);
+	});
+
+	glfwSetCursorPosCallback(m_glfwInstance, [](GLFWwindow* window, double xpos, double ypos)
+	{
+		auto self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+		Event e;
+		e.Type = EventType::InputMouseMove;
+		e.InputMouseMoveArgs.MouseX = xpos;
+		e.InputMouseMoveArgs.MouseY = ypos;
+		self->m_eventSystem->DispatchEvent(e);
+	});
 }
 
 void Window::Shutdown()

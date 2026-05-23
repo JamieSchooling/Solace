@@ -24,6 +24,7 @@ target_sources(${CORE_LIBRARY}
         "src/Rendering/UBO.cpp"
         "src/Assets/MaterialSerialiser.cpp" 
         "src/Assets/MaterialAssetCache.cpp"
+        "src/Input/InputSystem.cpp"
 
     PUBLIC
     FILE_SET HEADERS
@@ -62,7 +63,10 @@ target_sources(${CORE_LIBRARY}
         "include/Rendering/Colour.h"
         "include/Reflection/PropertyType.h"
         "include/Assets/MaterialSerialiser.h"
-        "include/Assets/MaterialAssetCache.h")
+        "include/Assets/MaterialAssetCache.h"
+        "include/Input/InputSystem.h"
+        "include/Input/KeyCodes.h"
+        )
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

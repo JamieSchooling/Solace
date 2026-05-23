@@ -8,6 +8,9 @@
 	X(WindowFocusLost) \
 	X(WindowFileDropped, int Count; const char** Paths;) \
 	X(SceneLoad) \
+	X(InputKey, int Key; int Action;) \
+	X(InputMouseButton, int Button; int Action;) \
+	X(InputMouseMove, double MouseX; double MouseY;)
 
 enum class EventType
 {

@@ -27,6 +27,9 @@ private:
 	ImVec2 m_thumbnailSize = { 75.0f, 75.0f };
 	std::unique_ptr<Texture> m_directoryIcon;
 	std::unique_ptr<Texture> m_fileIcon;
+	bool m_editingFilename = false;
+	std::filesystem::path m_currentEditFilepath;
 
 	void DrawTruncatedPath(const std::filesystem::path& path, float maxWidth);
+	void DrawFilenameEdit(const std::filesystem::path& path);
 };

@@ -156,13 +156,29 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 				ImGui::EndDragDropSource();
 			}
 
-			DrawTruncatedPath(filePath.filename(), cellWidth);
+			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+			{
+				m_editingFilename = true;
+				m_currentEditFilepath = filePath;
+			}
+			if (m_editingFilename)
+			{
+				DrawFilenameEdit(filePath);
+			}
+			else
+			{
+				DrawTruncatedPath(filePath.filename(), cellWidth);
+			}
 			
 			ImGui::TableNextColumn();
 		}
 		ImGui::EndTable();
 	}
 
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (ImGui::IsWindowHovered() || ImGui::IsItemHovered()))
+	{
+		m_editingFilename = false;
+	}
 
 	if (ImGui::BeginPopupContextItem())
 	{
@@ -197,4 +213,19 @@ void AssetBrowser::DrawTruncatedPath(const std::filesystem::path& path, float ma
 		text += "...";
 
 	ImGui::TextUnformatted(text.c_str());
+}
+
+void AssetBrowser::DrawFilenameEdit(const std::filesystem::path& path)
+{
+	std::string filename = m_currentEditFilepath.filename().string();
+	if (ImGui::InputText("##Filename", &filename))
+	{
+		m_currentEditFilepath = m_currentDirectory / filename;
+	}
+
+	if (ImGui::IsKeyPressed(ImGuiKey_Enter))
+	{
+		std::filesystem::rename(path, m_currentEditFilepath);
+		m_editingFilename = false;
+	}
 }

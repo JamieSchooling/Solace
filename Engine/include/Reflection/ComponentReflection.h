@@ -15,6 +15,7 @@ struct IComponentReflection
     virtual const std::vector<IProperty*>& GetProperties() const = 0;
     virtual bool IsOnEntity(entt::registry& r, entt::entity e) const = 0;
     virtual void Emplace(entt::registry& r, entt::entity e) const = 0;
+    virtual void Erase(entt::registry& r, entt::entity e) const = 0;
     virtual void Initialise(entt::registry& r, entt::entity e) const = 0;
 	virtual TypeID GetTypeID() = 0;
 
@@ -58,7 +59,12 @@ struct ComponentReflection : IComponentReflection
 
 	void Emplace(entt::registry& r, entt::entity e) const override
 	{
-		r.emplace<T>(e);
+		if (!r.any_of<T>(e)) { r.emplace<T>(e); }
+	}
+
+	void Erase(entt::registry& r, entt::entity e) const override
+	{
+		if (r.any_of<T>(e)) { r.erase<T>(e); }
 	}
 
 	void Initialise(entt::registry& r, entt::entity e) const override

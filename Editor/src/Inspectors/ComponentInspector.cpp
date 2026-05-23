@@ -14,7 +14,29 @@ void ComponentInspector::Draw(entt::registry& r, entt::entity e)
 {
 	ImGui::Separator();
 	ImGui::TextUnformatted(m_component->Name());
+	ImGui::PushID(m_component->Name());
+	ImGui::SameLine(ImGui::GetWindowWidth() - 30.f);
+	if (ImGui::BeginPopupContextItem("##ComponentMenu"))
+	{
+		bool removed = false;
+		if (ImGui::MenuItem("Remove Component"))
+		{
+			m_component->Erase(r, e);
+			removed = true;
+		}
+		ImGui::EndPopup();
+		if (removed) 
+		{ 
+			ImGui::PopID(); 
+			return; 
+		}
+	}
+	if (ImGui::SmallButton("="))
+	{
+		ImGui::OpenPopup("##ComponentMenu");
+	}
 	DrawInspector(r, e);
+	ImGui::PopID();
 	ImGui::Separator();
 }
 

@@ -14,6 +14,7 @@ public:
 
 	void Draw(entt::registry& r, entt::entity e);
 
+	std::shared_ptr<IComponentReflection> GetComponent() { return m_component; }
 protected:
 	std::shared_ptr<IComponentReflection> m_component;
 

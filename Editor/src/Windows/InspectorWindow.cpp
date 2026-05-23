@@ -27,6 +27,26 @@ void InspectorWindow::DrawContent(entt::entity& selected, Scene& scene)
 	{
 		return;
 	}
+
+	if (ImGui::BeginPopupContextWindow())
+	{
+		if (ImGui::BeginMenu("Add Component"))
+		{
+			auto componentReflections = ReflectionRegistry::Get();
+			for (auto& component : componentReflections)
+			{
+				if (ImGui::MenuItem(component->Name()))
+				{
+					component->Emplace(scene.Registry, selected);
+					component->Initialise(scene.Registry, selected);
+					CacheEntityInspectors(selected, scene.Registry);
+				}
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndPopup();
+	}
+
 	if (!m_inspectors.contains(selected))
 	{
 		CacheEntityInspectors(selected, scene.Registry);
@@ -39,6 +59,11 @@ void InspectorWindow::DrawContent(entt::entity& selected, Scene& scene)
 	}
 	for (auto& inspector : m_inspectors[selected])
 	{
+		if (!inspector->GetComponent()->IsOnEntity(scene.Registry, selected))
+		{
+			m_inspectors.erase(selected);
+			continue;
+		}
 		inspector->Draw(scene.Registry, selected);
 	}
 	ImGui::PopID();

@@ -13,6 +13,11 @@ void MeshRenderComponent::Initialise()
 
 void MeshRenderComponent::ReloadMesh()
 {
+	if (Mesh.empty() || !std::filesystem::exists(Mesh))
+	{
+		return;
+	}
+
 	std::cout << "Mesh Initialise: " << Mesh << std::endl;
 
 	Assimp::Importer importer;

@@ -33,6 +33,7 @@ void RenderSystem::OnAppUpdate()
 	for (RenderItem& item : m_renderData->RenderQueue)
 	{
 		// Render
+		if (!item.Geometry) continue;
 		item.Geometry->Use();
 		item.Material->SetValue("u_model", item.Transform);
 		item.Material->Use();

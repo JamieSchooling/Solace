@@ -17,21 +17,7 @@ void InspectorWindow::Initialise(Scene& scene)
 	auto& registry = scene.Registry;
 	for (auto& entity : registry.view<entt::entity>())
 	{
-		m_inspectors[entity] = std::vector<std::shared_ptr<ComponentInspector>>();
-
-		auto componentReflections = ReflectionRegistry::View(registry, entity);
-		for (auto& component : componentReflections)
-		{
-			if (InspectorRegistry::Get().contains(component->GetTypeID()))
-			{
-				auto inspectorConstructor = InspectorRegistry::Get().at(component->GetTypeID());
-				m_inspectors[entity].push_back(inspectorConstructor(component));
-			}
-			else
-			{
-				m_inspectors[entity].push_back(std::make_shared<ComponentInspector>(component));
-			}
-		}
+		CacheEntityInspectors(entity, registry);
 	}
 }
 
@@ -40,6 +26,10 @@ void InspectorWindow::DrawContent(entt::entity& selected, Scene& scene)
 	if (selected == entt::null)
 	{
 		return;
+	}
+	if (!m_inspectors.contains(selected))
+	{
+		CacheEntityInspectors(selected, scene.Registry);
 	}
 
 	ImGui::PushID((int)selected);
@@ -52,4 +42,23 @@ void InspectorWindow::DrawContent(entt::entity& selected, Scene& scene)
 		inspector->Draw(scene.Registry, selected);
 	}
 	ImGui::PopID();
+}
+
+void InspectorWindow::CacheEntityInspectors(entt::entity entity, entt::registry& registry)
+{
+	m_inspectors[entity] = std::vector<std::shared_ptr<ComponentInspector>>();
+
+	auto componentReflections = ReflectionRegistry::View(registry, entity);
+	for (auto& component : componentReflections)
+	{
+		if (InspectorRegistry::Get().contains(component->GetTypeID()))
+		{
+			auto inspectorConstructor = InspectorRegistry::Get().at(component->GetTypeID());
+			m_inspectors[entity].push_back(inspectorConstructor(component));
+		}
+		else
+		{
+			m_inspectors[entity].push_back(std::make_shared<ComponentInspector>(component));
+		}
+	}
 }

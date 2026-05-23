@@ -17,4 +17,6 @@ protected:
 	void DrawContent(entt::entity& selected, Scene& scene) override;
 private:
 	std::unordered_map<entt::entity, std::vector<std::shared_ptr<ComponentInspector>>> m_inspectors;
+
+	void CacheEntityInspectors(entt::entity entity, entt::registry& registry);
 };

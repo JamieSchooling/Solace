@@ -2,6 +2,7 @@
 
 #include <imgui.h>
 #include <Scenes/NameComponent.h>
+#include <Transform/Transform.h>
 
 #include "Core/EditorSystem.h"
 
@@ -12,6 +13,18 @@ void SceneHierarchy::Open()
 
 void SceneHierarchy::DrawContent(entt::entity& selected, Scene& scene)
 {
+	if (ImGui::BeginPopupContextWindow())
+	{
+		if (ImGui::MenuItem("Create Entity"))
+		{
+			entt::entity entity = scene.Registry.create();
+			scene.Registry.emplace<NameComponent>(entity).Name = "Entity";
+			scene.Registry.emplace<Transform>(entity);
+			selected = entity;
+		}
+		ImGui::EndPopup();
+	}
+
 	ImGuiTreeNodeFlags baseNodeFlags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_SpanAvailWidth;
 
 	if (ImGui::TreeNodeEx(scene.Name.c_str(), ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow))
@@ -34,6 +47,15 @@ void SceneHierarchy::DrawContent(entt::entity& selected, Scene& scene)
 					selected = entity;
 				}
 				ImGui::TreePop();
+			}
+			if (ImGui::BeginPopupContextItem())
+			{
+				if (ImGui::MenuItem("Delete"))
+				{
+					if (selected == entity) { selected = entt::null; }
+					scene.Registry.destroy(entity);
+				}
+				ImGui::EndPopup();
 			}
 			ImGui::PopID();
 		}

@@ -28,8 +28,9 @@ void EventSystem::RemoveListener(Subsystem& subsystem)
 
 void EventSystem::DispatchEvent(Event event)
 {
-	for (auto listener : m_listenerSystems)
+	for (auto it = m_listenerSystems.rbegin(); it != m_listenerSystems.rend(); it++)
 	{
+		auto listener = *it;
 		listener->OnEvent(event);
 		if (event.Handled) break;
 	}

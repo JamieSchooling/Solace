@@ -2,6 +2,7 @@
 
 #include "Core/EditorSystem.h"
 #include <Assets/MaterialSerialiser.h>
+#include <Assets/MaterialAssetCache.h>
 
 void MaterialWindow::Open()
 {
@@ -12,9 +13,7 @@ void MaterialWindow::Open(std::filesystem::path materialPath)
 {
 	auto& window = EditorSystem::Get().OpenWindow<MaterialWindow>();
 	window.m_materialPath = materialPath;
-
-	MaterialSerialiser ms;
-	window.m_material = ms.DeserialiseFrom(materialPath);
+	window.m_material = MaterialAssetCache::Load(materialPath);
 }
 
 void MaterialWindow::DrawContent(entt::entity& selected, Scene& scene)
@@ -25,10 +24,7 @@ void MaterialWindow::DrawContent(entt::entity& selected, Scene& scene)
 		if (!isProperty) { continue; }
 
 		UniformDescription desc = m_material->GetUniformDescription(name);
-		if (DrawProperty(name, data, desc))
-		{
-			ShowUnsaved();
-		}
+		DrawProperty(name, data, desc);
 	}
 
 	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S))
@@ -39,7 +35,7 @@ void MaterialWindow::DrawContent(entt::entity& selected, Scene& scene)
 	}
 }
 
-bool MaterialWindow::DrawProperty(const std::string& name, UniformData data, UniformDescription desc)
+void MaterialWindow::DrawProperty(const std::string& name, UniformData data, UniformDescription desc)
 {
 	std::string prefix = "u_prop_";
 	std::string displayName = name.substr(prefix.length());
@@ -49,7 +45,7 @@ bool MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		if (EditorProperty<bool>(displayName, value).Draw())
 		{
 			m_material->SetValue(name, value);
-			return true;
+			ShowUnsaved();
 		}
 	}
 	else if (desc.type == ShaderDataType::Int)
@@ -58,7 +54,7 @@ bool MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		if (EditorProperty<int>(displayName, value).Draw())
 		{
 			m_material->SetValue(name, value);
-			return true;
+			ShowUnsaved();
 		}
 	}
 	else if (desc.type == ShaderDataType::Float)
@@ -67,7 +63,7 @@ bool MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		if (EditorProperty<float>(displayName, value).Draw())
 		{
 			m_material->SetValue(name, value);
-			return true;
+			ShowUnsaved();
 		}
 	}
 	else if (desc.type == ShaderDataType::Vector2)
@@ -76,7 +72,7 @@ bool MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		if (EditorProperty<glm::vec2>(displayName, value).Draw())
 		{
 			m_material->SetValue(name, value);
-			return true;
+			ShowUnsaved();
 		}
 	}
 	else if (desc.type == ShaderDataType::Vector3)
@@ -90,7 +86,7 @@ bool MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 			if (EditorProperty<Colour>(displayName, c).Draw())
 			{
 				m_material->SetValue(name, glm::vec3(c.ColourValue));
-				return true;
+				ShowUnsaved();
 			}
 		}
 		else
@@ -98,7 +94,7 @@ bool MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 			if (EditorProperty<glm::vec3>(displayName, value).Draw())
 			{
 				m_material->SetValue(name, value);
-				return true;
+				ShowUnsaved();
 			}
 		}
 	}
@@ -113,7 +109,7 @@ bool MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 			if (EditorProperty<Colour>(displayName, c).Draw())
 			{
 				m_material->SetValue(name, c.ColourValue);
-				return true;
+				ShowUnsaved();
 			}
 
 		}
@@ -122,7 +118,7 @@ bool MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 			if (EditorProperty<glm::vec4>(displayName, value).Draw())
 			{
 				m_material->SetValue(name, value);
-				return true;
+				ShowUnsaved();
 			}
 		}
 	}

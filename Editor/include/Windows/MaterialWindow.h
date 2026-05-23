@@ -22,5 +22,5 @@ private:
 	std::shared_ptr<Material> m_material;
 	std::filesystem::path m_materialPath;
 
-	bool DrawProperty(const std::string& name, UniformData data, UniformDescription desc);
+	void DrawProperty(const std::string& name, UniformData data, UniformDescription desc);
 };

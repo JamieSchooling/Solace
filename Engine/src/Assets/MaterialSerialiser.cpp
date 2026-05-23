@@ -8,18 +8,18 @@ void MaterialSerialiser::SerialiseTo(std::shared_ptr<Material> material, std::fi
 	auto [vertexPath, fragmentPath] = material->GetShaderPaths();
 
 	JSON out;
-	out["VertexPath"] = std::string(vertexPath);
-	out["FragmentPath"] = std::string(fragmentPath);
+	out["VertexPath"] = vertexPath;
+	out["FragmentPath"] = fragmentPath;
 	for (auto [name, data] : material->GetUniformData())
 	{
+		bool isProperty = name.rfind("u_prop_", 0) == 0;
+		if (!isProperty) { continue; }
+
 		if (std::holds_alternative<std::monostate>(data))
 		{
 			std::cout << "Warning: Couldn't serialise [" << name << "], material value not set." << std::endl;
 			continue;
 		}
-
-		bool isProperty = name.rfind("u_prop_", 0) == 0;
-		if (!isProperty) { continue; }
 
 		UniformDescription desc = material->GetUniformDescription(name);
 		out["Properties"].push_back(SerialiseProperty(name, data, desc));

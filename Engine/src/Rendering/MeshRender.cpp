@@ -3,7 +3,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <Assets/MaterialSerialiser.h>
+#include "Assets/MaterialAssetCache.h"
 
 void MeshRenderComponent::Initialise()
 {
@@ -63,6 +63,5 @@ void MeshRenderComponent::ReloadMaterial()
 		return;
 	}
 	
-	MaterialSerialiser ms;
-	Material = ms.DeserialiseFrom(MaterialAsset);
+	Material = MaterialAssetCache::Load(MaterialAsset);
 }

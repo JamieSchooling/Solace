@@ -10,7 +10,7 @@ void MeshRenderComponent::Initialise()
 
 	std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl");
 	Material = std::make_shared<::Material>(shader);
-	Material->SetValue("u_colour", glm::vec3(1.0));
+	Material->SetValue("u_prop_colour", glm::vec3(1.0));
 
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(Mesh,

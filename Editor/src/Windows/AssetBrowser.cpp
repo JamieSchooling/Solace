@@ -4,6 +4,8 @@
 #include "Core/Application.h"
 
 #include <fstream>
+#include <Assets/MaterialSerialiser.h>
+#include <Rendering/Material.h>
 
 void AssetBrowser::Open()
 {
@@ -154,6 +156,19 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 			ImGui::TableNextColumn();
 		}
 		ImGui::EndTable();
+	}
+
+
+	if (ImGui::BeginPopupContextItem())
+	{
+		if (ImGui::MenuItem("Create Material"))
+		{
+			std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl");
+			std::shared_ptr<Material> material = std::make_shared<Material>(shader, InitWithDefaultValues);
+			MaterialSerialiser ms;
+			ms.SerialiseTo(material, m_currentDirectory / "Material.mat");
+		}
+		ImGui::EndPopup();
 	}
 
 	if (ImGui::SliderFloat("Thumnail Size", &m_thumbnailSize.x, 10.0f, 512.0f))

@@ -26,6 +26,8 @@ public:
 
 	void SetUniform(const std::string& m_name, UniformData uniformData);
 
+	std::pair<const char*, const char*> GetShaderPaths() { return { m_vertexPath, m_fragmentPath }; };
+
 private:
 	void UploadUniform(uint32_t location, bool value) const;
 	void UploadUniform(uint32_t location, int value) const;
@@ -40,6 +42,8 @@ private:
 private:
 	uint32_t m_id;
 	std::unordered_map<std::string, UniformDescription> m_uniformLookup;
+	const char* m_vertexPath;
+	const char* m_fragmentPath;
 
 	friend class Material;
 };

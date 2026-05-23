@@ -32,7 +32,7 @@ layout (std140, binding = 1) uniform b_lights
 	int u_numPointLights;
 };
 
-uniform vec3 u_colour;
+uniform vec3 u_prop_colour;
 
 in vec3 posWorldSpace;
 in vec3 normal;
@@ -98,5 +98,5 @@ void main()
 		result += getPointLight(i);
 	}
 
-	colour = vec4(u_colour * result, 1.0);
+	colour = vec4(u_prop_colour * result, 1.0);
 }

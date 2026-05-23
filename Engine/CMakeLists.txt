@@ -22,6 +22,7 @@ target_sources(${CORE_LIBRARY}
         "src/Scenes/SceneSerialiser.cpp"
         "src/Rendering/MeshRender.cpp"
         "src/Rendering/UBO.cpp"
+        "src/Assets/MaterialSerialiser.cpp"
 
     PUBLIC
     FILE_SET HEADERS
@@ -59,6 +60,7 @@ target_sources(${CORE_LIBRARY}
         "include/Rendering/Light.h"
         "include/Rendering/Colour.h"
         "include/Reflection/PropertyType.h"
+        "include/Assets/MaterialSerialiser.h"
 )
 
 target_include_directories(${CORE_LIBRARY}

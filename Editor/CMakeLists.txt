@@ -55,7 +55,7 @@ FetchContent_Declare(imgui
 )
 
 FetchContent_Declare(nfd
-    URL https://github.com/mlabbe/nativefiledialog/archive/refs/tags/release_116.zip
+    URL https://github.com/btzy/nativefiledialog-extended/archive/refs/tags/v1.3.0.zip
 )
 
 FetchContent_Declare(imguizmo
@@ -81,18 +81,6 @@ target_include_directories(imgui
     PUBLIC
       ${imgui_SOURCE_DIR}
       ${imgui_SOURCE_DIR}/backends
-)
-
-add_library(nfd STATIC
-  ${nfd_SOURCE_DIR}/src/nfd_common.c
-  ${nfd_SOURCE_DIR}/src/nfd_win.cpp
-)
-message(DEBUG "PATH:" ${nfd_SOURCE_DIR})
-
-target_include_directories(nfd
-    PUBLIC
-      ${nfd_SOURCE_DIR}/src
-      ${nfd_SOURCE_DIR}/src/include
 )
 
 target_include_directories(imguizmo

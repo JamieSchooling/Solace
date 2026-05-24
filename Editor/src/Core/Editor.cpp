@@ -10,6 +10,8 @@
 #include <Scenes/SceneSystem.h>
 #include <Input/InputSystem.h>
 
+#include <nfd.h>
+
 #include "Core/EditorSystem.h"
 
 Application* CreateApplication()
@@ -27,6 +29,8 @@ void Editor::Initialise()
 		props.EventSystem = &EventSystem::Get();
 		AddSubsystem<Window>(props);
 	}
+
+	NFD_Init();
 
 	{
 		InputSystemProps props;
@@ -82,6 +86,7 @@ void Editor::Shutdown()
 	RemoveSubsystem<RenderSystem>();
 	RemoveSubsystem<SceneSystem>();
 	RemoveSubsystem<InputSystem>();
+	NFD_Quit();
 	RemoveSubsystem<Window>();
 	RemoveSubsystem<EventSystem>();
 }

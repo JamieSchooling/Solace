@@ -151,6 +151,14 @@ void EditorSystem::PostAppUpdate()
 
 void EditorSystem::OnEvent(Event& e)
 {
+	if (e.Type == EventType::WindowResize)
+	{
+		if (e.WindowResizeArgs.Width > 0 && e.WindowResizeArgs.Height > 0)
+		{
+			m_editorCamera.RecalculateProjection();
+		}
+	}
+
 	if (e.Type == EventType::SceneLoad)
 	{
 		Scene& scene = SceneSystem::Get().GetActiveScene();

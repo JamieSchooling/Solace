@@ -129,6 +129,9 @@ void EditorSystem::PostAppUpdate()
 	for (auto&& window : m_windows)
 	{
 		window->Draw(m_selectedEntity, scene);
+	}
+	for (auto&& window : m_windows)
+	{
 		window->DrawGizmos(m_selectedEntity, m_editorCamera, m_editorCamTransform, scene);
 	}
 

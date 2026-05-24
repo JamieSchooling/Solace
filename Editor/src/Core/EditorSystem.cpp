@@ -14,6 +14,7 @@
 #include "Windows/SceneHierarchy.h"
 #include "Windows/InspectorWindow.h"
 #include "Windows/AssetBrowser.h"
+#include <Input/InputSystem.h>
 
 void EditorSystem::Start(const SubsystemParams& params)
 {
@@ -56,6 +57,8 @@ void EditorSystem::Start(const SubsystemParams& params)
 	OpenWindow<SceneHierarchy>();
 	OpenWindow<InspectorWindow>();
 	OpenWindow<AssetBrowser>();
+
+	InputSystem::Get().AddFourComponentAction("Move", InputBinding::W, InputBinding::A, InputBinding::S, InputBinding::D);
 }
 
 void EditorSystem::Shutdown()
@@ -66,6 +69,42 @@ void EditorSystem::Shutdown()
 void EditorSystem::PreAppUpdate()
 {
 	HandleLayoutChange(); // Done on frame start to preserve docking in layout
+}
+
+void EditorSystem::OnAppUpdate()
+{
+	if (InputSystem::Get().WasKeyPressedThisFrame(InputBinding::MouseButtonRight))
+	{
+		Window::Get().SetCursorMode(CursorMode::Disabled);
+	}
+	else if (InputSystem::Get().WasKeyReleasedThisFrame(InputBinding::MouseButtonRight))
+	{
+		Window::Get().SetCursorMode(CursorMode::Visible);
+	}
+
+	if (InputSystem::Get().IsKeyDown(InputBinding::MouseButtonRight))
+	{
+		float lookSpeed = 0.08f;
+		glm::vec2 mouseDelta = InputSystem::Get().MouseDelta();
+
+		m_editorCamRotation.x += -mouseDelta.y * lookSpeed;
+		m_editorCamRotation.y += -mouseDelta.x * lookSpeed;
+		m_editorCamTransform.Rotation = glm::quat(glm::radians(m_editorCamRotation));
+
+		auto moveAction = InputSystem::Get().GetAction("Move");
+		if (!moveAction) { return; }
+
+		glm::vec2 inputVector = moveAction->Get<glm::vec2>();
+		glm::vec3 position = m_editorCamTransform.Position;
+		float curSpeedX = inputVector.x * m_editorFlyCamSpeed * Window::Get().DeltaTime();
+		float curSpeedZ = inputVector.y * m_editorFlyCamSpeed * Window::Get().DeltaTime();
+		glm::vec3 moveDirection = (m_editorCamTransform.Forward() * curSpeedZ) + (m_editorCamTransform.Right() * -curSpeedX);
+		position += moveDirection;
+
+		m_editorCamTransform.Position = position;
+	}
+
+	
 }
 
 void EditorSystem::PostAppUpdate()

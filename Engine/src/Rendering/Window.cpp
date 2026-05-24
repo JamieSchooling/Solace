@@ -131,10 +131,14 @@ void Window::Shutdown()
 void Window::PreAppUpdate()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	m_currentTime = glfwGetTime();
+	m_deltaTime = m_currentTime - m_prevFrameTime;
 }
 
 void Window::FinaliseAppUpdate()
 {
+	m_prevFrameTime = m_currentTime;
     glfwSwapBuffers(m_glfwInstance);
     glfwPollEvents();
 }
@@ -142,4 +146,20 @@ void Window::FinaliseAppUpdate()
 bool Window::IsOpen()
 {
     return !glfwWindowShouldClose(m_glfwInstance);
+}
+
+void Window::SetCursorMode(CursorMode mode)
+{
+	switch (mode)
+	{
+	case CursorMode::Visible:
+		glfwSetInputMode(m_glfwInstance, GLFW_CURSOR, GLFW_CURSOR_NORMAL); 
+		break;
+	case CursorMode::Hidden:
+		glfwSetInputMode(m_glfwInstance, GLFW_CURSOR, GLFW_CURSOR_HIDDEN); 
+		break;
+	case CursorMode::Disabled:
+		glfwSetInputMode(m_glfwInstance, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
+		break;
+	}
 }

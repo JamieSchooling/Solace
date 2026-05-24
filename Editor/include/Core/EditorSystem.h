@@ -38,6 +38,7 @@ public:
 	void Shutdown() override;
 
 	void PreAppUpdate() override;
+	void OnAppUpdate() override;
 	void PostAppUpdate() override;
 	void OnEvent(Event& e) override;
 
@@ -66,12 +67,27 @@ public:
 
 	LayoutOption GetLayout() const { return m_currentLayout; }
 	void SetLayout(LayoutOption layout) { m_newLayout = layout; }
+
+	CameraData GetEditorCameraData() 
+	{
+		CameraData data;
+		data.Projection = m_editorCamera.GetProjection();
+		data.View = m_editorCamera.GetView(m_editorCamTransform);
+		data.Position = glm::vec4(m_editorCamTransform.Position, 0.0f);
+
+		return data;
+	}
 private:
 	std::shared_ptr<FBO> m_gameRenderTarget;
 	LayoutOption m_currentLayout = LayoutOption::Default;
 	LayoutOption m_newLayout = LayoutOption::Default;
 	entt::entity m_selectedEntity = entt::null;
 	std::vector<std::unique_ptr<EditorWindow>> m_windows;
+
+	Camera m_editorCamera;
+	Transform m_editorCamTransform;
+	glm::vec3 m_editorCamRotation;
+	float m_editorFlyCamSpeed = 2.5f;
 
 	void HandleLayoutChange();
 	void DrawMenuBar();

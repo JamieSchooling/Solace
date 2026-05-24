@@ -44,6 +44,7 @@ void Editor::Initialise()
 		AddSubsystem<RenderSystem>();
 	};
 	m_gameViewTarget = std::make_shared<FBO>();
+	m_editorViewTarget = std::make_shared<FBO>();
 	
 	{
 		EditorSystemProps props;
@@ -64,8 +65,10 @@ void Editor::Run()
 		frame.RenderQueue = SceneSystem::Get().GetRenderQueue();
 		frame.Lights = SceneSystem::Get().GetLightData();
 
-		RenderView gameView{ SceneSystem::Get().GetActiveScene().GetMainCameraData(), m_gameViewTarget };
-		frame.RenderViews.push_back(gameView);
+		//RenderView gameView{ SceneSystem::Get().GetActiveScene().GetMainCameraData(), m_gameViewTarget };
+		//frame.RenderViews.push_back(gameView);
+		RenderView editorView{ EditorSystem::Get().GetEditorCameraData(), m_editorViewTarget};
+		frame.RenderViews.push_back(editorView);
 
 		RenderSystem::Get().SetFrameRenderData(frame);
 		PostUpdate();

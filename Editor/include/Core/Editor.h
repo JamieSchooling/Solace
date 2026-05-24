@@ -12,4 +12,5 @@ public:
 
 private:
 	std::shared_ptr<FBO> m_gameViewTarget;
+	std::shared_ptr<FBO> m_editorViewTarget;
 };

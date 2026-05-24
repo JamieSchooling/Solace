@@ -68,7 +68,7 @@ void EditorSystem::PreAppUpdate()
 	HandleLayoutChange(); // Done on frame start to preserve docking in layout
 }
 
-void EditorSystem::OnAppUpdate()
+void EditorSystem::PostAppUpdate()
 {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();

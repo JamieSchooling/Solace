@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Rendering/VAO.h"
+#include "Rendering/FBO.h"
 #include "Rendering/Material.h"
 
 struct RenderItem
@@ -9,9 +10,6 @@ struct RenderItem
 	std::shared_ptr<Material> Material;
 	glm::mat4 Transform = glm::mat4(1.0f);
 };
-
-using RenderQueue = std::vector<RenderItem>;
-
 
 struct alignas(16) CameraData
 {
@@ -43,9 +41,15 @@ struct alignas(16) LightData
 	int NumPointLights;
 };
 
+struct RenderView
+{
+	CameraData Camera;
+	std::shared_ptr<FBO> RenderTarget;
+};
+
 struct FrameRenderData
 {
-	RenderQueue RenderQueue;
-	CameraData Camera;
+	std::vector<RenderItem> RenderQueue;
+	std::vector<RenderView> RenderViews;
 	LightData Lights;
 };

@@ -10,25 +10,18 @@
 
 #include <glm/mat4x4.hpp>
 
-struct RenderSystemProps : public SubsystemParams
-{
-	FrameRenderData* renderData;
-	std::shared_ptr<FBO> renderTarget;
-};
-
 class RenderSystem : public SingletonSubsystem<RenderSystem>
 {
 public:
 	void Start(const SubsystemParams& params) override;
 	void Shutdown() override;
 
-	void OnAppUpdate() override;
+	void PostAppUpdate() override;
 
-	inline std::shared_ptr<FBO> GetRenderTarget() { return m_renderTarget; }
+	inline void SetFrameRenderData(FrameRenderData& frame) { m_renderData = &frame; }
 
 private:
 	FrameRenderData* m_renderData;
-	std::shared_ptr<FBO> m_renderTarget;
 	std::unique_ptr<UBO> m_cameraUBO;
 	std::unique_ptr<UBO> m_lightUBO;
 };

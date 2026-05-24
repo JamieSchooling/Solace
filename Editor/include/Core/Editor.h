@@ -9,4 +9,7 @@ public:
 	void Initialise() override;
 	void Run() override;
 	void Shutdown() override;
+
+private:
+	std::shared_ptr<FBO> m_gameViewTarget;
 };

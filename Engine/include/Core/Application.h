@@ -35,7 +35,11 @@ protected:
 		subsystem.Shutdown();
 		m_subsystems.erase(std::find(m_subsystems.begin(), m_subsystems.end(), &subsystem));
 	}
-	void UpdateSubsystems();
+
+	void PreUpdate();
+	void Update();
+	void PostUpdate();
+	void FinaliseUpdate();
 private:
 	std::vector<Subsystem*> m_subsystems;
 };

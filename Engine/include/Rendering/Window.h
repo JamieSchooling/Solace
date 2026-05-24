@@ -20,7 +20,7 @@ public:
 	void Shutdown() override;
 
 	void PreAppUpdate() override;
-	void PostAppUpdate() override;
+	void FinaliseAppUpdate() override;
 
 	bool IsOpen();
 

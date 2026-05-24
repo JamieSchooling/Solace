@@ -11,22 +11,37 @@ void Application::ExecuteLifecycle()
 	Shutdown();
 }
 
-void Application::UpdateSubsystems()
+void Application::PreUpdate()
 {
 	for (auto subsystem : m_subsystems)
 	{
 		subsystem->PreAppUpdate();
 	}
+}
+
+void Application::Update()
+{
 	for (auto subsystem : m_subsystems)
 	{
 		subsystem->OnAppUpdate();
 	}
+}
+
+void Application::PostUpdate()
+{
 	for (auto subsystem : m_subsystems)
 	{
 		subsystem->PostAppUpdate();
 	}
 }
 
+void Application::FinaliseUpdate()
+{
+	for (auto subsystem : m_subsystems)
+	{
+		subsystem->FinaliseAppUpdate();
+	}
+}
 
 std::filesystem::path Application::GetResourcePath()
 {

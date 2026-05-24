@@ -38,7 +38,7 @@ public:
 	void Shutdown() override;
 
 	void PreAppUpdate() override;
-	void OnAppUpdate() override;
+	void PostAppUpdate() override;
 	void OnEvent(Event& e) override;
 
 	template<typename T, typename = std::enable_if_t<std::is_base_of_v<EditorWindow, T>>>

@@ -13,6 +13,7 @@ public:
 	virtual void PreAppUpdate() {}
 	virtual void OnAppUpdate() {}
 	virtual void PostAppUpdate() {}
+	virtual void FinaliseAppUpdate() {}
 
 	virtual void OnEvent(Event& event) {}
 protected:

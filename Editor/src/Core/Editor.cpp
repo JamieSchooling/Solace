@@ -8,6 +8,7 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <Scenes/SceneSystem.h>
+#include <Input/InputSystem.h>
 
 #include "Core/EditorSystem.h"
 
@@ -28,24 +29,26 @@ void Editor::Initialise()
 	}
 
 	{
+		InputSystemProps props;
+		props.EventSystem = &EventSystem::Get();
+		AddSubsystem<InputSystem>(props);
+	}
+
+	{
 		SceneSystemProps props;
 		props.EventSystem = &EventSystem::Get();
 		AddSubsystem<SceneSystem>(props);
 	}
 
 	{
-		RenderSystemProps props;
-		props.renderData = &SceneSystem::Get().GetRenderData();
-		//props.renderTarget = std::make_shared<FBO>(glm::ivec2(Window::Get().GetWidth(), Window::Get().GetHeight()));
-		AddSubsystem<RenderSystem>(props);
-	};	
+		AddSubsystem<RenderSystem>();
+	};
+	m_gameViewTarget = std::make_shared<FBO>();
 	
 	{
 		EditorSystemProps props;
 		props.GLFWInstance = Window::Get().GetGLFWInstance();
 		props.EventSystem = &EventSystem::Get();
-		// For later use when viewport windows are implemented
-		//props.GameRenderTarget = RenderSystem::Get().GetRenderTarget();
 		AddSubsystem<EditorSystem>(props);
 	}
 }
@@ -54,7 +57,19 @@ void Editor::Run()
 {
 	while (Window::Get().IsOpen())
 	{
-		UpdateSubsystems();
+		PreUpdate();
+		Update();
+
+		FrameRenderData frame;
+		frame.RenderQueue = SceneSystem::Get().GetRenderQueue();
+		frame.Lights = SceneSystem::Get().GetLightData();
+
+		RenderView gameView{ SceneSystem::Get().GetActiveScene().GetMainCameraData(), m_gameViewTarget };
+		frame.RenderViews.push_back(gameView);
+
+		RenderSystem::Get().SetFrameRenderData(frame);
+		PostUpdate();
+		FinaliseUpdate();
 	}
 }
 
@@ -63,6 +78,7 @@ void Editor::Shutdown()
 	RemoveSubsystem<EditorSystem>();
 	RemoveSubsystem<RenderSystem>();
 	RemoveSubsystem<SceneSystem>();
+	RemoveSubsystem<InputSystem>();
 	RemoveSubsystem<Window>();
 	RemoveSubsystem<EventSystem>();
 }

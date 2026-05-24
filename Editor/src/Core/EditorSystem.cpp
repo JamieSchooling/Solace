@@ -6,6 +6,8 @@
 #include <imgui_impl_glfw.h>
 #include <Scenes/NameComponent.h>
 
+#include <ImGuizmo.h>
+
 #include <filesystem>
 #include <Core/Application.h>
 
@@ -113,6 +115,7 @@ void EditorSystem::PostAppUpdate()
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 	ImGui::DockSpaceOverViewport(0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingOverCentralNode);
+	ImGuizmo::BeginFrame();
 
 	DrawMenuBar();
 
@@ -126,6 +129,7 @@ void EditorSystem::PostAppUpdate()
 	for (auto&& window : m_windows)
 	{
 		window->Draw(m_selectedEntity, scene);
+		window->DrawGizmos(m_selectedEntity, m_editorCamera, m_editorCamTransform, scene);
 	}
 
 	// Framework is there to make game render to an ImGui window (Editor Viewport Window), 

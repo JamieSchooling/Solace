@@ -13,6 +13,7 @@ public:
 	MENU_ITEM("Window/General/Inspector", 400, Open);
 
 	void Initialise(Scene& scene) override;
+	void DrawGizmos(entt::entity& selected, Camera& editorCamera, Transform& editorCamTransform, Scene& scene) override;
 protected:
 	void DrawContent(entt::entity& selected, Scene& scene) override;
 private:

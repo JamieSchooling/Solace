@@ -58,7 +58,12 @@ FetchContent_Declare(nfd
     URL https://github.com/mlabbe/nativefiledialog/archive/refs/tags/release_116.zip
 )
 
-FetchContent_MakeAvailable(imgui nfd)
+FetchContent_Declare(imguizmo
+    GIT_REPOSITORY https://github.com/CedricGuillemet/ImGuizmo.git
+    GIT_TAG 1.10
+)
+
+FetchContent_MakeAvailable(imgui nfd imguizmo)
 
 add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/imgui.cpp
@@ -90,11 +95,17 @@ target_include_directories(nfd
       ${nfd_SOURCE_DIR}/src/include
 )
 
+target_include_directories(imguizmo
+    PUBLIC
+      ${imgui_SOURCE_DIR}
+)
+
 set_target_properties(${APPLICATION} PROPERTIES CXX_STANDARD 20)
 
 target_link_libraries(${APPLICATION} PUBLIC Engine)
 target_link_libraries(${APPLICATION} PUBLIC imgui)
 target_link_libraries(${APPLICATION} PRIVATE nfd)
+target_link_libraries(${APPLICATION} PRIVATE imguizmo)
 
 if(WIN32 AND MSVC)
     # Hide console in Release builds

@@ -21,6 +21,14 @@ void InspectorWindow::Initialise(Scene& scene)
 	}
 }
 
+void InspectorWindow::DrawGizmos(entt::entity& selected, Camera& editorCamera, Transform& editorCamTransform, Scene& scene)
+{
+	for (auto& inspector : m_inspectors[selected])
+	{
+		inspector->DrawGizmos(editorCamera, editorCamTransform, scene.Registry, selected);
+	}
+}
+
 void InspectorWindow::DrawContent(entt::entity& selected, Scene& scene)
 {
 	if (selected == entt::null)
@@ -85,5 +93,6 @@ void InspectorWindow::CacheEntityInspectors(entt::entity entity, entt::registry&
 		{
 			m_inspectors[entity].push_back(std::make_shared<ComponentInspector>(component));
 		}
+		m_inspectors[entity].back()->Initialise(registry, entity);
 	}
 }

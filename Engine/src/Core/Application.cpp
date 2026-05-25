@@ -8,10 +8,10 @@
 #include <ShlObj.h>
 #endif
 
-void Application::ExecuteLifecycle()
+void Application::ExecuteLifecycle(std::vector<std::string> args)
 {
-	Initialise();
 	std::filesystem::current_path(Application::GetExecutableDirectory());
+	Initialise(args);
 	Run();
 	Shutdown();
 }

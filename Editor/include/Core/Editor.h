@@ -6,7 +6,7 @@
 class Editor : public Application
 {
 public:
-	void Initialise() override;
+	void Initialise(std::vector<std::string> args) override;
 	void Run() override;
 	void Shutdown() override;
 

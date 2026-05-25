@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 #include "Core/Subsystem.h"
 
@@ -8,9 +9,9 @@
 class Application
 {
 public:
-	void ExecuteLifecycle();
+	void ExecuteLifecycle(std::vector<std::string> args);
 
-	virtual void Initialise() = 0;
+	virtual void Initialise(std::vector<std::string> args) = 0;
 	virtual void Run() = 0;
 	virtual void Shutdown() = 0;
 

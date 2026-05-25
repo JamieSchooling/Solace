@@ -19,8 +19,17 @@ Application* CreateApplication()
 	return new Editor();
 }
 
-void Editor::Initialise()
+void Editor::Initialise(std::vector<std::string> args)
 {
+	for (auto arg : args)
+	{
+		if (arg.ends_with(".solaceproj"))
+		{
+			std::filesystem::path proj(arg);
+			std::cout << proj << std::endl;
+		}
+	}
+
 	AddSubsystem<EventSystem>();
 
 	{

@@ -32,8 +32,12 @@ protected:
 	void RemoveSubsystem()
 	{
 		T& subsystem = T::Get();
-		subsystem.Shutdown();
-		m_subsystems.erase(std::find(m_subsystems.begin(), m_subsystems.end(), &subsystem));
+		auto it = std::find(m_subsystems.begin(), m_subsystems.end(), &subsystem);
+		if (it != m_subsystems.end())
+		{
+			subsystem.Shutdown();
+			m_subsystems.erase(it);
+		}
 	}
 
 	void PreUpdate();

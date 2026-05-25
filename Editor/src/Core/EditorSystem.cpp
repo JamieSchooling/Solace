@@ -28,8 +28,6 @@ void EditorSystem::Start(const SubsystemParams& params)
 	// For later use when viewport windows are implemented
 	//m_gameRenderTarget = props.GameRenderTarget;
 
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
@@ -52,9 +50,6 @@ void EditorSystem::Start(const SubsystemParams& params)
 
 	io.Fonts->AddFontFromFileTTF((Application::GetResourcePath()/"Fonts"/"RobotoMono-Regular.ttf").string().c_str(), 16.0f);
 	ImGui::StyleColorsDark();
-
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init("#version 460");
 
 	OpenWindow<SceneHierarchy>();
 	OpenWindow<InspectorWindow>();

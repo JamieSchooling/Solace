@@ -3,6 +3,8 @@
 #include <Core/Application.h>
 #include <Rendering/RenderSystem.h>
 
+#include "Core/ProjectManager.h"
+
 class Editor : public Application
 {
 public:
@@ -13,4 +15,8 @@ public:
 private:
 	std::shared_ptr<FBO> m_gameViewTarget;
 	std::shared_ptr<FBO> m_editorViewTarget;
+
+	ProjectManager m_projectManager;
+
+	void RunProjectManager(std::vector<std::string> args);
 };

@@ -1,6 +1,6 @@
 # CMakeList.txt : CMake project for Demo Application
 
-set(APPLICATION Editor)
+set(APPLICATION Solace)
 
 # Add source to this project's executable.
 add_executable (${APPLICATION})

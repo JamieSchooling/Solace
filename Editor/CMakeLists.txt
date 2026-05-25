@@ -47,7 +47,6 @@ target_sources(${APPLICATION}
         "include/Windows/AssetBrowser.h" 
         "include/Inspectors/LightInspector.h"
         "include/Windows/MaterialWindow.h"
-)
         "include/Core/ProjectManager.h")
 
 include(FetchContent)
@@ -64,8 +63,11 @@ FetchContent_Declare(imguizmo
     GIT_REPOSITORY https://github.com/CedricGuillemet/ImGuizmo.git
     GIT_TAG 1.10
 )
-
-FetchContent_MakeAvailable(imgui nfd imguizmo)
+FetchContent_Declare(ziplib
+    GIT_REPOSITORY https://bitbucket.org/wbenny/ziplib.git
+    GIT_TAG v0.01
+)
+FetchContent_MakeAvailable(imgui nfd imguizmo ziplib)
 
 add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/imgui.cpp
@@ -90,12 +92,27 @@ target_include_directories(imguizmo
       ${imgui_SOURCE_DIR}
 )
 
+add_library(ZipLib STATIC
+    ${ziplib_SOURCE_DIR}/Source/ZipLib/EndOfCentralDirectoryBlock.cpp
+    ${ziplib_SOURCE_DIR}/Source/ZipLib/ZipArchive.cpp
+    ${ziplib_SOURCE_DIR}/Source/ZipLib/ZipArchiveEntry.cpp
+    ${ziplib_SOURCE_DIR}/Source/ZipLib/ZipFile.cpp
+    ${ziplib_SOURCE_DIR}/Source/ZipLib/ZipCentralDirectoryFileHeader.cpp
+    ${ziplib_SOURCE_DIR}/Source/ZipLib/ZipGenericExtraField.cpp
+    ${ziplib_SOURCE_DIR}/Source/ZipLib/ZipLocalFileHeader.cpp
+)
+target_include_directories(ZipLib
+    PUBLIC
+      ${ziplib_SOURCE_DIR}/Source
+)
+
 set_target_properties(${APPLICATION} PROPERTIES CXX_STANDARD 20)
 
 target_link_libraries(${APPLICATION} PUBLIC Engine)
 target_link_libraries(${APPLICATION} PUBLIC imgui)
 target_link_libraries(${APPLICATION} PRIVATE nfd)
 target_link_libraries(${APPLICATION} PRIVATE imguizmo)
+target_link_libraries(${APPLICATION} PRIVATE ZipLib)
 
 if(WIN32 AND MSVC)
     # Hide console in Release builds

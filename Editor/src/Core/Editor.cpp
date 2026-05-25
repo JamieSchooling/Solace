@@ -114,7 +114,6 @@ void Editor::RunProjectManager(std::vector<std::string> args)
 		if (ProjectManager::IsProjectFile(arg))
 		{
 			projectPath = arg;
-			std::cout << projectPath << std::endl;
 		}
 	}
 

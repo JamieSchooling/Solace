@@ -11,7 +11,8 @@ using JSON = nlohmann::ordered_json;
 enum class ProjectManagerMode
 {
 	List,
-	Create
+	Create,
+	CreateFromPackage,
 };
 
 class ProjectManager
@@ -31,6 +32,8 @@ private:
 	std::filesystem::path m_currentProjectPath;
 	std::filesystem::path m_currentProjectAssetsPath;
 
+	std::filesystem::path m_currentPackageSource;
+
 	std::vector<std::filesystem::path> m_projectList;
 
 	void DrawProjectList(ImGuiWindowFlags flags);
@@ -38,6 +41,7 @@ private:
 
 	void LoadProject(std::filesystem::path projectPath);	
 	void CreateProject(std::filesystem::path projectPath);
+	void CreateProjectFromPackage(std::filesystem::path projectPath);
 	JSON CreateProjectJson();
 	void SerialiseProjectList();
 	bool ExistsInProjectList(std::filesystem::path projectPath);

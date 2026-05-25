@@ -10,4 +10,7 @@ public:
 
 	static void SaveAs();
 	MENU_ITEM("File/Save As...", 110, SaveAs)
+
+	static void PackageProject();
+	MENU_ITEM("File/Package Project...", 120, PackageProject)
 };

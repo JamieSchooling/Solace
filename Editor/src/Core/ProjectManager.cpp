@@ -10,6 +10,8 @@
 #include <nfd_glfw3.h>
 #include <iostream>
 #include <fstream>
+#include <ZipLib/ZipArchive.h>
+#include <ZipLib/ZipFile.h>
 
 void ProjectManager::Initialise(std::filesystem::path projectPath)
 {
@@ -62,6 +64,7 @@ void ProjectManager::Update()
 		DrawProjectList(flags);
 		break;
 	case ProjectManagerMode::Create:
+	case ProjectManagerMode::CreateFromPackage:
 		DrawProjectCreator(flags);
 		break;
 	}
@@ -72,7 +75,7 @@ void ProjectManager::Update()
 
 bool ProjectManager::IsProjectFile(std::filesystem::path file)
 {
-	return file.extension() == ".solaceproj";
+	return file.extension() == ".solaceproj" || file.extension() == ".solacepkg";
 }
 
 bool ProjectManager::IsProjectLoaded()
@@ -116,7 +119,7 @@ void ProjectManager::DrawProjectList(ImGuiWindowFlags flags)
 	{
 		nfdchar_t* outPath = nullptr;
 		nfdopendialogu8args_t args = { 0 };
-		nfdu8filteritem_t filters[1] = { { "Solace Project", "solaceproj" } };
+		nfdu8filteritem_t filters[1] = { { "Solace Project", "solaceproj,solacepkg" } };
 		args.filterList = filters;
 		args.filterCount = 1;
 		NFD_GetNativeWindowFromGLFWWindow(Window::Get().GetGLFWInstance(), &args.parentWindow);
@@ -141,7 +144,7 @@ void ProjectManager::DrawProjectCreator(ImGuiWindowFlags flags)
 	ImGui::Begin("Project Creator", nullptr, flags);
 	ImGui::PushFont(nullptr, 32.0f);
 	ImGui::SetCursorPosX(40);
-	ImGui::TextUnformatted("New Project");
+	ImGui::TextUnformatted(m_mode == ProjectManagerMode::CreateFromPackage ? "Unpackage Project" : "New Project");
 	ImGui::PopFont();
 
 	ImGui::SetCursorPosX(40);
@@ -192,7 +195,15 @@ void ProjectManager::DrawProjectCreator(ImGuiWindowFlags flags)
 	{
 		if (!std::filesystem::exists(m_currentProjectPath / m_currentProjectName))
 		{
-			CreateProject(m_currentProjectPath / m_currentProjectName);
+			switch (m_mode)
+			{
+			case ProjectManagerMode::Create:
+				CreateProject(m_currentProjectPath / m_currentProjectName);
+				break;
+			case ProjectManagerMode::CreateFromPackage:
+				CreateProjectFromPackage(m_currentProjectPath / m_currentProjectName);
+				break;
+			}
 		}
 	}
 	ImGui::EndDisabled();
@@ -202,6 +213,15 @@ void ProjectManager::DrawProjectCreator(ImGuiWindowFlags flags)
 
 void ProjectManager::LoadProject(std::filesystem::path projectPath)
 {
+	if (projectPath.extension() == ".solacepkg")
+	{
+		m_currentProjectName = projectPath.stem().string();
+		m_currentProjectPath = projectPath.parent_path();
+		m_currentPackageSource = projectPath;
+		m_mode = ProjectManagerMode::CreateFromPackage;
+		return;
+	}
+
 	m_currentProjectPath = projectPath.parent_path();
 
 	std::ifstream stream(projectPath);
@@ -241,6 +261,47 @@ void ProjectManager::CreateProject(std::filesystem::path projectPath)
 	m_projectList.push_back(projectFile);
 	SerialiseProjectList();
 	m_isProjectLoaded = true;
+}
+
+void ProjectManager::CreateProjectFromPackage(std::filesystem::path projectPath)
+{
+	ZipArchive::Ptr archive = ZipFile::Open(m_currentPackageSource.string());
+	
+	std::filesystem::path projectFile;
+	for (size_t i = 0; i < archive->GetEntriesCount(); ++i)
+	{
+		auto entry = archive->GetEntry(i);
+
+		std::filesystem::path outputPath = projectPath / entry->GetFullName();
+
+		// Directory entry
+		if (entry->IsDirectory())
+		{
+			std::filesystem::create_directories(outputPath);
+			continue;
+		}
+
+		// Ensure parent exists
+		std::filesystem::create_directories(outputPath.parent_path());
+
+		{
+			// Open decompression stream
+			std::istream* decompressStream = entry->GetDecompressionStream();
+
+			// Write file
+			std::ofstream out(outputPath, std::ios::binary);
+
+			out << decompressStream->rdbuf();
+		}
+
+		if (outputPath.extension() == ".solaceproj")
+		{
+			projectFile = outputPath;
+		}
+	}
+	if (projectFile.empty()) { return; }
+
+	LoadProject(projectFile);
 }
 
 JSON ProjectManager::CreateProjectJson()

@@ -1,4 +1,5 @@
 #include "Menu/FileMenu.h"
+#include <Core/Editor.h>
 #include <nfd.h>
 #include <nfd_glfw3.h>
 #include <iostream>
@@ -6,6 +7,9 @@
 #include <Scenes/SceneSerialiser.h>
 #include <Scenes/SceneSystem.h>
 #include <Core/Application.h>
+#include <ZipLib/ZipFile.h>
+#include <ZipLib/ZipArchiveEntry.h>
+#include <fstream>
 
 void FileMenu::Open()
 {
@@ -44,4 +48,55 @@ void FileMenu::SaveAs()
 		serialiser.SerialiseTo(outPath);
 		NFD_FreePath(outPath);
 	}
+}
+
+void FileMenu::PackageProject()
+{
+	nfdchar_t* outPath = nullptr;
+	nfdsavedialogu8args_t args = { 0 };
+	nfdu8filteritem_t filters[1] = { { "Solace Package", "solacepkg" } };
+	args.filterList = filters;
+	args.filterCount = 1;
+	std::string filename = Editor::ProjectDirectoryPath().filename().string();
+	args.defaultName = filename.c_str();
+	NFD_GetNativeWindowFromGLFWWindow(Window::Get().GetGLFWInstance(), &args.parentWindow);
+	nfdresult_t result = NFD_SaveDialogU8_With(&outPath, &args);
+	if (result == NFD_OKAY)
+	{
+		auto archive = ZipFile::Open(outPath);
+
+		const auto root = Editor::ProjectDirectoryPath();
+
+		for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(root))
+		{
+			auto relative = std::filesystem::relative(dirEntry.path(), root);
+
+			std::string archivePath = relative.generic_string();
+
+			if (dirEntry.is_directory())
+			{
+				archivePath += '/';
+
+				auto entry = archive->CreateEntry(archivePath);
+				continue;
+			}
+
+			auto entry = archive->CreateEntry(archivePath);
+			assert(entry != nullptr);
+
+			std::ifstream contentStream(dirEntry.path(), std::ios::binary);
+
+			entry->SetCompressionStream(
+				contentStream,
+				ZipArchiveEntry::CompressionLevel::Default,
+				ZipArchiveEntry::CompressionMethod::Deflate,
+				ZipArchiveEntry::CompressionMode::Immediate
+			);
+		}
+
+		ZipFile::SaveAndClose(archive, outPath);
+		NFD_FreePath(outPath);
+	}
+
+	
 }

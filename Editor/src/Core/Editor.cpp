@@ -43,6 +43,9 @@ void Editor::Initialise(std::vector<std::string> args)
 	RunProjectManager(args);
 	if (!m_projectManager.IsProjectLoaded()) { return; }
 
+	s_projectDirectoryPath = m_projectManager.GetProjectPath();
+	s_projectAssetsPath = m_projectManager.GetProjectAssetsPath();
+
 	{
 		InputSystemProps props;
 		props.EventSystem = &EventSystem::Get();
@@ -108,7 +111,7 @@ void Editor::RunProjectManager(std::vector<std::string> args)
 
 	for (auto arg : args)
 	{
-		if (arg.ends_with(".solaceproj"))
+		if (ProjectManager::IsProjectFile(arg))
 		{
 			projectPath = arg;
 			std::cout << projectPath << std::endl;

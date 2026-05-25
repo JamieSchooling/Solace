@@ -1,5 +1,6 @@
 #include "Windows/AssetBrowser.h"
 
+#include "Core/Editor.h"
 #include "Core/EditorSystem.h"
 #include "Core/Application.h"
 
@@ -15,8 +16,7 @@ void AssetBrowser::Open()
 
 void AssetBrowser::Initialise(Scene& scene)
 {
-	// TODO: Change this once projects are eventually implemented
-	m_baseDirectory = Application::GetResourcePath();
+	m_baseDirectory = Editor::ProjectAssetsPath();
 	m_currentDirectory = m_baseDirectory;
 
 	m_directoryIcon = std::make_unique<Texture>(Application::GetResourcePath() / "Icons" / "DirectoryIcon.png");
@@ -57,23 +57,32 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 
 	ImGui::BeginChild("##Toolbar", ImVec2(0, 22), false, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoDecoration);
 
-	std::filesystem::path full = m_currentDirectory.lexically_normal();
-	std::vector<std::filesystem::path> parts(full.begin(), full.end());
+	std::filesystem::path relative =
+		std::filesystem::relative(m_currentDirectory, m_baseDirectory);
+
+	std::vector<std::filesystem::path> parts(relative.begin(), relative.end());
+
 	std::filesystem::path target;
+
+	if (ImGui::SmallButton("Assets"))
+	{
+		m_currentDirectory = m_baseDirectory;
+	}
+
 	for (int i = 0; i < parts.size(); ++i)
 	{
-		if (i > 0) { ImGui::SameLine(); }
+		if (parts[i] == ".") { continue; }
+
+		ImGui::SameLine();
+		ImGui::TextUnformatted(">");
+
+		ImGui::SameLine();
 
 		target /= parts[i];
 
 		if (ImGui::SmallButton(parts[i].string().c_str()))
 		{
-			m_currentDirectory = target;
-		}
-		if (i < parts.size() - 1)
-		{
-			ImGui::SameLine();
-			ImGui::Text(">");
+			m_currentDirectory = m_baseDirectory / target;
 		}
 	}
 

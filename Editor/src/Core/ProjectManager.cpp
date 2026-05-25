@@ -2,9 +2,14 @@
 
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_glfw.h>
+#include <misc/cpp/imgui_stdlib.h>
 
 #include <Rendering/Window.h>
 #include <Core/Application.h>
+#include <nfd.h>
+#include <nfd_glfw3.h>
+#include <iostream>
+#include <fstream>
 
 void ProjectManager::Initialise(std::filesystem::path projectPath)
 {
@@ -15,6 +20,25 @@ void ProjectManager::Initialise(std::filesystem::path projectPath)
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->AddFontFromFileTTF((Application::GetResourcePath() / "Fonts" / "RobotoMono-Regular.ttf").string().c_str(), 16.0f);
+
+	if (std::filesystem::exists(Application::GetDataPath() / "ProjectList.json"))
+	{
+		std::ifstream stream(Application::GetDataPath() / "ProjectList.json");
+		std::stringstream sstream;
+		sstream << stream.rdbuf();
+
+		JSON data = JSON::parse(sstream.str());
+
+		for (auto& project : data["Projects"])
+		{
+			if (std::filesystem::exists(project))
+			{
+				m_projectList.push_back(project);
+			}
+		}
+
+		SerialiseProjectList(); // Removes deleted projects from list file
+	}
 }
 
 void ProjectManager::Update()
@@ -32,20 +56,23 @@ void ProjectManager::Update()
 		ImGuiWindowFlags_NoResize | 
 		ImGuiWindowFlags_NoCollapse;
 
-	ImGui::Begin("Project Manager", nullptr, flags);
-	ImGui::PushFont(nullptr, 32.0f);
-	ImGui::TextUnformatted("Projects");
-	ImGui::PopFont();
-
-	if (ProjectEntry("Sample Project", "/Path/To/Project", ImVec2(ImGui::GetContentRegionAvail().x, 55)))
+	switch (m_mode)
 	{
-		LoadProject("");
+	case ProjectManagerMode::List:
+		DrawProjectList(flags);
+		break;
+	case ProjectManagerMode::Create:
+		DrawProjectCreator(flags);
+		break;
 	}
-
-	ImGui::End();
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+bool ProjectManager::IsProjectFile(std::filesystem::path file)
+{
+	return file.extension() == ".solaceproj";
 }
 
 bool ProjectManager::IsProjectLoaded()
@@ -53,19 +80,206 @@ bool ProjectManager::IsProjectLoaded()
 	return m_isProjectLoaded;
 }
 
+void ProjectManager::DrawProjectList(ImGuiWindowFlags flags)
+{
+	ImGui::Begin("Project Manager", nullptr, flags);
+	ImGui::PushFont(nullptr, 32.0f);
+	ImGui::SetCursorPosX(40);
+	ImGui::TextUnformatted("Projects");
+	ImGui::PopFont();
+
+
+	ImGui::BeginChild("Project List", ImVec2(0.0f, ImGui::GetContentRegionAvail().y - 44.0f));
+	if (m_projectList.empty())
+	{
+		ImGui::PushFont(nullptr, 20.0f);
+		ImGui::SetCursorPosX(35);
+		ImGui::TextUnformatted("No projects yet.");
+		ImGui::PopFont();
+	}
+	else
+	{
+		for (auto& project : m_projectList)
+		{
+			ImGui::Separator();
+			if (ProjectEntry(project.stem().string(), project.string(), ImVec2(ImGui::GetContentRegionAvail().x, 55)))
+			{
+				LoadProject(project);
+			}
+		}
+		ImGui::Separator();
+	}
+	ImGui::EndChild();
+
+	ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x - 200.0f);
+	if (ImGui::Button("Add Project"))
+	{
+		nfdchar_t* outPath = nullptr;
+		nfdopendialogu8args_t args = { 0 };
+		nfdu8filteritem_t filters[1] = { { "Solace Project", "solaceproj" } };
+		args.filterList = filters;
+		args.filterCount = 1;
+		NFD_GetNativeWindowFromGLFWWindow(Window::Get().GetGLFWInstance(), &args.parentWindow);
+		nfdresult_t result = NFD_OpenDialogU8_With(&outPath, &args);
+		if (result == NFD_OKAY)
+		{
+			LoadProject(outPath);
+			NFD_FreePath(outPath);
+		}
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("+ New Project"))
+	{
+		m_mode = ProjectManagerMode::Create;
+	}
+
+	ImGui::End();
+}
+
+void ProjectManager::DrawProjectCreator(ImGuiWindowFlags flags)
+{
+	ImGui::Begin("Project Creator", nullptr, flags);
+	ImGui::PushFont(nullptr, 32.0f);
+	ImGui::SetCursorPosX(40);
+	ImGui::TextUnformatted("New Project");
+	ImGui::PopFont();
+
+	ImGui::SetCursorPosX(40);
+	ImGui::TextUnformatted("Project Name");
+	ImGui::SetCursorPosX(40);
+	if (ImGui::InputText("##Project Name", &m_currentProjectName));
+
+	bool projectAlreadyExists = !m_currentProjectName.empty() && std::filesystem::exists(m_currentProjectPath / m_currentProjectName);
+	if (projectAlreadyExists)
+	{
+		ImGui::SetCursorPosX(40);
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8, 0, 0, 1));
+		ImGui::TextUnformatted("A project with this name already exists here.");
+		ImGui::PopStyleColor();
+	}
+
+	
+	std::string path = (m_currentProjectPath / m_currentProjectName).string();
+	ImGui::SetCursorPosX(40);
+	ImGui::TextUnformatted("Project Location");
+	ImGui::SetCursorPosX(40);
+	ImGui::PushStyleColor(ImGuiCol_InputTextCursor, ImVec4(0, 0, 0, 0));
+	ImGui::InputText("##Project Path", &path, ImGuiInputTextFlags_ReadOnly | ImGuiInputTextFlags_ElideLeft);
+	ImGui::PopStyleColor();
+	if (ImGui::IsItemClicked())
+	{
+		nfdchar_t* outPath = nullptr;
+		nfdpickfolderu8args_t args = { 0 };
+
+		NFD_GetNativeWindowFromGLFWWindow(Window::Get().GetGLFWInstance(), &args.parentWindow);
+		nfdresult_t result = NFD_PickFolderU8_With(&outPath, &args);
+		if (result == NFD_OKAY)
+		{
+			m_currentProjectPath = outPath;
+			
+			NFD_FreePath(outPath);
+		}
+	}
+
+	ImGui::SetCursorPosX(40);
+	if (ImGui::Button("Cancel"))
+	{
+		m_mode = ProjectManagerMode::List;
+	}
+	ImGui::SameLine();
+	ImGui::BeginDisabled(projectAlreadyExists || m_currentProjectPath.empty() || m_currentProjectName.empty());
+	if (ImGui::Button("Create") && !m_currentProjectPath.empty() && !m_currentProjectName.empty())
+	{
+		if (!std::filesystem::exists(m_currentProjectPath / m_currentProjectName))
+		{
+			CreateProject(m_currentProjectPath / m_currentProjectName);
+		}
+	}
+	ImGui::EndDisabled();
+
+	ImGui::End();
+}
+
 void ProjectManager::LoadProject(std::filesystem::path projectPath)
 {
+	m_currentProjectPath = projectPath.parent_path();
+
+	std::ifstream stream(projectPath);
+	std::stringstream sstream;
+	sstream << stream.rdbuf();
+
+	JSON data = JSON::parse(sstream.str());
+
+	m_currentProjectAssetsPath = m_currentProjectPath / data["AssetsFolder"].get<std::string>();
+
+	if (!ExistsInProjectList(projectPath)) m_projectList.push_back(projectPath);
+	SerialiseProjectList();
 	m_isProjectLoaded = true;
 }
 
-void ProjectManager::CreateProject(std::filesystem::path projectDirectory)
+void ProjectManager::CreateProject(std::filesystem::path projectPath)
 {
+	m_currentProjectPath = projectPath;
+	m_currentProjectAssetsPath = projectPath / "Assets";
+	std::filesystem::create_directory(m_currentProjectPath);
+	std::filesystem::create_directory(m_currentProjectAssetsPath);
+
+	JSON json = CreateProjectJson();
+
+	std::filesystem::path projectFile = (m_currentProjectPath / m_currentProjectName).replace_extension(".solaceproj");
+	std::ofstream file((m_currentProjectPath / m_currentProjectName).replace_extension(".solaceproj").string());
+	if (file.is_open())
+	{
+		file << json.dump(4); // 4 spaces indentation
+		file.close();
+	}
+	else
+	{
+		// Handle file opening errors appropriately
+		throw std::runtime_error("Unable to open file for writing: " + m_currentProjectPath.string());
+	}
+	m_projectList.push_back(projectFile);
+	SerialiseProjectList();
+	m_isProjectLoaded = true;
+}
+
+JSON ProjectManager::CreateProjectJson()
+{
+	JSON out;
+	out["AssetsFolder"] = "Assets";
+	return out;
+}
+
+void ProjectManager::SerialiseProjectList()
+{
+	JSON json;
+	for (auto& project : m_projectList)
+	{
+		json["Projects"].push_back(project);
+	}
+	std::ofstream file(Application::GetDataPath() / "ProjectList.json");
+	if (file.is_open())
+	{
+		file << json.dump(4); // 4 spaces indentation
+		file.close();
+	}
+	else
+	{
+		// Handle file opening errors appropriately
+		throw std::runtime_error("Unable to open file for writing: " + m_currentProjectPath.string());
+	}
+}
+
+bool ProjectManager::ExistsInProjectList(std::filesystem::path projectPath)
+{
+	auto it = std::find(m_projectList.begin(), m_projectList.end(), projectPath);
+	return it != m_projectList.end();
 }
 
 bool ProjectManager::ProjectEntry(const std::string& projectName, const std::string& projectPath, const ImVec2& size)
 {
 	ImGui::PushID(projectPath.c_str());
-
+	ImGui::SetCursorPosX(30);
 	ImGui::BeginChild("ProjectEntry", size, 0, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
 	ImVec2 avail = ImGui::GetContentRegionAvail();
@@ -81,7 +295,7 @@ bool ProjectManager::ProjectEntry(const std::string& projectName, const std::str
 
 	ImGui::SetCursorPosX(10);
 	ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(180, 180, 180, 255));
-	ImGui::TextWrapped("%s", projectPath.c_str());
+	ImGui::TextUnformatted(projectPath.c_str());
 	ImGui::PopStyleColor();
 
 	ImGui::EndChild();

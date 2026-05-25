@@ -2,11 +2,16 @@
 
 #include "Core/Subsystem.h"
 
-#include <filesystem>
+#if defined(_WIN32)
+#include <Windows.h>
+#include <KnownFolders.h>
+#include <ShlObj.h>
+#endif
 
 void Application::ExecuteLifecycle()
 {
 	Initialise();
+	std::filesystem::current_path(Application::GetExecutableDirectory());
 	Run();
 	Shutdown();
 }
@@ -48,10 +53,28 @@ std::filesystem::path Application::GetResourcePath()
 	return std::filesystem::path("./resources").make_preferred();
 }
 
-#ifdef _WIN32
-#include <Windows.h>
-#include <KnownFolders.h>
-#include <ShlObj.h>
+std::filesystem::path Application::GetExecutableDirectory()
+{
+#if defined(_WIN32)
+	wchar_t buffer[MAX_PATH];
+	GetModuleFileNameW(nullptr, buffer, MAX_PATH);
+	return std::filesystem::path(buffer).parent_path();
+
+#elif defined(__linux__)
+	char buffer[PATH_MAX];
+	ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
+	buffer[len] = '\0';
+	return std::filesystem::path(buffer).parent_path();
+
+#elif defined(__APPLE__)
+	char buffer[1024];
+	uint32_t size = sizeof(buffer);
+	_NSGetExecutablePath(buffer, &size);
+	return std::filesystem::path(buffer).parent_path();
+#endif
+}
+
+#if defined(_WIN32)
 std::filesystem::path Application::GetConfigPath()
 {
 	PWSTR path = nullptr;

@@ -3,9 +3,7 @@
 #include <vector>
 #include "Core/Subsystem.h"
 
-namespace std::filesystem {
-	class path;
-}
+#include <filesystem>
 
 class Application
 {
@@ -19,6 +17,7 @@ public:
 	static std::filesystem::path GetResourcePath();
 	static std::filesystem::path GetConfigPath();
 	static std::filesystem::path GetDataPath();
+	static std::filesystem::path GetExecutableDirectory();
 protected:
 	template<typename T, typename = std::enable_if_t<std::is_base_of<SingletonSubsystem<T>, T>::value>>
 	void AddSubsystem(const SubsystemParams& params = {})

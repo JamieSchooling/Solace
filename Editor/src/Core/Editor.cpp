@@ -45,6 +45,7 @@ void Editor::Initialise(std::vector<std::string> args)
 
 	s_projectDirectoryPath = m_projectManager.GetProjectPath();
 	s_projectAssetsPath = m_projectManager.GetProjectAssetsPath();
+	Window::Get().SetTitle("Solace Editor - " + s_projectDirectoryPath.filename().string());
 
 	{
 		InputSystemProps props;

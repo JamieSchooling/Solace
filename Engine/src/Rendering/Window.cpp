@@ -148,6 +148,11 @@ bool Window::IsOpen()
     return !glfwWindowShouldClose(m_glfwInstance);
 }
 
+void Window::SetTitle(std::string title)
+{
+	glfwSetWindowTitle(m_glfwInstance, title.c_str());
+}
+
 void Window::SetCursorMode(CursorMode mode)
 {
 	switch (mode)

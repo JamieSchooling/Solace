@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Subsystem.h"
+#include <string>
 
 struct GLFWwindow;
 class EventSystem;
@@ -30,6 +31,7 @@ public:
 	void FinaliseAppUpdate() override;
 
 	bool IsOpen();
+	void SetTitle(std::string title);
 
 	inline float GetWidth() const { return m_width; }
 	inline float GetHeight() const { return m_height; }

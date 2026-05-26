@@ -21,15 +21,8 @@ public:
 	std::vector<RenderItem>& GetRenderQueue() { return m_renderQueue; }
 	LightData& GetLightData() { return m_lightData; }
 	Scene& GetActiveScene() { return m_activeScene; }
-	void LoadScene(Scene& scene)
-	{
-		m_activeScene.Registry.swap(scene.Registry);
-		m_activeScene.Name = scene.Name;
-		m_activeScene.MainCamera = scene.MainCamera;
-		Event e;
-		e.Type = EventType::SceneLoad;
-		m_eventSystem->DispatchEvent(e);
-	}
+	void LoadScene(Scene& scene);
+	
 private:
 	Scene m_activeScene;
 	EventSystem* m_eventSystem;

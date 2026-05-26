@@ -5,7 +5,6 @@
 #include "Rendering/MeshRender.h"
 #include "Transform/Transform.h"
 
-#include "Scenes/DefaultScene.h"
 
 void SceneSystem::Start(const SubsystemParams& params)
 {
@@ -14,7 +13,8 @@ void SceneSystem::Start(const SubsystemParams& params)
 	m_eventSystem = props.EventSystem;
 	m_eventSystem->AddListener(this);
 
-	m_activeScene = BuildDefaultScene();
+	Scene scene = Scene::CreateDefault();
+	LoadScene(scene);
 }
 
 void SceneSystem::Shutdown()

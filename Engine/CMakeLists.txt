@@ -46,7 +46,7 @@ target_sources(${CORE_LIBRARY}
         "include/Scenes/Scene.h"
         "include/Scenes/SceneSystem.h"  
         "include/Rendering/FrameRenderData.h"  
-        "include/Scenes/DefaultScene.h" 
+         
         "include/Rendering/MeshRender.h" 
         "include/Transform/Transform.h" 
         "include/Rendering/FBO.h" 

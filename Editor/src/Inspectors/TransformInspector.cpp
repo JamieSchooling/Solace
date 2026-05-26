@@ -62,7 +62,7 @@ void TransformInspector::DrawGizmos(Camera& editorCamera, Transform& editorCamTr
 	glm::mat4 view = editorCamera.GetView(editorCamTransform);
 	glm::mat4 proj = editorCamera.GetProjection();
 	
-	static ImGuizmo::OPERATION s_currentGizmoOperation(ImGuizmo::ROTATE);
+	static ImGuizmo::OPERATION s_currentGizmoOperation(ImGuizmo::TRANSLATE);
 	static ImGuizmo::MODE s_currentGizmoMode(ImGuizmo::WORLD);
 
 	if (InputSystem::Get().WasKeyPressedThisFrame(InputBinding::W))

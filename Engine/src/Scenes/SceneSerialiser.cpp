@@ -178,7 +178,6 @@ void SceneSerialiser::DeserialiseEntity(JSON entityData)
 			auto property = component->GetProperty(key.c_str());
 			DeserialiseProperty(propData, property, entity);
 		}
-		component->Initialise(m_scene.Registry, entity);
 	}
 }
 

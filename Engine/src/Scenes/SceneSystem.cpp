@@ -76,3 +76,23 @@ void SceneSystem::OnEvent(Event& event)
 		}
 	}
 }
+
+void SceneSystem::LoadScene(Scene& scene)
+{
+	m_activeScene.Registry.swap(scene.Registry);
+	m_activeScene.Name = scene.Name;
+	m_activeScene.MainCamera = scene.MainCamera;
+
+	for (auto& entity : m_activeScene.Registry.view<entt::entity>())
+	{
+		auto componentReflections = ReflectionRegistry::View(m_activeScene.Registry, entity);
+		for (auto& component : componentReflections)
+		{
+			component->Initialise(m_activeScene.Registry, entity);
+		}
+	}
+
+	Event e;
+	e.Type = EventType::SceneLoad;
+	m_eventSystem->DispatchEvent(e);
+}

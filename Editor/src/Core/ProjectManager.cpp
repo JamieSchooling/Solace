@@ -340,6 +340,17 @@ JSON ProjectManager::CreateProjectJson()
 void ProjectManager::SerialiseProjectList()
 {
 	JSON json;
+	// Prevent duplicates
+	std::vector<std::filesystem::path> projectsToSerialise(m_projectList);
+	m_projectList.clear();
+	for (auto& project : projectsToSerialise)
+	{
+		bool projectNotInList = std::find(m_projectList.begin(), m_projectList.end(), project) == m_projectList.end();
+		if (std::filesystem::exists(project) && projectNotInList)
+		{
+			m_projectList.push_back(project);
+		}
+	}
 	for (auto& project : m_projectList)
 	{
 		json["Projects"].push_back(project);

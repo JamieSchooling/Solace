@@ -142,10 +142,8 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 			}
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 			{
-				m_editingFilename = true;
 				startedFilenameEditThisFrame = true;
-				m_currentEditFilepath = directoryPath;
-				m_currentEditFilepathModified = directoryPath;
+				StartFilenameEdit(directoryPath);
 			}
 
 			ImGui::TableNextColumn();
@@ -191,10 +189,8 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 			}
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 			{
-				m_editingFilename = true;
 				startedFilenameEditThisFrame = true;
-				m_currentEditFilepath = filePath;
-				m_currentEditFilepathModified = filePath;
+				StartFilenameEdit(filePath);
 			}
 			
 			ImGui::TableNextColumn();
@@ -209,14 +205,30 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 
 	if (ImGui::BeginPopupContextItem())
 	{
-		if (ImGui::MenuItem("Create Material"))
+		if (ImGui::BeginMenu("Create"))
 		{
-			std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl");
-			std::shared_ptr<Material> material = std::make_shared<Material>(shader, InitWithDefaultValues);
-			MaterialSerialiser ms;
-			auto path = m_currentDirectory / "Material.mat";
-			AppendDuplicateCount(path);
-			ms.SerialiseTo(material, path);
+			if (ImGui::MenuItem("Folder"))
+			{
+				auto path = m_currentDirectory / "New Folder";
+				AppendDuplicateCount(path);
+				std::filesystem::create_directory(path);
+				StartFilenameEdit(path);
+			}
+			if (ImGui::MenuItem("Scene"))
+			{
+			}
+			if (ImGui::MenuItem("Material"))
+			{
+				std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl");
+				std::shared_ptr<Material> material = std::make_shared<Material>(shader, InitWithDefaultValues);
+				MaterialSerialiser ms;
+				auto path = m_currentDirectory / "Material.mat";
+				AppendDuplicateCount(path);
+				ms.SerialiseTo(material, path);
+
+				StartFilenameEdit(path);
+			}
+			ImGui::EndMenu();
 		}
 		ImGui::EndPopup();
 	}
@@ -248,7 +260,7 @@ void AssetBrowser::DrawFilenameEdit(const std::filesystem::path& path, float max
 {
 	ImGui::SetNextItemWidth(maxWidth);
 	std::string filename = m_currentEditFilepathModified.filename().string();
-	if (ImGui::InputText("##Filename", &filename))
+	if (ImGui::InputText("##Filename", &filename, ImGuiInputTextFlags_AutoSelectAll))
 	{
 		m_currentEditFilepathModified = m_currentDirectory / filename;
 	}
@@ -258,6 +270,13 @@ void AssetBrowser::DrawFilenameEdit(const std::filesystem::path& path, float max
 		std::filesystem::rename(path, m_currentEditFilepathModified);
 		m_editingFilename = false;
 	}
+}
+
+void AssetBrowser::StartFilenameEdit(const std::filesystem::path& path)
+{
+	m_editingFilename = true;
+	m_currentEditFilepath = path;
+	m_currentEditFilepathModified = path;
 }
 
 void AssetBrowser::AppendDuplicateCount(std::filesystem::path& target)

@@ -4,6 +4,7 @@
 #include "Rendering/Colour.h"
 
 #include <glm/glm.hpp>
+#include <Assets/AssetRegistry.h>
 
 enum class PropertyType
 {
@@ -18,6 +19,7 @@ enum class PropertyType
 	String,
 	Colour,
 	Enum,
+	Asset,
 };
 
 template<typename T>
@@ -81,4 +83,10 @@ template<>
 struct PropertyTypeResolver<Colour>
 {
 	static constexpr PropertyType Type = PropertyType::Colour;
+};
+
+template<>
+struct PropertyTypeResolver<AssetHandle>
+{
+	static constexpr PropertyType Type = PropertyType::Asset;
 };

@@ -28,8 +28,11 @@ void RenderSystem::PostAppUpdate()
 			// Render
 			if (!item.Geometry) continue;
 			item.Geometry->Use();
-			item.Material->SetValue("u_model", item.Transform);
-			item.Material->Use();
+			if (item.Material)
+			{
+				item.Material->SetValue("u_model", item.Transform);
+				item.Material->Use();
+			}
 			glDrawElements(GL_TRIANGLES, item.Geometry->Count(), GL_UNSIGNED_INT, NULL);
 		}
 

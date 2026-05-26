@@ -4,6 +4,7 @@
 #include "Rendering/VAO.h"
 
 #include "Reflection/Reflection.h"
+#include <Assets/AssetRegistry.h>
 
 struct MeshRenderComponent
 {
@@ -11,9 +12,9 @@ struct MeshRenderComponent
 
 	std::shared_ptr<Material> Material;
 	std::shared_ptr<VAO> Geometry;
-	std::string Mesh;
+	AssetHandle Mesh;
 	PROPERTY(Mesh)
-	std::string MaterialAsset;
+	AssetHandle MaterialAsset;
 	PROPERTY(MaterialAsset)
 
 	void Initialise();

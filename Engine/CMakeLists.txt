@@ -25,6 +25,7 @@ target_sources(${CORE_LIBRARY}
         "src/Assets/MaterialSerialiser.cpp" 
         "src/Assets/MaterialAssetCache.cpp"
         "src/Input/InputSystem.cpp"
+        "src/Assets/AssetRegistry.cpp"
 
     PUBLIC
     FILE_SET HEADERS
@@ -66,7 +67,7 @@ target_sources(${CORE_LIBRARY}
         "include/Assets/MaterialAssetCache.h"
         "include/Input/InputSystem.h"
         "include/Input/KeyCodes.h"
-        )
+        "include/Assets/AssetRegistry.h")
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

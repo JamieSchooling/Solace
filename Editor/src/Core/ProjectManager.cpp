@@ -327,7 +327,7 @@ void ProjectManager::SerialiseProjectList()
 	else
 	{
 		// Handle file opening errors appropriately
-		throw std::runtime_error("Unable to open file for writing: " + m_currentProjectPath.string());
+		throw std::runtime_error("Unable to open file for writing: " + (Application::GetDataPath() / "ProjectList.json").string());
 	}
 }
 

@@ -51,6 +51,7 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 			std::ofstream dst(target, std::ios::binary);
 
 			dst << src.rdbuf();
+			AssetRegistry::Get().RegisterNewAsset(target);
 		}
 
 		m_droppedFiles.clear();
@@ -173,9 +174,10 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 
 			if (ImGui::BeginDragDropSource())
 			{
-				const auto itemPath = filePath.c_str();
-				const size_t pathSize = (wcslen(itemPath) + 1) * sizeof(std::filesystem::path::value_type);
-				ImGui::SetDragDropPayload("Asset_Item", itemPath, pathSize, ImGuiCond_Once);
+				auto path = std::filesystem::relative(filePath, m_baseDirectory);
+				AssetHandle handle = AssetRegistry::Get().GetHandle(path);
+
+				ImGui::SetDragDropPayload("Asset_Item", &handle, sizeof(AssetHandle), ImGuiCond_Once);
 				ImGui::EndDragDropSource();
 			}
 
@@ -222,6 +224,7 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 				AppendDuplicateCount(path);
 				serialiser.SerialiseTo(path);
 				SceneSystem::Get().LoadScene(scene);
+				AssetRegistry::Get().RegisterNewAsset(path);
 				StartFilenameEdit(path);
 			}
 			if (ImGui::MenuItem("Material"))
@@ -232,7 +235,7 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 				auto path = m_currentDirectory / "Material.mat";
 				AppendDuplicateCount(path);
 				ms.SerialiseTo(material, path);
-
+				AssetRegistry::Get().RegisterNewAsset(path);
 				StartFilenameEdit(path);
 			}
 			ImGui::EndMenu();
@@ -274,8 +277,19 @@ void AssetBrowser::DrawFilenameEdit(const std::filesystem::path& path, float max
 
 	if (ImGui::IsKeyPressed(ImGuiKey_Enter))
 	{
-		std::filesystem::rename(path, m_currentEditFilepathModified);
 		m_editingFilename = false;
+		std::filesystem::rename(path, m_currentEditFilepathModified);
+		if (std::filesystem::is_directory(m_currentEditFilepath)) { return; }
+
+		AssetHandle handle = AssetRegistry::Get().GetHandle(std::filesystem::relative(m_currentEditFilepath, m_baseDirectory));
+		if (!handle.is_nil())
+		{
+			AssetRegistry::Get().MoveAsset(handle, m_currentEditFilepathModified);
+		}
+		else
+		{
+			AssetRegistry::Get().RegisterNewAsset(m_currentEditFilepathModified);
+		}
 	}
 }
 

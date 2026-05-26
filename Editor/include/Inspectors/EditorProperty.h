@@ -121,6 +121,11 @@ bool EditorProperty<T>::DrawPropertyWidget()
 	{
 		return ImGui::ColorEdit4(id, &m_data.ColourValue.r);
 	}
+	else if constexpr (std::is_same_v<T, AssetHandle>)
+	{
+		std::string pathString = AssetRegistry::Get().GetPath(m_data).stem().string();
+		return ImGui::InputText(id, &pathString);
+	}
 	else if constexpr (std::is_same_v<T, EnumInfo>)
 	{
 		std::vector<const char*> names;

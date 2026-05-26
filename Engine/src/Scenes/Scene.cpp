@@ -33,7 +33,7 @@ Scene Scene::CreateDefault()
 	scene.Registry.emplace<NameComponent>(cube).Name = "Cube";
 
 	MeshRenderComponent& meshRender = scene.Registry.emplace<MeshRenderComponent>(cube);
-	meshRender.Mesh = (Application::GetResourcePath() / "meshes" / "cube.obj").string();
+	meshRender.Mesh = AssetRegistry::Get().RegisterNewAsset(Application::GetResourcePath() / "meshes" / "cube.obj");
 	//meshRender.Mesh = (Application::GetResourcePath() / "meshes" / "cube.obj").string();
 	
 	scene.Registry.emplace<Transform>(cube);

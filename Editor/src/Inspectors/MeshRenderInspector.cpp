@@ -11,22 +11,22 @@ void MeshRenderInspector::DrawInspector(entt::registry& r, entt::entity e)
 	auto meshProp = m_component->GetProperty("Mesh");
 	if (meshProp)
 	{
-		std::string meshPath = std::any_cast<std::string>(meshProp->Get(r, e));
-		if (EditorProperty<std::string>("Mesh", meshPath).Draw())
+		AssetHandle meshHandle = std::any_cast<AssetHandle>(meshProp->Get(r, e));
+		if (EditorProperty<AssetHandle>("Mesh", meshHandle).Draw())
 		{
-			meshProp->Set(meshPath, r, e);
+			meshProp->Set(meshHandle, r, e);
 		}
 
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset_Item"))
 			{
-				const wchar_t* pathString = (const wchar_t*)payload->Data;
-				std::filesystem::path path = pathString;
+				AssetHandle handle = *(AssetHandle*)payload->Data;
+				std::filesystem::path path = AssetRegistry::Get().GetFullPath(handle);
 				Assimp::Importer importer;
 				if (importer.IsExtensionSupported(path.extension().string().c_str()))
 				{
-					meshProp->Set(path.string(), r, e);
+					meshProp->Set(handle, r, e);
 					m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMesh();
 				}
 			}
@@ -37,21 +37,21 @@ void MeshRenderInspector::DrawInspector(entt::registry& r, entt::entity e)
 	auto materialProp = m_component->GetProperty("MaterialAsset");
 	if (materialProp)
 	{
-		std::string materialPath = std::any_cast<std::string>(materialProp->Get(r, e));
-		if (EditorProperty<std::string>("Material", materialPath).Draw())
+		AssetHandle materialHandle = std::any_cast<AssetHandle>(materialProp->Get(r, e));
+		if (EditorProperty<AssetHandle>("material", materialHandle).Draw())
 		{
-			materialProp->Set(materialPath, r, e);
+			materialProp->Set(materialHandle, r, e);
 		}
 
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset_Item"))
 			{
-				const wchar_t* pathString = (const wchar_t*)payload->Data;
-				std::filesystem::path path = pathString;
+				AssetHandle handle = *(AssetHandle*)payload->Data;
+				std::filesystem::path path = AssetRegistry::Get().GetFullPath(handle);
 				if (path.extension() == ".mat")
 				{
-					materialProp->Set(path.string(), r, e);
+					materialProp->Set(handle, r, e);
 					m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMaterial();
 				}
 			}

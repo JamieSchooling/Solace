@@ -116,6 +116,14 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 				property->Set(value, r, e);
 			}
 		}
+		else if (property->Type() == PropertyType::Asset)
+		{
+			AssetHandle value = std::any_cast<AssetHandle>(property->Get(r, e));
+			if (EditorProperty<AssetHandle>(property->Name(), value).Draw())
+			{
+				property->Set(value, r, e);
+			}
+		}
 		else if (property->Type() == PropertyType::Enum)
 		{
 			EnumInfo value = std::any_cast<EnumInfo>(property->Get(r, e));

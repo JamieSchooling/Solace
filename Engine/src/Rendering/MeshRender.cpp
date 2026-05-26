@@ -13,15 +13,18 @@ void MeshRenderComponent::Initialise()
 
 void MeshRenderComponent::ReloadMesh()
 {
-	if (Mesh.empty() || !std::filesystem::exists(Mesh))
+	if (Mesh.is_nil())
+	{
+		return;
+	}
+	auto path = AssetRegistry::Get().GetFullPath(Mesh);
+	if (path.empty() || !std::filesystem::exists(path))
 	{
 		return;
 	}
 
-	std::cout << "Mesh Initialise: " << Mesh << std::endl;
-
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(Mesh,
+	const aiScene* scene = importer.ReadFile(path.string(),
 	aiProcess_Triangulate |
 	aiProcess_GenNormals |
 	aiProcess_JoinIdenticalVertices |
@@ -60,7 +63,16 @@ void MeshRenderComponent::ReloadMesh()
 
 void MeshRenderComponent::ReloadMaterial()
 {
-	if (MaterialAsset.empty() || !std::filesystem::exists(MaterialAsset))
+	if (MaterialAsset.is_nil())
+	{
+		return;
+	}
+	auto path = AssetRegistry::Get().GetFullPath(MaterialAsset);
+	if (path.empty() || !std::filesystem::exists(path))
+	{
+		return;
+	}
+	if (path.empty() || !std::filesystem::exists(path))
 	{
 		std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl");
 		Material = std::make_shared<::Material>(shader);
@@ -68,5 +80,5 @@ void MeshRenderComponent::ReloadMaterial()
 		return;
 	}
 	
-	Material = MaterialAssetCache::Load(MaterialAsset);
+	Material = MaterialAssetCache::Load(path);
 }

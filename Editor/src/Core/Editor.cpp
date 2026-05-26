@@ -1,6 +1,7 @@
 ﻿#include "Core/Editor.h"
 
 #include <Core/EntryPoint.h>
+#include <Assets/AssetRegistry.h>
 #include <Events/EventSystem.h>
 #include <Rendering/Window.h>
 #include <Rendering/FrameRenderData.h>
@@ -46,6 +47,13 @@ void Editor::Initialise(std::vector<std::string> args)
 	s_projectDirectoryPath = m_projectManager.GetProjectPath();
 	s_projectAssetsPath = m_projectManager.GetProjectAssetsPath();
 	Window::Get().SetTitle("Solace Editor - " + s_projectDirectoryPath.filename().string());
+
+	{
+		AssetRegistryProps props;
+		props.Root = s_projectAssetsPath;
+		props.RegistryFile = s_projectDirectoryPath / "Data" / ".assetregistry";
+		AddSubsystem<AssetRegistry>(props);
+	}
 
 	{
 		InputSystemProps props;
@@ -102,6 +110,7 @@ void Editor::Shutdown()
 	RemoveSubsystem<SceneSystem>();
 	RemoveSubsystem<InputSystem>();
 	NFD_Quit();
+	RemoveSubsystem<AssetRegistry>();
 	RemoveSubsystem<Window>();
 	RemoveSubsystem<EventSystem>();
 }

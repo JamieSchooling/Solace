@@ -56,6 +56,8 @@ void EditorSystem::Start(const SubsystemParams& params)
 	OpenWindow<AssetBrowser>();
 
 	InputSystem::Get().AddFourComponentAction("Move", InputBinding::W, InputBinding::A, InputBinding::S, InputBinding::D);
+	m_editorCamTransform.Position = glm::vec3(4.0f, 4.0f, 4.0f);
+	m_editorCamTransform.Rotation = glm::quat(glm::radians(glm::vec3(-45.0f, 45.0f, 0.0f)));
 }
 
 void EditorSystem::Shutdown()

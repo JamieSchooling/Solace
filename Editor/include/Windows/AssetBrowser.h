@@ -16,7 +16,7 @@ public:
 	static void Open();
 	MENU_ITEM("Window/General/Asset Browser", 420, Open);
 
-	void Initialise(Scene& scene) override;
+	void Initialise() override;
 	void OnEvent(Event& e) override;
 protected:
 	void DrawContent(entt::entity& selected, Scene& scene) override;

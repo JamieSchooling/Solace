@@ -15,7 +15,7 @@ void AssetBrowser::Open()
 	EditorSystem::Get().OpenWindow<AssetBrowser>();
 }
 
-void AssetBrowser::Initialise(Scene& scene)
+void AssetBrowser::Initialise()
 {
 	m_baseDirectory = Editor::ProjectAssetsPath();
 	m_currentDirectory = m_baseDirectory;

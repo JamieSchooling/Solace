@@ -62,6 +62,7 @@ public:
 		T& windowRef = *window;
 		m_windows.push_back(std::move(window));
 		m_windows.back()->Initialise(SceneSystem::Get().GetActiveScene());
+		m_windows.back()->Initialise();
 		return windowRef;
 	}
 

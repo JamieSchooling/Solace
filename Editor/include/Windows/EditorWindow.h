@@ -12,6 +12,7 @@ public:
 	EditorWindow(const char* title) : m_title(title) {}
 
 	virtual void Initialise(Scene& scene) {}
+	virtual void Initialise() {}
 	virtual void OnEvent(Event& e) {}
 	void Draw(entt::entity& selected, Scene& scene);
 	virtual void DrawGizmos(entt::entity& selected, Camera& editorCamera, Transform& editorCamTransform, Scene& scene) {}

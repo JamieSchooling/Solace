@@ -19,7 +19,7 @@ public:
 	void Start(const SubsystemParams& params) override;
 	void Shutdown() override;
 
-	AssetHandle RegisterNewAsset(std::filesystem::path path);
+	AssetHandle RegisterNewAsset(std::filesystem::path& path, AssetRelativeRoot relativeTo = AssetRelativeRoot::Custom);
 	void MoveAsset(AssetHandle handle, std::filesystem::path newPath);
 	void MoveDirectory(std::filesystem::path oldDir, std::filesystem::path newDir);
 
@@ -31,7 +31,7 @@ public:
 	std::filesystem::path GetFullPath(AssetHandle handle) const;
 
 private:
-	std::unordered_map<AssetHandle, std::filesystem::path> m_pathByHandle;
+	std::unordered_map<AssetHandle, AssetMetadata> m_metadataByHandle;
 	std::unordered_map<std::filesystem::path, AssetHandle> m_handleByPath;
 
 	std::filesystem::path m_root;

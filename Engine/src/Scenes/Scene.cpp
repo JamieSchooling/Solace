@@ -33,7 +33,8 @@ Scene Scene::CreateDefault()
 	scene.Registry.emplace<NameComponent>(cube).Name = "Cube";
 
 	MeshRenderComponent& meshRender = scene.Registry.emplace<MeshRenderComponent>(cube);
-	meshRender.Mesh = AssetRegistry::Get().RegisterNewAsset(Application::GetResourcePath() / "meshes" / "cube.obj");
+	std::filesystem::path path = Application::GetResourcePath() / "meshes" / "cube.obj";
+	meshRender.Mesh = AssetRegistry::Get().RegisterNewAsset(path, AssetRelativeRoot::Resources);
 	//meshRender.Mesh = (Application::GetResourcePath() / "meshes" / "cube.obj").string();
 	
 	scene.Registry.emplace<Transform>(cube);

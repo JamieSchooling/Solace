@@ -241,7 +241,10 @@ void ProjectManager::LoadProject(std::filesystem::path projectPath)
 		m_mode = ProjectManagerMode::CreateFromPackage;
 		return;
 	}
-
+	if (!std::filesystem::exists(projectPath))
+	{
+		return;
+	}
 	m_currentProjectPath = projectPath.parent_path();
 
 	std::ifstream stream(projectPath);

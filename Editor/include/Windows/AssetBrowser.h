@@ -29,6 +29,7 @@ private:
 	std::unique_ptr<Texture> m_fileIcon;
 	bool m_editingFilename = false;
 	std::filesystem::path m_currentEditFilepath;
+	std::filesystem::path m_currentEditFilepathModified;
 
 	void DrawTruncatedPath(const std::filesystem::path& path, float maxWidth);
 	void DrawFilenameEdit(const std::filesystem::path& path);

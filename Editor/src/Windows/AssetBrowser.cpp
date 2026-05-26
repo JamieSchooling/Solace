@@ -103,6 +103,8 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 		}
 	}
 
+	bool startedFilenameEditThisFrame = false;
+
 	ImGuiStyle& style = ImGui::GetStyle();
 	float cellWidth = m_thumbnailSize.x + style.CellPadding.x * 2.0f;
 	float availableWidth = ImGui::GetContentRegionAvail().x;
@@ -165,12 +167,7 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 				ImGui::EndDragDropSource();
 			}
 
-			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-			{
-				m_editingFilename = true;
-				m_currentEditFilepath = filePath;
-			}
-			if (m_editingFilename)
+			if (m_editingFilename && filePath == m_currentEditFilepath)
 			{
 				DrawFilenameEdit(filePath);
 			}
@@ -178,13 +175,20 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 			{
 				DrawTruncatedPath(filePath.filename(), cellWidth);
 			}
+			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+			{
+				m_editingFilename = true;
+				startedFilenameEditThisFrame = true;
+				m_currentEditFilepath = filePath;
+				m_currentEditFilepathModified = filePath;
+			}
 			
 			ImGui::TableNextColumn();
 		}
 		ImGui::EndTable();
 	}
 
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (ImGui::IsWindowHovered() || ImGui::IsItemHovered()))
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && (ImGui::IsWindowHovered() || ImGui::IsItemHovered()) && !startedFilenameEditThisFrame)
 	{
 		m_editingFilename = false;
 	}
@@ -228,15 +232,15 @@ void AssetBrowser::DrawTruncatedPath(const std::filesystem::path& path, float ma
 
 void AssetBrowser::DrawFilenameEdit(const std::filesystem::path& path)
 {
-	std::string filename = m_currentEditFilepath.filename().string();
+	std::string filename = m_currentEditFilepathModified.filename().string();
 	if (ImGui::InputText("##Filename", &filename))
 	{
-		m_currentEditFilepath = m_currentDirectory / filename;
+		m_currentEditFilepathModified = m_currentDirectory / filename;
 	}
 
 	if (ImGui::IsKeyPressed(ImGuiKey_Enter))
 	{
-		std::filesystem::rename(path, m_currentEditFilepath);
+		std::filesystem::rename(path, m_currentEditFilepathModified);
 		m_editingFilename = false;
 	}
 }

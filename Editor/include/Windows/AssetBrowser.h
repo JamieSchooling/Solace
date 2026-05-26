@@ -37,6 +37,8 @@ private:
 
 	void FileDropToMoveTarget(const std::filesystem::path& targetDirectory);
 
+	bool Delete(std::filesystem::path target, bool show);
+
 	void AppendDuplicateCount(std::filesystem::path& target);
 	void AppendDuplicateCount(std::filesystem::path& target, const std::filesystem::path& targetDir);
 };

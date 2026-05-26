@@ -113,6 +113,8 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 	float availableWidth = ImGui::GetContentRegionAvail().x;
 	availableWidth -= style.ScrollbarSize;
 
+	bool itemContextMenuOpened = false;
+
 	int columnCount = availableWidth / cellWidth;
 	columnCount = std::max(columnCount, 1);
 	if (ImGui::BeginTable("##Files", columnCount, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY, {0.0f, ImGui::GetContentRegionAvail().y - 44.0f}))
@@ -141,6 +143,22 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 				const size_t pathSize = (wcslen(itemPath) + 1) * sizeof(std::filesystem::path::value_type);
 				ImGui::SetDragDropPayload("Directory_Item", itemPath, pathSize, ImGuiCond_Once);
 				ImGui::EndDragDropSource();
+			}
+			bool shouldDelete = false;
+			if (ImGui::BeginPopupContextItem())
+			{
+				itemContextMenuOpened = true;
+				if (ImGui::MenuItem("Delete"))
+				{
+					shouldDelete = true;
+				}
+				ImGui::EndPopup();
+			}
+			if (Delete(directoryPath, shouldDelete))
+			{
+				std::filesystem::remove_all(directoryPath);
+
+				AssetRegistry::Get().DeleteDirectory(directoryPath);
 			}
 
 			if (m_editingFilename && directoryPath == m_currentEditFilepath)
@@ -193,6 +211,25 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 				ImGui::EndDragDropSource();
 			}
 
+			bool shouldDelete = false;
+			if (ImGui::BeginPopupContextItem())
+			{
+				itemContextMenuOpened = true;
+				if (ImGui::MenuItem("Delete"))
+				{
+					shouldDelete = true;
+				}
+				ImGui::EndPopup();
+			}
+			if (Delete(filePath, shouldDelete))
+			{
+				std::filesystem::remove(filePath);
+
+				auto path = std::filesystem::relative(filePath, m_baseDirectory);
+				AssetHandle handle = AssetRegistry::Get().GetHandle(path);
+				AssetRegistry::Get().DeleteAsset(handle);
+			}
+
 			if (m_editingFilename && filePath == m_currentEditFilepath)
 			{
 				DrawFilenameEdit(filePath, cellWidth);
@@ -217,7 +254,7 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 		m_editingFilename = false;
 	}
 
-	if (ImGui::BeginPopupContextItem())
+	if (!itemContextMenuOpened && ImGui::BeginPopupContextItem())
 	{
 		if (ImGui::BeginMenu("Create"))
 		{
@@ -340,6 +377,43 @@ void AssetBrowser::FileDropToMoveTarget(const std::filesystem::path& targetDirec
 		}
 		ImGui::EndDragDropTarget();
 	}
+}
+
+bool AssetBrowser::Delete(std::filesystem::path target, bool show)
+{
+	ImGui::PushID(target.string().c_str());
+	if (show)
+	{
+		ImGui::OpenPopup("Delete");
+	}
+
+	// Always center this window when appearing
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("Delete", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Are you sure?\nThis operation cannot be undone.");
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0))) 
+		{ 
+			ImGui::CloseCurrentPopup();
+			ImGui::EndPopup();
+			ImGui::PopID();
+			return true; 
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0))) 
+		{ 
+			ImGui::CloseCurrentPopup(); 
+		}
+		ImGui::EndPopup();
+	}
+	ImGui::PopID();
+
+	return false;
 }
 
 void AssetBrowser::AppendDuplicateCount(std::filesystem::path& target)

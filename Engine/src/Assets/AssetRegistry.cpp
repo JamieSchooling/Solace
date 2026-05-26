@@ -65,6 +65,33 @@ void AssetRegistry::MoveDirectory(std::filesystem::path oldDir, std::filesystem:
 	}
 }
 
+void AssetRegistry::DeleteAsset(AssetHandle handle)
+{
+	m_handleByPath.erase(m_pathByHandle.at(handle));
+	m_pathByHandle.erase(handle);
+	SerialiseRegistry();
+}
+
+void AssetRegistry::DeleteDirectory(std::filesystem::path directory)
+{
+	std::filesystem::path directoryRelative = std::filesystem::relative(directory, m_root);
+
+	std::vector<AssetHandle> toDelete;
+
+	for (const auto& [handle, path] : m_pathByHandle)
+	{
+		if (path.string().starts_with(directoryRelative.string()))
+		{
+			toDelete.push_back(handle);
+		}
+	}
+
+	for (AssetHandle handle : toDelete)
+	{
+		DeleteAsset(handle);
+	}
+}
+
 AssetHandle AssetRegistry::GetHandle(const std::filesystem::path& path)
 {
 	if (!m_handleByPath.contains(path))

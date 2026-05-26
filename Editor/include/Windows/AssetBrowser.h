@@ -32,7 +32,7 @@ private:
 	std::filesystem::path m_currentEditFilepathModified;
 
 	void DrawTruncatedPath(const std::filesystem::path& path, float maxWidth);
-	void DrawFilenameEdit(const std::filesystem::path& path);
+	void DrawFilenameEdit(const std::filesystem::path& path, float maxWidth);
 
 	void AppendDuplicateCount(std::filesystem::path& target);
 };

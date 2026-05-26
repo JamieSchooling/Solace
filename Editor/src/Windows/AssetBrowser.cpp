@@ -132,7 +132,21 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 				m_currentDirectory /= directoryPath.filename();
 			}
 
-			DrawTruncatedPath(directoryPath.filename(), cellWidth);
+			if (m_editingFilename && directoryPath == m_currentEditFilepath)
+			{
+				DrawFilenameEdit(directoryPath, cellWidth);
+			}
+			else
+			{
+				DrawTruncatedPath(directoryPath.filename(), cellWidth);
+			}
+			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+			{
+				m_editingFilename = true;
+				startedFilenameEditThisFrame = true;
+				m_currentEditFilepath = directoryPath;
+				m_currentEditFilepathModified = directoryPath;
+			}
 
 			ImGui::TableNextColumn();
 		}
@@ -169,7 +183,7 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 
 			if (m_editingFilename && filePath == m_currentEditFilepath)
 			{
-				DrawFilenameEdit(filePath);
+				DrawFilenameEdit(filePath, cellWidth);
 			}
 			else
 			{
@@ -230,8 +244,9 @@ void AssetBrowser::DrawTruncatedPath(const std::filesystem::path& path, float ma
 	ImGui::TextUnformatted(text.c_str());
 }
 
-void AssetBrowser::DrawFilenameEdit(const std::filesystem::path& path)
+void AssetBrowser::DrawFilenameEdit(const std::filesystem::path& path, float maxWidth)
 {
+	ImGui::SetNextItemWidth(maxWidth);
 	std::string filename = m_currentEditFilepathModified.filename().string();
 	if (ImGui::InputText("##Filename", &filename))
 	{

@@ -70,6 +70,7 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 	{
 		m_currentDirectory = m_baseDirectory;
 	}
+	FileDropToMoveTarget(m_baseDirectory);
 
 	for (int i = 0; i < parts.size(); ++i)
 	{
@@ -86,6 +87,7 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 		{
 			m_currentDirectory = m_baseDirectory / target;
 		}
+		FileDropToMoveTarget(m_baseDirectory / target);
 	}
 
 	ImGui::EndChild();
@@ -124,7 +126,7 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 
 		for (const auto& directoryPath : directoryPaths)
 		{
-			if (ImGui::ImageButton(directoryPath.filename().string().c_str(), (ImTextureRef)m_directoryIcon->GetID(), m_thumbnailSize))
+			if (ImGui::ImageButton(directoryPath.string().c_str(), (ImTextureRef)m_directoryIcon->GetID(), m_thumbnailSize))
 			{
 				// This will set selected *asset* rather than selected entity to display inspector info
 			}
@@ -132,6 +134,7 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 			{
 				m_currentDirectory /= directoryPath.filename();
 			}
+			FileDropToMoveTarget(directoryPath);
 
 			if (m_editingFilename && directoryPath == m_currentEditFilepath)
 			{
@@ -178,7 +181,8 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 				auto path = std::filesystem::relative(filePath, m_baseDirectory);
 				AssetHandle handle = AssetRegistry::Get().GetHandle(path);
 
-				ImGui::SetDragDropPayload("Asset_Item", &handle, sizeof(AssetHandle), ImGuiCond_Once);
+				ImGui::SetDragDropPayload("Asset_Item", &handle, sizeof(AssetHandle));
+
 				ImGui::EndDragDropSource();
 			}
 
@@ -301,6 +305,23 @@ void AssetBrowser::StartFilenameEdit(const std::filesystem::path& path)
 	m_currentEditFilepathModified = path;
 }
 
+void AssetBrowser::FileDropToMoveTarget(const std::filesystem::path& targetDirectory)
+{
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset_Item"))
+		{
+			AssetHandle handle = *(AssetHandle*)payload->Data;
+			std::filesystem::path path = AssetRegistry::Get().GetFullPath(handle);
+			std::filesystem::path target = targetDirectory / path.filename();
+			AppendDuplicateCount(target, targetDirectory);
+			std::filesystem::rename(path, target);
+			AssetRegistry::Get().MoveAsset(handle, target);
+		}
+		ImGui::EndDragDropTarget();
+	}
+}
+
 void AssetBrowser::AppendDuplicateCount(std::filesystem::path& target)
 {
 	if (std::filesystem::exists(target))
@@ -312,6 +333,24 @@ void AssetBrowser::AppendDuplicateCount(std::filesystem::path& target)
 		do
 		{
 			target = m_currentDirectory /
+				std::format("{} {}{}", stem, index, extension);
+
+			++index;
+		} while (std::filesystem::exists(target));
+	}
+}
+
+void AssetBrowser::AppendDuplicateCount(std::filesystem::path& target, const std::filesystem::path& targetDir)
+{
+	if (std::filesystem::exists(target))
+	{
+		const auto stem = target.stem().string();
+		const auto extension = target.extension().string();
+
+		int index = 1;
+		do
+		{
+			target = targetDir /
 				std::format("{} {}{}", stem, index, extension);
 
 			++index;

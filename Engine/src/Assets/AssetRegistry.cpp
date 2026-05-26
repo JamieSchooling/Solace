@@ -45,6 +45,7 @@ void AssetRegistry::MoveAsset(AssetHandle handle, std::filesystem::path newPath)
 {
 	if (!m_pathByHandle.contains(handle)) { return; }
 
+	newPath = std::filesystem::relative(newPath, m_root);
 	m_handleByPath.erase(m_pathByHandle.at(handle));
 	m_pathByHandle[handle] = newPath;
 	m_handleByPath[newPath] = handle;

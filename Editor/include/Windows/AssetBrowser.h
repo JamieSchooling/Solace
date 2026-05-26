@@ -35,5 +35,8 @@ private:
 	void DrawFilenameEdit(const std::filesystem::path& path, float maxWidth);
 	void StartFilenameEdit(const std::filesystem::path& path);
 
+	void FileDropToMoveTarget(const std::filesystem::path& targetDirectory);
+
 	void AppendDuplicateCount(std::filesystem::path& target);
+	void AppendDuplicateCount(std::filesystem::path& target, const std::filesystem::path& targetDir);
 };

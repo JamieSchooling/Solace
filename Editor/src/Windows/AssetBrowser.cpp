@@ -8,6 +8,7 @@
 #include <Assets/MaterialSerialiser.h>
 #include <Rendering/Material.h>
 #include <Windows/MaterialWindow.h>
+#include <Scenes/SceneSerialiser.h>
 
 void AssetBrowser::Open()
 {
@@ -142,6 +143,17 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 				if (filePath.extension() == ".mat")
 				{
 					MaterialWindow::Open(filePath);
+				}
+			}
+
+			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+			{
+				if (filePath.extension() == ".solace")
+				{
+					Scene scene;
+					SceneSerialiser serialiser(scene);
+					serialiser.DeserialiseFrom(filePath);
+					SceneSystem::Get().LoadScene(scene);
 				}
 			}
 

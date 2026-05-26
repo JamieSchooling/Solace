@@ -7,6 +7,7 @@
 struct SceneSystemProps : public SubsystemParams
 {
 	EventSystem* EventSystem = nullptr;
+	AssetHandle StartupScene;
 };
 
 class SceneSystem : public SingletonSubsystem<SceneSystem>

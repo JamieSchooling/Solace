@@ -198,6 +198,8 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 					serialiser.DeserialiseFrom(filePath);
 					SceneSystem::Get().LoadScene(scene);
 					EditorSystem::Get().SetCurrentlyOpenScene(filePath);
+					auto path = std::filesystem::relative(filePath, m_baseDirectory);
+					Editor::SetStartupScene(AssetRegistry::Get().GetHandle(path));
 				}
 			}
 

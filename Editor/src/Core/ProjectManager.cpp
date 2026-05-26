@@ -83,6 +83,26 @@ bool ProjectManager::IsProjectLoaded()
 	return m_isProjectLoaded;
 }
 
+void ProjectManager::SerialiseProjectData(AssetHandle startupScene)
+{
+	JSON json;
+	json["AssetsFolder"] = "Assets";
+	json["StartupScene"] = uuids::to_string(startupScene);
+	
+	std::filesystem::path projectFile = (m_currentProjectPath / m_currentProjectName).replace_extension(".solaceproj");
+	std::ofstream file((m_currentProjectPath / m_currentProjectName).replace_extension(".solaceproj").string());
+	if (file.is_open())
+	{
+		file << json.dump(4); // 4 spaces indentation
+		file.close();
+	}
+	else
+	{
+		// Handle file opening errors appropriately
+		throw std::runtime_error("Unable to open file for writing: " + m_currentProjectPath.string());
+	}
+}
+
 void ProjectManager::DrawProjectList(ImGuiWindowFlags flags)
 {
 	ImGui::Begin("Project Manager", nullptr, flags);
@@ -231,6 +251,11 @@ void ProjectManager::LoadProject(std::filesystem::path projectPath)
 	JSON data = JSON::parse(sstream.str());
 
 	m_currentProjectAssetsPath = m_currentProjectPath / data["AssetsFolder"].get<std::string>();
+	auto handle = AssetHandle::from_string(data["StartupScene"].get<std::string>());
+	if (handle.has_value())
+	{
+		m_startupScene = handle.value();
+	}
 
 	if (!ExistsInProjectList(projectPath)) m_projectList.push_back(projectPath);
 	SerialiseProjectList();
@@ -308,6 +333,7 @@ JSON ProjectManager::CreateProjectJson()
 {
 	JSON out;
 	out["AssetsFolder"] = "Assets";
+	out["StartupScene"] = uuids::to_string(AssetHandle());
 	return out;
 }
 

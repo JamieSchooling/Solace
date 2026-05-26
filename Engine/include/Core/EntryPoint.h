@@ -26,6 +26,7 @@ int main(int argc, char** argv)
 
 #ifdef _WIN32
 #include <windows.h>
+#include <shellapi.h>
 
 static std::string WideToUtf8(const wchar_t* w)
 {

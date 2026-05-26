@@ -5,9 +5,7 @@
 #include <filesystem>
 #include <unordered_map>
 
-#include <stduuid/uuid.h>
-
-using AssetHandle = uuids::uuid;
+#include "Assets/AssetHandle.h"
 
 struct AssetRegistryProps : public SubsystemParams
 {

@@ -28,6 +28,8 @@ void FileMenu::Open()
 		serialiser.DeserialiseFrom(outPath);
 		SceneSystem::Get().LoadScene(scene);
 		EditorSystem::Get().SetCurrentlyOpenScene(outPath);
+		auto path = std::filesystem::relative(outPath, Editor::ProjectAssetsPath());
+		Editor::SetStartupScene(AssetRegistry::Get().GetHandle(path));
 		NFD_FreePath(outPath);
 	}
 }

@@ -6,6 +6,8 @@
 
 #include <nlohmann/json.hpp>
 
+#include <Assets/AssetHandle.h>
+
 using JSON = nlohmann::ordered_json;
 
 enum class ProjectManagerMode
@@ -25,12 +27,16 @@ public:
 	bool IsProjectLoaded();
 	std::filesystem::path GetProjectPath() { return m_currentProjectPath; }
 	std::filesystem::path GetProjectAssetsPath() { return m_currentProjectAssetsPath; }
+	AssetHandle GetStartupScene() { return m_startupScene; }
+
+	void SerialiseProjectData(AssetHandle startupScene);
 private:
 	bool m_isProjectLoaded = false;
 	ProjectManagerMode m_mode = ProjectManagerMode::List;
 	std::string m_currentProjectName = "Untitled";
 	std::filesystem::path m_currentProjectPath;
 	std::filesystem::path m_currentProjectAssetsPath;
+	AssetHandle m_startupScene;
 
 	std::filesystem::path m_currentPackageSource;
 

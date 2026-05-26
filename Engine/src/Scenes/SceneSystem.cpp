@@ -4,6 +4,7 @@
 #include "Rendering/Light.h"
 #include "Rendering/MeshRender.h"
 #include "Transform/Transform.h"
+#include <Scenes/SceneSerialiser.h>
 
 
 void SceneSystem::Start(const SubsystemParams& params)
@@ -14,6 +15,12 @@ void SceneSystem::Start(const SubsystemParams& params)
 	m_eventSystem->AddListener(this);
 
 	Scene scene = Scene::CreateDefault();
+	if (!props.StartupScene.is_nil())
+	{
+		std::filesystem::path scenePath = AssetRegistry::Get().GetFullPath(props.StartupScene);
+		SceneSerialiser s(scene);
+		s.DeserialiseFrom(scenePath);
+	}
 	LoadScene(scene);
 }
 

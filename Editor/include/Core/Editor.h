@@ -2,6 +2,7 @@
 
 #include <Core/Application.h>
 #include <Rendering/RenderSystem.h>
+#include <Assets/AssetHandle.h>
 
 #include "Core/ProjectManager.h"
 
@@ -14,12 +15,14 @@ public:
 
 	inline static std::filesystem::path ProjectDirectoryPath() { return s_projectDirectoryPath; }
 	inline static std::filesystem::path ProjectAssetsPath() { return s_projectAssetsPath; }
+	inline static void SetStartupScene(AssetHandle scene) { s_startupScene = scene; }
 
 private:
 	std::shared_ptr<FBO> m_gameViewTarget;
 	std::shared_ptr<FBO> m_editorViewTarget;
 	inline static std::filesystem::path s_projectDirectoryPath;
 	inline static std::filesystem::path s_projectAssetsPath;
+	inline static AssetHandle s_startupScene;
 
 	ProjectManager m_projectManager;
 

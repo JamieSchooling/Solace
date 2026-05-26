@@ -25,4 +25,6 @@ public:
 
 		return data;
 	}
+
+	static Scene CreateDefault();
 };

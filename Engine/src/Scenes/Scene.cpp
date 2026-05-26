@@ -4,16 +4,39 @@
 #include "Rendering/Light.h"
 #include "Transform/Transform.h"
 #include "Scenes/NameComponent.h"
+#include <Rendering/MeshRender.h>
+#include <Core/Application.h>
 
 Scene::Scene()
 {
-	MainCamera = Registry.create();
-	Registry.emplace<NameComponent>(MainCamera).Name = "Main Camera";
-	Registry.emplace<Transform>(MainCamera);
-	Registry.emplace<Camera>(MainCamera);
+	
+}
 
-	auto directionalLight = Registry.create();
-	Registry.emplace<NameComponent>(directionalLight).Name = "Directional Light";
-	Registry.emplace<Transform>(directionalLight);
-	Registry.emplace<Light>(directionalLight);
+Scene Scene::CreateDefault()
+{
+	Scene scene;
+	scene.Name = "Default Scene";
+
+	entt::entity mainCamera = scene.Registry.create();
+	scene.Registry.emplace<NameComponent>(mainCamera).Name = "Main Camera";
+	scene.Registry.emplace<Transform>(mainCamera);
+	scene.Registry.emplace<Camera>(mainCamera);
+	scene.MainCamera = mainCamera;
+
+	entt::entity directionalLight = scene.Registry.create();
+	scene.Registry.emplace<NameComponent>(directionalLight).Name = "Directional Light";
+	scene.Registry.emplace<Transform>(directionalLight).Rotation = glm::quat(glm::radians(glm::vec3(-15.0f, 20.0f, 0.0f)));
+	scene.Registry.emplace<Light>(directionalLight);
+
+	entt::entity cube = scene.Registry.create();
+
+	scene.Registry.emplace<NameComponent>(cube).Name = "Cube";
+
+	MeshRenderComponent& meshRender = scene.Registry.emplace<MeshRenderComponent>(cube);
+	meshRender.Mesh = (Application::GetResourcePath() / "meshes" / "cube.obj").string();
+	//meshRender.Mesh = (Application::GetResourcePath() / "meshes" / "cube.obj").string();
+	
+	scene.Registry.emplace<Transform>(cube);
+
+	return scene;
 }

@@ -216,6 +216,13 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 			}
 			if (ImGui::MenuItem("Scene"))
 			{
+				Scene scene = Scene::CreateDefault();
+				SceneSerialiser serialiser(scene);
+				auto path = m_currentDirectory / "New Scene.solace";
+				AppendDuplicateCount(path);
+				serialiser.SerialiseTo(path);
+				SceneSystem::Get().LoadScene(scene);
+				StartFilenameEdit(path);
 			}
 			if (ImGui::MenuItem("Material"))
 			{

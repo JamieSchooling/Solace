@@ -135,6 +135,13 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 				m_currentDirectory /= directoryPath.filename();
 			}
 			FileDropToMoveTarget(directoryPath);
+			if (ImGui::BeginDragDropSource())
+			{
+				const auto itemPath = directoryPath.c_str();
+				const size_t pathSize = (wcslen(itemPath) + 1) * sizeof(std::filesystem::path::value_type);
+				ImGui::SetDragDropPayload("Directory_Item", itemPath, pathSize, ImGuiCond_Once);
+				ImGui::EndDragDropSource();
+			}
 
 			if (m_editingFilename && directoryPath == m_currentEditFilepath)
 			{
@@ -317,6 +324,19 @@ void AssetBrowser::FileDropToMoveTarget(const std::filesystem::path& targetDirec
 			AppendDuplicateCount(target, targetDirectory);
 			std::filesystem::rename(path, target);
 			AssetRegistry::Get().MoveAsset(handle, target);
+		}
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Directory_Item"))
+		{
+			const wchar_t* pathString = (const wchar_t*)payload->Data;
+			std::filesystem::path path = pathString;
+			if (targetDirectory.string().starts_with(path.string()))
+			{
+				return;
+			}
+			std::filesystem::path target = targetDirectory / path.filename();
+			AppendDuplicateCount(target, targetDirectory);
+			std::filesystem::rename(path, target);
+			AssetRegistry::Get().MoveDirectory(path, target);
 		}
 		ImGui::EndDragDropTarget();
 	}

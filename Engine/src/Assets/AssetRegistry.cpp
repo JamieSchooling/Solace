@@ -52,6 +52,19 @@ void AssetRegistry::MoveAsset(AssetHandle handle, std::filesystem::path newPath)
 	SerialiseRegistry();
 }
 
+void AssetRegistry::MoveDirectory(std::filesystem::path oldDir, std::filesystem::path newDir)
+{
+	std::filesystem::path oldDirRelative = std::filesystem::relative(oldDir, m_root);
+
+	for (auto& [handle, path] : m_pathByHandle)
+	{
+		if (path.string().starts_with(oldDirRelative.string()))
+		{
+			MoveAsset(handle, newDir / path.filename());
+		}
+	}
+}
+
 AssetHandle AssetRegistry::GetHandle(const std::filesystem::path& path)
 {
 	if (!m_handleByPath.contains(path))

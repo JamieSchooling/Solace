@@ -23,6 +23,7 @@ public:
 
 	AssetHandle RegisterNewAsset(std::filesystem::path path);
 	void MoveAsset(AssetHandle handle, std::filesystem::path newPath);
+	void MoveDirectory(std::filesystem::path oldDir, std::filesystem::path newDir);
 
 	AssetHandle GetHandle(const std::filesystem::path& path);
 	std::filesystem::path GetPath(AssetHandle handle) const;

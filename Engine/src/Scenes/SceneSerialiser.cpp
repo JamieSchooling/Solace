@@ -149,6 +149,12 @@ JSON SceneSerialiser::SerialiseProperty(IProperty* property, entt::entity entity
 		out["Type"] = "colour";
 		out["Value"] = { value.r, value.g, value.b, value.a };
 	}
+	else if (property->Type() == PropertyType::Asset)
+	{
+		AssetHandle handle = std::any_cast<AssetHandle>(property->Get(m_scene.Registry, entity));
+		out["Type"] = "asset";
+		out["Value"] = uuids::to_string(handle);
+	}
 	else if (property->Type() == PropertyType::Enum)
 	{
 		EnumInfo enumInfo = std::any_cast<EnumInfo>(property->Get(m_scene.Registry, entity));
@@ -232,6 +238,12 @@ void SceneSerialiser::DeserialiseProperty(JSON propertyData, IProperty* property
 		auto value = propertyData["Value"];
 		Colour colour = glm::vec4(value[0].get<float>(), value[1].get<float>(), value[2].get<float>(), value[3].get<float>());
 		property->Set(colour, m_scene.Registry, entity);
+	}
+	else if (propertyData["Type"] == "asset")
+	{
+		auto value = propertyData["Value"].get<std::string>();
+		AssetHandle handle = AssetHandle::from_string(value).value();
+		property->Set(handle, m_scene.Registry, entity);
 	}
 	else if (propertyData["Type"] == "enum")
 	{

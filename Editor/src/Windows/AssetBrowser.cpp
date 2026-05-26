@@ -169,6 +169,7 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 					SceneSerialiser serialiser(scene);
 					serialiser.DeserialiseFrom(filePath);
 					SceneSystem::Get().LoadScene(scene);
+					EditorSystem::Get().SetCurrentlyOpenScene(filePath);
 				}
 			}
 

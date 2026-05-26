@@ -69,6 +69,9 @@ public:
 	LayoutOption GetLayout() const { return m_currentLayout; }
 	void SetLayout(LayoutOption layout) { m_newLayout = layout; }
 
+	std::filesystem::path GetCurrentlyOpenScene() const;
+	void SetCurrentlyOpenScene(std::filesystem::path path);
+
 	CameraData GetEditorCameraData() 
 	{
 		CameraData data;
@@ -84,6 +87,8 @@ private:
 	LayoutOption m_newLayout = LayoutOption::Default;
 	entt::entity m_selectedEntity = entt::null;
 	std::vector<std::unique_ptr<EditorWindow>> m_windows;
+
+	std::filesystem::path m_currentlyOpenScene;
 
 	Camera m_editorCamera;
 	Transform m_editorCamTransform;

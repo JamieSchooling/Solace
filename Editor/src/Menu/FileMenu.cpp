@@ -6,6 +6,7 @@
 #include <Scenes/Scene.h>
 #include <Scenes/SceneSerialiser.h>
 #include <Scenes/SceneSystem.h>
+#include <Core/EditorSystem.h>
 #include <Core/Application.h>
 #include <ZipLib/ZipFile.h>
 #include <ZipLib/ZipArchiveEntry.h>
@@ -22,13 +23,26 @@ void FileMenu::Open()
 	nfdresult_t result = NFD_OpenDialogU8_With(&outPath, &args);
 	if (result == NFD_OKAY)
 	{
-		std::cout << outPath << std::endl;
 		Scene scene;
 		SceneSerialiser serialiser(scene);
 		serialiser.DeserialiseFrom(outPath);
 		SceneSystem::Get().LoadScene(scene);
+		EditorSystem::Get().SetCurrentlyOpenScene(outPath);
 		NFD_FreePath(outPath);
 	}
+}
+
+void FileMenu::Save()
+{
+	std::filesystem::path path = EditorSystem::Get().GetCurrentlyOpenScene();
+	if (path.empty() || !std::filesystem::exists(path))
+	{
+		SaveAs();
+		return;
+	}
+
+	SceneSerialiser serialiser(SceneSystem::Get().GetActiveScene());
+	serialiser.SerialiseTo(path);
 }
 
 void FileMenu::SaveAs()
@@ -43,7 +57,6 @@ void FileMenu::SaveAs()
 	nfdresult_t result = NFD_SaveDialogU8_With(&outPath, &args);
 	if (result == NFD_OKAY)
 	{
-		std::cout << outPath << std::endl;
 		SceneSerialiser serialiser(SceneSystem::Get().GetActiveScene());
 		serialiser.SerialiseTo(outPath);
 		NFD_FreePath(outPath);

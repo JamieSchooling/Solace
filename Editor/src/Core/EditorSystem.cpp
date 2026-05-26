@@ -17,6 +17,7 @@
 #include "Windows/InspectorWindow.h"
 #include "Windows/AssetBrowser.h"
 #include <Input/InputSystem.h>
+#include <Menu/FileMenu.h>
 
 void EditorSystem::Start(const SubsystemParams& params)
 {
@@ -142,6 +143,11 @@ void EditorSystem::PostAppUpdate()
 	//ImGui::Image((void*)(intptr_t)textureID, imageSize, uv0, uv1);
 	//ImGui::End();
 
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S, ImGuiInputFlags_RouteAlways))
+	{
+		FileMenu::Save();
+	}
+
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -177,6 +183,16 @@ void EditorSystem::OnEvent(Event& e)
 	{
 		e.Handled = true;
 	}
+}
+
+std::filesystem::path EditorSystem::GetCurrentlyOpenScene() const
+{
+	return m_currentlyOpenScene;
+}
+
+void EditorSystem::SetCurrentlyOpenScene(std::filesystem::path path)
+{
+	m_currentlyOpenScene = path;
 }
 
 void EditorSystem::HandleLayoutChange()

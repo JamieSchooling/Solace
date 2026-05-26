@@ -27,7 +27,7 @@ void MaterialWindow::DrawContent(entt::entity& selected, Scene& scene)
 		DrawProperty(name, data, desc);
 	}
 
-	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S))
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S, ImGuiInputFlags_RouteAlways))
 	{
 		MaterialSerialiser ms;
 		ms.SerialiseTo(m_material, m_materialPath);

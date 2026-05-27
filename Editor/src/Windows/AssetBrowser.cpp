@@ -94,6 +94,15 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 
 	std::vector<std::filesystem::path> directoryPaths;
 	std::vector<std::filesystem::path> filePaths;
+	if (!std::filesystem::exists(m_baseDirectory))
+	{
+		std::filesystem::create_directories(m_baseDirectory);
+		m_currentDirectory = m_baseDirectory;
+	}
+	else if (!std::filesystem::exists(m_currentDirectory))
+	{
+		m_currentDirectory = m_baseDirectory;
+	}
 	for (auto& directoryEntry : std::filesystem::directory_iterator(m_currentDirectory))
 	{
 		if (directoryEntry.is_directory())

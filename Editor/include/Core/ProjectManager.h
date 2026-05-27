@@ -45,7 +45,9 @@ private:
 	void DrawProjectList(ImGuiWindowFlags flags);
 	void DrawProjectCreator(ImGuiWindowFlags flags);
 
-	void LoadProject(std::filesystem::path projectPath);	
+	bool LoadProject(std::filesystem::path projectPath);
+	bool ShowProjectExistanceWarn(bool show);
+
 	void CreateProject(std::filesystem::path projectPath);
 	void CreateProjectFromPackage(std::filesystem::path projectPath);
 	JSON CreateProjectJson();

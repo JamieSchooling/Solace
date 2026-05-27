@@ -125,10 +125,14 @@ void ProjectManager::DrawProjectList(ImGuiWindowFlags flags)
 		for (auto& project : m_projectList)
 		{
 			ImGui::Separator();
+			static bool showLoadFailed = false;
 			if (ProjectEntry(project.stem().string(), project.string(), ImVec2(ImGui::GetContentRegionAvail().x, 55)))
 			{
-				LoadProject(project);
+				showLoadFailed = !LoadProject(project);
 			}
+			ImGui::PushID(project.string().c_str());
+			showLoadFailed = ShowProjectExistanceWarn(showLoadFailed);
+			ImGui::PopID();
 		}
 		ImGui::Separator();
 	}
@@ -231,7 +235,7 @@ void ProjectManager::DrawProjectCreator(ImGuiWindowFlags flags)
 	ImGui::End();
 }
 
-void ProjectManager::LoadProject(std::filesystem::path projectPath)
+bool ProjectManager::LoadProject(std::filesystem::path projectPath)
 {
 	if (projectPath.extension() == ".solacepkg")
 	{
@@ -239,11 +243,11 @@ void ProjectManager::LoadProject(std::filesystem::path projectPath)
 		m_currentProjectPath = projectPath.parent_path();
 		m_currentPackageSource = projectPath;
 		m_mode = ProjectManagerMode::CreateFromPackage;
-		return;
+		return true;
 	}
 	if (!std::filesystem::exists(projectPath))
 	{
-		return;
+		return false;
 	}
 	m_currentProjectPath = projectPath.parent_path();
 
@@ -263,6 +267,39 @@ void ProjectManager::LoadProject(std::filesystem::path projectPath)
 	if (!ExistsInProjectList(projectPath)) m_projectList.push_back(projectPath);
 	SerialiseProjectList();
 	m_isProjectLoaded = true;
+	return true;
+}
+
+bool ProjectManager::ShowProjectExistanceWarn(bool show)
+{
+	if (!show)
+	{
+		return false;
+	}
+	
+	ImGui::OpenPopup("Project Not Found");
+
+	// Always center this window when appearing
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("Project Not Found", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("It seems this project no longer exists.");
+		ImGui::Separator();
+
+		ImGui::SetItemDefaultFocus();
+		ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x / 2) - 60);
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+			ImGui::EndPopup();
+			return false;
+		}
+		ImGui::EndPopup();
+	}
+
+	return true;
 }
 
 void ProjectManager::CreateProject(std::filesystem::path projectPath)

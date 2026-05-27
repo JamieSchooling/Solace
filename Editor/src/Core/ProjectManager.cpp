@@ -258,6 +258,7 @@ bool ProjectManager::LoadProject(std::filesystem::path projectPath)
 	JSON data = JSON::parse(sstream.str());
 
 	m_currentProjectAssetsPath = m_currentProjectPath / data["AssetsFolder"].get<std::string>();
+	m_currentProjectName = m_currentProjectPath.stem().string();
 	auto handle = AssetHandle::from_string(data["StartupScene"].get<std::string>());
 	if (handle.has_value())
 	{

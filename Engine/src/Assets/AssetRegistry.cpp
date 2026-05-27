@@ -25,6 +25,8 @@ void AssetRegistry::Shutdown()
 
 AssetHandle AssetRegistry::RegisterNewAsset(std::filesystem::path& path, AssetRelativeRoot relativeTo /*=AssetRelativeRoot::Custom*/)
 {
+	if (std::filesystem::is_directory(path)) { return AssetHandle(); }
+
 	if (m_handleByPath.contains(path)) { return m_handleByPath.at(path); }
 
 	switch (relativeTo)
@@ -56,6 +58,8 @@ AssetHandle AssetRegistry::RegisterNewAsset(std::filesystem::path& path, AssetRe
 
 void AssetRegistry::MoveAsset(AssetHandle handle, std::filesystem::path newPath)
 {
+	if (std::filesystem::is_directory(newPath)) { return; }
+
 	if (!m_metadataByHandle.contains(handle)) { return; }
 	
 	AssetMetadata metadata = m_metadataByHandle.at(handle);

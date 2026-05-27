@@ -27,8 +27,6 @@ AssetHandle AssetRegistry::RegisterNewAsset(std::filesystem::path& path, AssetRe
 {
 	if (std::filesystem::is_directory(path)) { return AssetHandle(); }
 
-	if (m_handleByPath.contains(path)) { return m_handleByPath.at(path); }
-
 	switch (relativeTo)
 	{
 	case AssetRelativeRoot::Custom:
@@ -38,6 +36,8 @@ AssetHandle AssetRegistry::RegisterNewAsset(std::filesystem::path& path, AssetRe
 		path = std::filesystem::relative(path, Application::GetResourcePath());
 		break;
 	}
+
+	if (m_handleByPath.contains(path)) { return m_handleByPath.at(path); }
 
 	std::random_device rd;
 	auto seed_data = std::array<int, std::mt19937::state_size>{};
@@ -52,6 +52,7 @@ AssetHandle AssetRegistry::RegisterNewAsset(std::filesystem::path& path, AssetRe
 	metadata.RelativeTo = relativeTo;
 	m_metadataByHandle[handle] = metadata;
 	m_handleByPath[path] = handle;
+
 	SerialiseRegistry();
 	return handle;
 }
@@ -202,21 +203,21 @@ void AssetRegistry::DeserialiseRegistry()
 			if (!h.has_value()) { continue; }
 			AssetHandle handle = h.value();
 			AssetMetadata metadata;
-			metadata.RelativePath = meta["Path"].get<std::string>();
-			std::filesystem::path path;
+			std::filesystem::path relativePath = meta["Path"].get<std::string>();
+			metadata.RelativePath = relativePath;
+			std::filesystem::path absolutePath;
 			if (meta["RelativeTo"] == "Custom")
 			{
 				metadata.RelativeTo = AssetRelativeRoot::Custom;
-				path = m_root / metadata.RelativePath;
+				absolutePath = m_root / relativePath;
 			}
 			else if (meta["RelativeTo"] == "Resources")
 			{
 				metadata.RelativeTo = AssetRelativeRoot::Resources;
-				path = Application::GetResourcePath() / metadata.RelativePath;
+				absolutePath = Application::GetResourcePath() / relativePath;
 			}
-			std::cout << "Deserialising Asset Entry: " << path << std::endl;
 			m_metadataByHandle[handle] = metadata;
-			m_handleByPath[path] = handle;
+			m_handleByPath[relativePath] = handle;
 		}
 	}
 }

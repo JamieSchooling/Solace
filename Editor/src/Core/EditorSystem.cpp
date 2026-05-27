@@ -95,10 +95,15 @@ void EditorSystem::OnAppUpdate()
 		auto moveAction = InputSystem::Get().GetAction("Move");
 		if (!moveAction) { return; }
 
+		float flightSpeed = m_editorFlyCamSpeed;
+		if (InputSystem::Get().IsKeyDown(InputBinding::LeftShift))
+		{
+			flightSpeed *= 2.0f;
+		}
 		glm::vec2 inputVector = moveAction->Get<glm::vec2>();
 		glm::vec3 position = m_editorCamTransform.Position;
-		float curSpeedX = inputVector.x * m_editorFlyCamSpeed * Window::Get().DeltaTime();
-		float curSpeedZ = inputVector.y * m_editorFlyCamSpeed * Window::Get().DeltaTime();
+		float curSpeedX = inputVector.x * flightSpeed * Window::Get().DeltaTime();
+		float curSpeedZ = inputVector.y * flightSpeed * Window::Get().DeltaTime();
 		glm::vec3 moveDirection = (m_editorCamTransform.Forward() * curSpeedZ) + (m_editorCamTransform.Right() * -curSpeedX);
 		position += moveDirection;
 

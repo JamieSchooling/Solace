@@ -25,6 +25,8 @@ void AssetRegistry::Shutdown()
 
 AssetHandle AssetRegistry::RegisterNewAsset(std::filesystem::path& path, AssetRelativeRoot relativeTo /*=AssetRelativeRoot::Custom*/)
 {
+	if (m_handleByPath.contains(path)) { return m_handleByPath.at(path); }
+
 	switch (relativeTo)
 	{
 	case AssetRelativeRoot::Custom:
@@ -34,7 +36,6 @@ AssetHandle AssetRegistry::RegisterNewAsset(std::filesystem::path& path, AssetRe
 		path = std::filesystem::relative(path, Application::GetResourcePath());
 		break;
 	}
-	if (m_handleByPath.contains(path)) { return m_handleByPath.at(path); }
 
 	std::random_device rd;
 	auto seed_data = std::array<int, std::mt19937::state_size>{};
@@ -209,6 +210,7 @@ void AssetRegistry::DeserialiseRegistry()
 				metadata.RelativeTo = AssetRelativeRoot::Resources;
 				path = Application::GetResourcePath() / metadata.RelativePath;
 			}
+			std::cout << "Deserialising Asset Entry: " << path << std::endl;
 			m_metadataByHandle[handle] = metadata;
 			m_handleByPath[path] = handle;
 		}

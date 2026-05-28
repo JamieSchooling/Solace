@@ -60,7 +60,9 @@ void FileMenu::SaveAs()
 	if (result == NFD_OKAY)
 	{
 		SceneSerialiser serialiser(SceneSystem::Get().GetActiveScene());
-		serialiser.SerialiseTo(outPath);
+		std::filesystem::path scenePath(outPath);
+		serialiser.SerialiseTo(scenePath);
+		AssetRegistry::Get().RegisterNewAsset(scenePath);
 		NFD_FreePath(outPath);
 	}
 }

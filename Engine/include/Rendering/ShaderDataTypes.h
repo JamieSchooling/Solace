@@ -17,6 +17,7 @@ enum ShaderDataType
 	Vector4,
 	Matrix3,
 	Matrix4,
+	Texture2D,
 };
 
 ShaderDataType GLenumToShaderDataType(GLenum glEnum);

@@ -23,6 +23,9 @@ ShaderDataType GLenumToShaderDataType(GLenum glEnum)
 	case GL_FLOAT_MAT4:
 		return ShaderDataType::Matrix4;
 
+	case GL_SAMPLER_2D:
+		return ShaderDataType::Texture2D;
+
 	default:
 		return ShaderDataType::Unknown;
 	}
@@ -50,6 +53,9 @@ GLenum ShaderDataTypeToGLenum(ShaderDataType shaderType)
 		return GL_FLOAT_MAT3;
 	case ShaderDataType::Matrix4:
 		return GL_FLOAT_MAT4;
+
+	case ShaderDataType::Texture2D:
+		return GL_SAMPLER_2D;
 
 	default:
 		return 0;

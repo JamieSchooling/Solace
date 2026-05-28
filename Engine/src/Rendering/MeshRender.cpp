@@ -63,25 +63,5 @@ void MeshRenderComponent::ReloadMesh()
 
 void MeshRenderComponent::ReloadMaterial()
 {
-	if (MaterialAsset.is_nil())
-	{
-		std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl");
-		Material = std::make_shared<::Material>(shader);
-		Material->SetValue("u_prop_colour", glm::vec3(1.0));
-		return;
-	}
-	auto path = AssetRegistry::Get().GetFullPath(MaterialAsset);
-	if (path.empty() || !std::filesystem::exists(path))
-	{
-		return;
-	}
-	if (path.empty() || !std::filesystem::exists(path))
-	{
-		std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl");
-		Material = std::make_shared<::Material>(shader);
-		Material->SetValue("u_prop_colour", glm::vec3(1.0));
-		return;
-	}
-	
-	Material = MaterialAssetCache::Load(path);
+	Material = MaterialAssetCache::Load(MaterialAsset);
 }

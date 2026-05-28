@@ -194,7 +194,8 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 				// This will set selected *asset* rather than selected entity to display inspector info
 				if (filePath.extension() == ".mat")
 				{
-					MaterialWindow::Open(filePath);
+					auto path = std::filesystem::relative(filePath, m_baseDirectory);
+					MaterialWindow::Open(AssetRegistry::Get().GetHandle(path));
 				}
 			}
 

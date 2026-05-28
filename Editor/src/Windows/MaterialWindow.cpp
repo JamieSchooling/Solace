@@ -9,11 +9,11 @@ void MaterialWindow::Open()
 	EditorSystem::Get().OpenWindow<MaterialWindow>();
 }
 
-void MaterialWindow::Open(std::filesystem::path materialPath)
+void MaterialWindow::Open(AssetHandle materialHandle)
 {
 	auto& window = EditorSystem::Get().OpenWindow<MaterialWindow>();
-	window.m_materialPath = materialPath;
-	window.m_material = MaterialAssetCache::Load(materialPath);
+	window.m_materialPath = AssetRegistry::Get().GetFullPath(materialHandle);
+	window.m_material = MaterialAssetCache::Load(materialHandle);
 }
 
 void MaterialWindow::DrawContent(entt::entity& selected, Scene& scene)

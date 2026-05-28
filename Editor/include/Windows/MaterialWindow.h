@@ -14,7 +14,7 @@ public:
 	static void Open();
 	MENU_ITEM("Window/General/Material", 400, Open);
 	
-	static void Open(std::filesystem::path materialPath);
+	static void Open(AssetHandle materialHandle);
 protected:
 	void DrawContent(entt::entity& selected, Scene& scene) override;
 

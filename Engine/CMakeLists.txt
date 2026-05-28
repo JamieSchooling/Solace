@@ -26,6 +26,7 @@ target_sources(${CORE_LIBRARY}
         "src/Assets/MaterialAssetCache.cpp"
         "src/Input/InputSystem.cpp"
         "src/Assets/AssetRegistry.cpp"
+        "src/Rendering/ShaderDataTypes.cpp"
 
     PUBLIC
     FILE_SET HEADERS

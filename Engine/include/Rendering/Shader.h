@@ -38,7 +38,6 @@ private:
 	void UploadUniform(uint32_t location, const glm::mat3& mat) const;
 	void UploadUniform(uint32_t location, const glm::mat4& mat) const;
 	void CheckCompileErrors(uint32_t shader, const char* type);
-
 private:
 	uint32_t m_id;
 	std::unordered_map<std::string, UniformDescription> m_uniformLookup;

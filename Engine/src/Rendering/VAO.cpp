@@ -20,11 +20,11 @@ void VAO::AddVertexBuffer(const std::vector<float>& vertices, const std::vector<
 	glNamedBufferStorage(vbo, sizeof(float) * vertices.size(), vertices.data(), GL_DYNAMIC_STORAGE_BIT);
 
 	glVertexArrayVertexBuffer(m_id, 0, vbo, 0, CalculateStride(attributes));
-
+	               
 	for (size_t i = 0; i < attributes.size(); ++i)
 	{
 		glEnableVertexArrayAttrib(m_id, i);
-		glVertexArrayAttribFormat(m_id, i, attributes[i].Size, attributes[i].Type, attributes[i].Normalised ? GL_TRUE : GL_FALSE, attributes[i].Offset);
+		glVertexArrayAttribFormat(m_id, i, attributes[i].Size, ShaderDataTypeToGLenum(attributes[i].Type), attributes[i].Normalised ? GL_TRUE : GL_FALSE, attributes[i].Offset);
 		glVertexArrayAttribBinding(m_id, i, 0);
 	}
 }

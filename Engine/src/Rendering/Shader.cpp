@@ -1,7 +1,5 @@
 #include "Rendering/Shader.h"
 
-#include <glad/gl.h>
-
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -86,7 +84,20 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) : m_vertexPath(
 
 		glGetActiveUniform(m_id, i, bufSize, &length, &size, &type, m_name);
 		uint32_t location = glGetUniformLocation(m_id, m_name);
-		m_uniformLookup[m_name] = { location, (ShaderDataType)type }; // TODO: Implement check that m_type is supported
+
+		ShaderDataType shaderType = GLenumToShaderDataType(type); 
+
+		if (shaderType == ShaderDataType::Unknown)
+		{
+			std::cout << "Unsupported uniform type: [" << m_name << "]" << std::endl;
+			continue;
+		}
+
+		m_uniformLookup[m_name] =
+		{
+			location,
+			shaderType
+		};
 	}
 }
 
@@ -143,9 +154,9 @@ void Shader::SetUniform(const std::string& m_name, UniformData uniformData)
 		UploadUniform(desc.location, std::get<glm::vec3>(uniformData)); break;
 	case ShaderDataType::Vector4:
 		UploadUniform(desc.location, std::get<glm::vec4>(uniformData)); break;
-	case ShaderDataType::Mat3:
+	case ShaderDataType::Matrix3:
 		UploadUniform(desc.location, std::get<glm::mat3>(uniformData)); break;
-	case ShaderDataType::Mat4:
+	case ShaderDataType::Matrix4:
 		UploadUniform(desc.location, std::get<glm::mat4>(uniformData)); break;
 	}
 }

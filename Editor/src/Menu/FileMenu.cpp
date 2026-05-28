@@ -63,6 +63,9 @@ void FileMenu::SaveAs()
 		std::filesystem::path scenePath(outPath);
 		serialiser.SerialiseTo(scenePath);
 		AssetRegistry::Get().RegisterNewAsset(scenePath);
+		EditorSystem::Get().SetCurrentlyOpenScene(outPath);
+		auto path = std::filesystem::relative(outPath, Editor::ProjectAssetsPath());
+		Editor::SetStartupScene(AssetRegistry::Get().GetHandle(path));
 		NFD_FreePath(outPath);
 	}
 }

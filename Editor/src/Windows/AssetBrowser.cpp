@@ -338,6 +338,7 @@ void AssetBrowser::DrawFilenameEdit(const std::filesystem::path& path, float max
 	if (ImGui::IsKeyPressed(ImGuiKey_Enter))
 	{
 		m_editingFilename = false;
+		AppendDuplicateCount(m_currentEditFilepathModified);
 		std::filesystem::rename(path, m_currentEditFilepathModified);
 		if (std::filesystem::is_directory(m_currentEditFilepath)) { return; }
 

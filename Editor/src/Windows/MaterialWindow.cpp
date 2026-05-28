@@ -18,6 +18,8 @@ void MaterialWindow::Open(std::filesystem::path materialPath)
 
 void MaterialWindow::DrawContent(entt::entity& selected, Scene& scene)
 {
+	if (!m_material) return;
+
 	for (auto [name, data] : m_material->GetUniformData())
 	{
 		bool isProperty = name.rfind("u_prop_", 0) == 0;

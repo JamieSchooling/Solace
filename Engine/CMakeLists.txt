@@ -27,6 +27,7 @@ target_sources(${CORE_LIBRARY}
         "src/Input/InputSystem.cpp"
         "src/Assets/AssetRegistry.cpp"
         "src/Rendering/ShaderDataTypes.cpp"
+        "src/Assets/TextureAssetCache.cpp"
 
     PUBLIC
     FILE_SET HEADERS
@@ -68,7 +69,10 @@ target_sources(${CORE_LIBRARY}
         "include/Assets/MaterialAssetCache.h"
         "include/Input/InputSystem.h"
         "include/Input/KeyCodes.h"
-        "include/Assets/AssetRegistry.h" "include/Assets/AssetHandle.h")
+        "include/Assets/AssetRegistry.h" 
+        "include/Assets/AssetHandle.h"
+        "include/Assets/TextureAssetCache.h"
+)
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

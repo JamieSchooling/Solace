@@ -340,7 +340,11 @@ void AssetBrowser::DrawFilenameEdit(const std::filesystem::path& path, float max
 		m_editingFilename = false;
 		AppendDuplicateCount(m_currentEditFilepathModified);
 		std::filesystem::rename(path, m_currentEditFilepathModified);
-		if (std::filesystem::is_directory(m_currentEditFilepath)) { return; }
+		if (std::filesystem::is_directory(m_currentEditFilepathModified))
+		{
+			AssetRegistry::Get().MoveDirectory(m_currentEditFilepath, m_currentEditFilepathModified);
+			return; 
+		}
 
 		AssetHandle handle = AssetRegistry::Get().GetHandle(std::filesystem::relative(m_currentEditFilepath, m_baseDirectory));
 		if (!handle.is_nil())

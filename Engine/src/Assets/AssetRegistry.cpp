@@ -89,7 +89,8 @@ void AssetRegistry::MoveDirectory(std::filesystem::path oldDir, std::filesystem:
 	{
 		if (path.RelativePath.string().starts_with(oldDirRelative.string()))
 		{
-			MoveAsset(handle, newDir / path.RelativePath.filename());
+			std::filesystem::path subPath = std::filesystem::relative(path.RelativePath, oldDirRelative);
+			MoveAsset(handle, newDir / subPath);
 		}
 	}
 }

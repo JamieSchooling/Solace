@@ -14,7 +14,8 @@ void AssetRegistry::Start(const SubsystemParams& params)
 	m_root = props.Root;
 	m_registryFile = props.RegistryFile;
 
-	DeserialiseRegistry();
+	DeserialiseRegistry(); // Doesn't load files that no longer exist
+	SerialiseRegistry(); // Immediately reserialise to save without the deleted files
 }
 
 void AssetRegistry::Shutdown()
@@ -61,7 +62,7 @@ void AssetRegistry::MoveAsset(AssetHandle handle, std::filesystem::path newPath)
 {
 	if (std::filesystem::is_directory(newPath)) { return; }
 
-	if (!m_metadataByHandle.contains(handle)) { return; }
+	if (!Exists(handle)) { return; }
 	
 	AssetMetadata metadata = m_metadataByHandle.at(handle);
 	switch (metadata.RelativeTo)
@@ -120,6 +121,11 @@ void AssetRegistry::DeleteDirectory(std::filesystem::path directory)
 	}
 }
 
+bool AssetRegistry::Exists(AssetHandle handle) const
+{
+	return m_metadataByHandle.contains(handle);
+}
+
 AssetHandle AssetRegistry::GetHandle(const std::filesystem::path& path)
 {
 	if (!m_handleByPath.contains(path))
@@ -132,7 +138,7 @@ AssetHandle AssetRegistry::GetHandle(const std::filesystem::path& path)
 
 std::filesystem::path AssetRegistry::GetPath(AssetHandle handle) const
 {
-	if (!m_metadataByHandle.contains(handle))
+	if (!Exists(handle))
 	{
 		return std::filesystem::path("");
 	}
@@ -141,7 +147,7 @@ std::filesystem::path AssetRegistry::GetPath(AssetHandle handle) const
 
 std::filesystem::path AssetRegistry::GetFullPath(AssetHandle handle) const
 {
-	if (!m_metadataByHandle.contains(handle) || m_metadataByHandle.at(handle).RelativePath.empty())
+	if (!Exists(handle) || m_metadataByHandle.at(handle).RelativePath.empty())
 	{
 		return std::filesystem::path("");
 	}
@@ -216,6 +222,11 @@ void AssetRegistry::DeserialiseRegistry()
 				metadata.RelativeTo = AssetRelativeRoot::Resources;
 				absolutePath = Application::GetResourcePath() / relativePath;
 			}
+			if (!std::filesystem::exists(absolutePath))
+			{
+				continue;
+			}
+
 			m_metadataByHandle[handle] = metadata;
 			m_handleByPath[relativePath] = handle;
 		}

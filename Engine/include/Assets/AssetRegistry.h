@@ -26,6 +26,8 @@ public:
 	void DeleteAsset(AssetHandle handle);
 	void DeleteDirectory(std::filesystem::path directory);
 
+	bool Exists(AssetHandle handle) const;
+
 	AssetHandle GetHandle(const std::filesystem::path& path);
 	std::filesystem::path GetPath(AssetHandle handle) const;
 	std::filesystem::path GetFullPath(AssetHandle handle) const;

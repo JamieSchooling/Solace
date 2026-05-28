@@ -15,7 +15,7 @@ void SceneSystem::Start(const SubsystemParams& params)
 	m_eventSystem->AddListener(this);
 
 	Scene scene = Scene::CreateDefault();
-	if (!props.StartupScene.is_nil())
+	if (!props.StartupScene.is_nil() && AssetRegistry::Get().Exists(props.StartupScene))
 	{
 		std::filesystem::path scenePath = AssetRegistry::Get().GetFullPath(props.StartupScene);
 		SceneSerialiser s(scene);

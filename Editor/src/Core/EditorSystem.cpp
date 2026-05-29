@@ -18,6 +18,8 @@
 #include "Windows/AssetBrowser.h"
 #include <Input/InputSystem.h>
 #include <Menu/FileMenu.h>
+#include <Core/Editor.h>
+#include <Scenes/SceneSerialiser.h>
 
 void EditorSystem::Start(const SubsystemParams& params)
 {
@@ -60,6 +62,10 @@ void EditorSystem::Start(const SubsystemParams& params)
 	m_editorCamTransform.Position = glm::vec3(4.0f, 4.0f, 4.0f);
 	m_editorCamRotation = glm::vec3(-45.0f, 45.0f, 0.0f);
 	m_editorCamTransform.Rotation = glm::quat(glm::radians(m_editorCamRotation));
+
+
+	m_playIcon = std::make_unique<Texture>(Application::GetResourcePath() / "Icons" / "PlayButton.png");
+	m_stopIcon = std::make_unique<Texture>(Application::GetResourcePath() / "Icons" / "StopButton.png");
 }
 
 void EditorSystem::Shutdown()
@@ -74,6 +80,8 @@ void EditorSystem::PreAppUpdate()
 
 void EditorSystem::OnAppUpdate()
 {
+	if (Editor::CurrentState() != EditorState::Edit) { return; }
+
 	if (InputSystem::Get().WasKeyPressedThisFrame(InputBinding::MouseButtonRight))
 	{
 		Window::Get().SetCursorMode(CursorMode::Disabled);
@@ -122,6 +130,7 @@ void EditorSystem::PostAppUpdate()
 	ImGuizmo::BeginFrame();
 
 	DrawMenuBar();
+	DrawToolbar();
 
 	ImGui::ShowDemoWindow();
 
@@ -134,9 +143,13 @@ void EditorSystem::PostAppUpdate()
 	{
 		window->Draw(m_selectedEntity, scene);
 	}
-	for (auto&& window : m_windows)
+
+	if (Editor::CurrentState() == EditorState::Edit)
 	{
-		window->DrawGizmos(m_selectedEntity, m_editorCamera, m_editorCamTransform, scene);
+		for (auto&& window : m_windows)
+		{
+			window->DrawGizmos(m_selectedEntity, m_editorCamera, m_editorCamTransform, scene);
+		}
 	}
 
 	// Framework is there to make game render to an ImGui window (Editor Viewport Window), 
@@ -263,4 +276,45 @@ void EditorSystem::DrawMenuNode(MenuNode& node)
 
 		ImGui::EndMenu();
 	}
+}
+
+void EditorSystem::DrawToolbar()
+{
+	ImGui::Begin("##Toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+
+	auto& colours = ImGui::GetStyle().Colors;
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+	const auto& buttonHovered = colours[ImGuiCol_ButtonHovered];
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+	const auto& buttonActive = colours[ImGuiCol_ButtonActive];
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+	float size = ImGui::GetContentRegionAvail().y;
+	ImGui::SameLine((ImGui::GetContentRegionAvail().x * 0.5f) - (size * 0.5f));
+
+	auto buttonContent = Editor::CurrentState() == EditorState::Edit ? m_playIcon->GetID() : m_stopIcon->GetID();
+
+	if (ImGui::ImageButton("PlayButton", (ImTextureRef)buttonContent, {size, size}))
+	{
+		if (Editor::CurrentState() == EditorState::Edit)
+		{
+			FileMenu::Save();
+			Editor::SetCurrentState(EditorState::Play);
+		}
+		else if (Editor::CurrentState() == EditorState::Play)
+		{
+			Editor::SetCurrentState(EditorState::Edit);
+			Scene scene;
+			SceneSerialiser s(scene);
+			s.DeserialiseFrom(m_currentlyOpenScene);
+			SceneSystem::Get().LoadScene(scene);
+		}
+	}
+
+	ImGui::PopStyleColor(3);
+	ImGui::PopStyleVar(2);
+	ImGui::End();
 }

@@ -88,6 +88,9 @@ private:
 	entt::entity m_selectedEntity = entt::null;
 	std::vector<std::unique_ptr<EditorWindow>> m_windows;
 
+	std::unique_ptr<Texture> m_playIcon;
+	std::unique_ptr<Texture> m_stopIcon;
+
 	std::filesystem::path m_currentlyOpenScene;
 
 	Camera m_editorCamera;
@@ -98,4 +101,5 @@ private:
 	void HandleLayoutChange();
 	void DrawMenuBar();
 	void DrawMenuNode(MenuNode& node);
+	void DrawToolbar();
 };

@@ -6,6 +6,18 @@
 
 #include <filesystem>
 
+enum class UpdatePhase
+{
+	Always,
+	Simulation
+};
+
+struct RegisteredSubsystem
+{
+	Subsystem* Instance;
+	UpdatePhase Phase;
+};
+
 class Application
 {
 public:
@@ -21,18 +33,26 @@ public:
 	static std::filesystem::path GetExecutableDirectory();
 protected:
 	template<typename T, typename = std::enable_if_t<std::is_base_of<SingletonSubsystem<T>, T>::value>>
-	void AddSubsystem(const SubsystemParams& params = {})
+	void AddSubsystem(UpdatePhase phase, const SubsystemParams& params = {})
 	{
 		T& subsystem = T::Get();
+		RegisteredSubsystem system;
+		system.Instance = &subsystem;
+		system.Phase = phase;
 		subsystem.Start(params);
-		m_subsystems.push_back(&subsystem);
+		m_subsystems.push_back(system);
 	}
 
 	template<typename T, typename = std::enable_if_t<std::is_base_of<SingletonSubsystem<T>, T>::value>>
 	void RemoveSubsystem()
 	{
 		T& subsystem = T::Get();
-		auto it = std::find(m_subsystems.begin(), m_subsystems.end(), &subsystem);
+		auto it = std::find_if(m_subsystems.begin(), m_subsystems.end(), 
+			[&subsystem](const RegisteredSubsystem& s)
+			{
+				return s.Instance == &subsystem;
+			}
+		);
 		if (it != m_subsystems.end())
 		{
 			subsystem.Shutdown();
@@ -40,12 +60,13 @@ protected:
 		}
 	}
 
+	virtual bool ShouldUpdate(const RegisteredSubsystem& subsystem) const;
 	void PreUpdate();
 	void Update();
 	void PostUpdate();
 	void FinaliseUpdate();
 private:
-	std::vector<Subsystem*> m_subsystems;
+	std::vector<RegisteredSubsystem> m_subsystems;
 };
 
 extern Application* CreateApplication();

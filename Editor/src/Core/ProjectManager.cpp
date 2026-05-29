@@ -85,6 +85,8 @@ bool ProjectManager::IsProjectLoaded()
 
 void ProjectManager::SerialiseProjectData(AssetHandle startupScene)
 {
+	if (m_currentProjectPath.empty()) { return; }
+
 	JSON json;
 	json["AssetsFolder"] = "Assets";
 	json["StartupScene"] = uuids::to_string(startupScene);

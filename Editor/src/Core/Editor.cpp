@@ -24,13 +24,13 @@ Application* CreateApplication()
 
 void Editor::Initialise(std::vector<std::string> args)
 {
-	AddSubsystem<EventSystem>();
+	AddSubsystem<EventSystem>(UpdatePhase::Always);
 
 	{
 		WindowProps props;
 		props.Title = "Solace Editor";
 		props.EventSystem = &EventSystem::Get();
-		AddSubsystem<Window>(props);
+		AddSubsystem<Window>(UpdatePhase::Always, props);
 	}
 
 	NFD_Init();
@@ -53,24 +53,24 @@ void Editor::Initialise(std::vector<std::string> args)
 		AssetRegistryProps props;
 		props.Root = s_projectAssetsPath;
 		props.RegistryFile = s_projectDirectoryPath / "Data" / ".assetregistry";
-		AddSubsystem<AssetRegistry>(props);
+		AddSubsystem<AssetRegistry>(UpdatePhase::Always, props);
 	}
 
 	{
 		InputSystemProps props;
 		props.EventSystem = &EventSystem::Get();
-		AddSubsystem<InputSystem>(props);
+		AddSubsystem<InputSystem>(UpdatePhase::Always, props);
 	}
 
 	{
 		SceneSystemProps props;
 		props.EventSystem = &EventSystem::Get();
 		props.StartupScene = s_startupScene;
-		AddSubsystem<SceneSystem>(props);
+		AddSubsystem<SceneSystem>(UpdatePhase::Always, props);
 	}
 
 	{
-		AddSubsystem<RenderSystem>();
+		AddSubsystem<RenderSystem>(UpdatePhase::Always);
 	};
 	m_gameViewTarget = std::make_shared<FBO>();
 	m_editorViewTarget = std::make_shared<FBO>();
@@ -79,7 +79,7 @@ void Editor::Initialise(std::vector<std::string> args)
 		EditorSystemProps props;
 		props.GLFWInstance = Window::Get().GetGLFWInstance();
 		props.EventSystem = &EventSystem::Get();
-		AddSubsystem<EditorSystem>(props);
+		AddSubsystem<EditorSystem>(UpdatePhase::Always, props);
 	}
 }
 
@@ -94,10 +94,16 @@ void Editor::Run()
 		frame.RenderQueue = SceneSystem::Get().GetRenderQueue();
 		frame.Lights = SceneSystem::Get().GetLightData();
 
-		//RenderView gameView{ SceneSystem::Get().GetActiveScene().GetMainCameraData(), m_gameViewTarget };
-		//frame.RenderViews.push_back(gameView);
-		RenderView editorView{ EditorSystem::Get().GetEditorCameraData(), m_editorViewTarget};
-		frame.RenderViews.push_back(editorView);
+		if (s_state == EditorState::Edit)
+		{
+			RenderView editorView{ EditorSystem::Get().GetEditorCameraData(), m_editorViewTarget };
+			frame.RenderViews.push_back(editorView);
+		}
+		else if (s_state == EditorState::Play)
+		{
+			RenderView gameView{ SceneSystem::Get().GetActiveScene().GetMainCameraData(), m_gameViewTarget };
+			frame.RenderViews.push_back(gameView);
+		}
 
 		RenderSystem::Get().SetFrameRenderData(frame);
 		PostUpdate();
@@ -117,6 +123,17 @@ void Editor::Shutdown()
 	RemoveSubsystem<Window>();
 	RemoveSubsystem<EventSystem>();
 
+}
+
+bool Editor::ShouldUpdate(const RegisteredSubsystem& subsystem) const
+{
+	switch (s_state)
+	{
+	case EditorState::Edit:
+		return subsystem.Phase == UpdatePhase::Always;
+	case EditorState::Play:
+		return subsystem.Phase == UpdatePhase::Always || subsystem.Phase == UpdatePhase::Simulation;
+	}
 }
 
 void Editor::RunProjectManager(std::vector<std::string> args)

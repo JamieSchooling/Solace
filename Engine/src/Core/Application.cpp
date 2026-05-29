@@ -16,11 +16,19 @@ void Application::ExecuteLifecycle(std::vector<std::string> args)
 	Shutdown();
 }
 
+bool Application::ShouldUpdate(const RegisteredSubsystem& subsystem) const
+{
+	return true;
+}
+
 void Application::PreUpdate()
 {
 	for (auto subsystem : m_subsystems)
 	{
-		subsystem->PreAppUpdate();
+		if (ShouldUpdate(subsystem))
+		{
+			subsystem.Instance->PreAppUpdate();
+		}
 	}
 }
 
@@ -28,7 +36,10 @@ void Application::Update()
 {
 	for (auto subsystem : m_subsystems)
 	{
-		subsystem->OnAppUpdate();
+		if (ShouldUpdate(subsystem))
+		{
+			subsystem.Instance->OnAppUpdate();
+		}
 	}
 }
 
@@ -36,7 +47,10 @@ void Application::PostUpdate()
 {
 	for (auto subsystem : m_subsystems)
 	{
-		subsystem->PostAppUpdate();
+		if (ShouldUpdate(subsystem))
+		{
+			subsystem.Instance->PostAppUpdate();
+		}
 	}
 }
 
@@ -44,7 +58,10 @@ void Application::FinaliseUpdate()
 {
 	for (auto subsystem : m_subsystems)
 	{
-		subsystem->FinaliseAppUpdate();
+		if (ShouldUpdate(subsystem))
+		{
+			subsystem.Instance->FinaliseAppUpdate();
+		}
 	}
 }
 

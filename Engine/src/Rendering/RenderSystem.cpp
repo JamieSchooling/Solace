@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include <glad/gl.h>
+#include <Rendering/TextureUnitAllocator.h>
 
 void RenderSystem::Start(const SubsystemParams& params)
 {
@@ -16,6 +17,8 @@ void RenderSystem::Shutdown()
 
 void RenderSystem::PostAppUpdate()
 {	
+	TextureUnitAllocator::Reset();
+
 	m_lightUBO->Upload(m_renderData->Lights);
 
 	for (auto view : m_renderData->RenderViews)

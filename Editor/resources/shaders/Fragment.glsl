@@ -33,9 +33,11 @@ layout (std140, binding = 1) uniform b_lights
 };
 
 uniform vec3 u_prop_colour;
+uniform sampler2D u_prop_albedo;
 
 in vec3 posWorldSpace;
 in vec3 normal;
+in vec2 texCoord;
 
 vec3 getDirectionalLight()
 {
@@ -97,6 +99,7 @@ void main()
 
 		result += getPointLight(i);
 	}
-
-	colour = vec4(u_prop_colour * result, 1.0);
+	
+	vec3 rgb = texture(u_prop_albedo, texCoord).rgb;
+	colour = vec4(u_prop_colour * rgb * result, 1.0);
 }

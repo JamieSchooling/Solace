@@ -3,6 +3,8 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <Assets/TextureAssetCache.h>
+#include <Rendering/TextureUnitAllocator.h>
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath) : m_vertexPath(vertexPath), m_fragmentPath(fragmentPath)
 {
@@ -158,6 +160,18 @@ void Shader::SetUniform(const std::string& m_name, UniformData uniformData)
 		UploadUniform(desc.location, std::get<glm::mat3>(uniformData)); break;
 	case ShaderDataType::Matrix4:
 		UploadUniform(desc.location, std::get<glm::mat4>(uniformData)); break;
+	case ShaderDataType::Texture2D:
+		if (auto texture = TextureAssetCache::Load(std::get<AssetHandle>(uniformData)))
+		{
+			uint32_t texID = texture->GetID();
+			UploadUniform(desc.location, texID, TextureUnitAllocator::GetNext(texID));
+		} 
+		else
+		{
+			uint32_t texID = Texture::WhiteTexture().GetID();
+			UploadUniform(desc.location, texID, TextureUnitAllocator::GetNext(texID));
+		}
+		break;
 	}
 }
 
@@ -199,4 +213,9 @@ void Shader::UploadUniform(uint32_t location, const glm::mat3& mat) const
 void Shader::UploadUniform(uint32_t location, const glm::mat4& mat) const
 {
 	glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
+}
+
+void Shader::UploadUniform(uint32_t location, const uint32_t textureID, const uint32_t slot) const
+{
+	glBindTextureUnit(slot, textureID);
 }

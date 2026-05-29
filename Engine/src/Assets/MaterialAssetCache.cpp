@@ -14,7 +14,7 @@ std::shared_ptr<Material> MaterialAssetCache::Load(AssetHandle handle)
 	if (!AssetRegistry::Get().Exists(handle))
 	{
 		std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl");
-		material = std::make_shared<::Material>(shader);
+		material = std::make_shared<::Material>(shader, InitWithDefaultValues);
 		material->SetValue("u_prop_colour", glm::vec3(1.0));
 	}
 	else

@@ -2,6 +2,8 @@
 
 #include <stduuid/uuid.h>
 
+#include <filesystem>
+
 using AssetHandle = uuids::uuid;
 
 enum class AssetRelativeRoot

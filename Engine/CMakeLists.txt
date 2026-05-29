@@ -28,6 +28,7 @@ target_sources(${CORE_LIBRARY}
         "src/Assets/AssetRegistry.cpp"
         "src/Rendering/ShaderDataTypes.cpp"
         "src/Assets/TextureAssetCache.cpp"
+        "src/Rendering/TextureUnitAllocator.cpp"
 
     PUBLIC
     FILE_SET HEADERS
@@ -72,6 +73,7 @@ target_sources(${CORE_LIBRARY}
         "include/Assets/AssetRegistry.h" 
         "include/Assets/AssetHandle.h"
         "include/Assets/TextureAssetCache.h"
+        "include/Rendering/TextureUnitAllocator.h"
 )
 
 target_include_directories(${CORE_LIBRARY}

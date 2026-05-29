@@ -111,6 +111,12 @@ JSON MaterialSerialiser::SerialiseProperty(const std::string& name, UniformData 
 		out["Type"] = "vec4";
 		out["Value"] = { value.x, value.y, value.z, value.w };
 	}
+	else if (desc.type == ShaderDataType::Texture2D)
+	{
+		AssetHandle handle = std::get<AssetHandle>(data);
+		out["Type"] = "tex2d";
+		out["Value"] = uuids::to_string(handle);
+	}
 	return out;
 }
 
@@ -149,5 +155,11 @@ void MaterialSerialiser::DeserialiseProperty(JSON propertyData, std::shared_ptr<
 		auto value = propertyData["Value"];
 		glm::vec4 vec = glm::vec4(value[0].get<float>(), value[1].get<float>(), value[2].get<float>(), value[3].get<float>());
 		material->SetValue(name, vec);
+	}
+	else if (propertyData["Type"] == "tex2d")
+	{
+		auto value = propertyData["Value"];
+		AssetHandle handle = AssetHandle::from_string(value.get<std::string>()).value();
+		material->SetValue(name, handle);
 	}
 }

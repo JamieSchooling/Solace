@@ -9,6 +9,11 @@ std::shared_ptr<Texture> TextureAssetCache::Load(AssetHandle handle)
 		return m_cache.at(handle);
 	}
 
+	if (!AssetRegistry::Get().Exists(handle))
+	{
+		return nullptr;
+	}
+
 	auto path = AssetRegistry::Get().GetFullPath(handle);
 	if (path.empty() || !std::filesystem::exists(path))
 	{

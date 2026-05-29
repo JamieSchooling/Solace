@@ -124,4 +124,26 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 			}
 		}
 	}
+	else if (desc.type == ShaderDataType::Texture2D)
+	{
+		AssetHandle value = std::get<AssetHandle>(data);
+		if (EditorProperty<AssetHandle>(displayName, value).Draw())
+		{
+			m_material->SetValue(name, value);
+			ShowUnsaved();
+		}
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset_Item"))
+			{
+				AssetHandle handle = *(AssetHandle*)payload->Data;
+				std::filesystem::path path = AssetRegistry::Get().GetFullPath(handle);
+				if (Texture::IsImageFile(path))
+				{
+					m_material->SetValue(name, handle);
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+	}
 }

@@ -12,15 +12,15 @@ Texture::Texture(glm::ivec2 size)
 	Init(size);
 }
 
+Texture::Texture(glm::ivec2 size, unsigned char* data)
+{
+	Init(size, data);
+}
+
 Texture::Texture(std::filesystem::path imagePath)
 {
 	int width, height, numChannels;
-	unsigned char* data = stbi_load(imagePath.string().c_str(), &width, &height, &numChannels, 0);
-	if (data)
-	{
-		std::cout << "Image: " << imagePath << " loaded." << std::endl;
-		std::cout << "Width: " << width << "Height: " << height << std::endl;
-	}
+	unsigned char* data = stbi_load(imagePath.string().c_str(), &width, &height, &numChannels, 4);
 	Init({ width, height }, data); 
 	stbi_image_free(data);
 }
@@ -28,6 +28,18 @@ Texture::Texture(std::filesystem::path imagePath)
 Texture::~Texture()
 {
 	Delete();
+}
+
+Texture& Texture::WhiteTexture()
+{
+	static unsigned char pixel[] =
+	{
+		255, 255, 255, 255
+	};
+
+	static Texture texture({ 1, 1 }, pixel);
+
+	return texture;
 }
 
 void Texture::Recreate(glm::ivec2 size)
@@ -43,6 +55,11 @@ void Texture::Recreate(std::filesystem::path imagePath)
 	unsigned char* data = stbi_load(imagePath.string().c_str(), &width, &height, &numChannels, 4);
 	Init({ width, height }, data);
 	stbi_image_free(data);
+}
+
+bool Texture::IsImageFile(const std::filesystem::path& path)
+{
+	return stbi_info(path.string().c_str(), nullptr, nullptr, nullptr) != 0;
 }
 
 
@@ -67,5 +84,9 @@ void Texture::Init(glm::ivec2 size, unsigned char* data)
 
 void Texture::Delete()
 {
-	glDeleteTextures(1, &m_id);
+	if (m_id)
+	{
+		glDeleteTextures(1, &m_id);
+		m_id = 0;
+	}
 }

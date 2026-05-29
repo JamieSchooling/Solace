@@ -8,8 +8,9 @@
 #include <glm/glm.hpp>
 
 #include "Rendering/ShaderDataTypes.h"
+#include "Assets/AssetHandle.h"
 
-using UniformData = std::variant<std::monostate, bool, int, float, glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4>;
+using UniformData = std::variant<std::monostate, bool, int, float, glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4, AssetHandle>;
 
 struct UniformDescription
 {
@@ -36,7 +37,8 @@ private:
 	void UploadUniform(uint32_t location, const glm::vec3& value) const;
 	void UploadUniform(uint32_t location, const glm::vec4& value) const;
 	void UploadUniform(uint32_t location, const glm::mat3& mat) const;
-	void UploadUniform(uint32_t location, const glm::mat4& mat) const;
+	void UploadUniform(uint32_t location, const glm::mat4& mat) const; 
+	void UploadUniform(uint32_t location, const uint32_t textureID, const uint32_t slot) const;
 	void CheckCompileErrors(uint32_t shader, const char* type);
 private:
 	uint32_t m_id;

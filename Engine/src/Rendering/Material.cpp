@@ -48,4 +48,8 @@ void Material::SetDefaultValue(const std::string& name, UniformDescription desc)
 	{
 		m_uniformData[name] = glm::vec4(0.0f);
 	}
+	else if (desc.type == ShaderDataType::Texture2D)
+	{
+		m_uniformData[name] = AssetHandle();
+	}
 }

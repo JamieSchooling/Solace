@@ -56,9 +56,13 @@ void MeshRenderComponent::ReloadMesh()
 		verts.push_back(mesh->mNormals[i].x);
 		verts.push_back(mesh->mNormals[i].y);
 		verts.push_back(mesh->mNormals[i].z);
+
+		// UVs
+		verts.push_back(mesh->mTextureCoords[0][i].x);
+		verts.push_back(mesh->mTextureCoords[0][i].y);
 	}
 
-	Geometry->AddVertexBuffer(verts, { { 3, ShaderDataType::Float, false, 0 }, { 3, ShaderDataType::Float, false, 3 * sizeof(float) } });
+	Geometry->AddVertexBuffer(verts, { { 3, ShaderDataType::Float, false, 0 }, { 3, ShaderDataType::Float, false, 3 * sizeof(float) }, { 2, ShaderDataType::Float, false, 6 * sizeof(float) } });
 }
 
 void MeshRenderComponent::ReloadMaterial()

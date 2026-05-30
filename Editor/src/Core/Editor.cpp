@@ -18,6 +18,7 @@
 #include <imgui_impl_opengl3.h>
 #include <Reflection/ReflectionModule.h>
 #include <Reflection/ReflectionRegistry.h>
+#include <Core/ModuleLoader.h>
 
 Application* CreateApplication()
 {
@@ -167,26 +168,25 @@ void Editor::RunProjectManager(std::vector<std::string> args)
 
 void Editor::BuildReflectionRegistry()
 {
-	ReflectionModule engine = GetReflectionModule();
-	for (auto& comp : engine.Components)
+	ReflectionModule* engine = GetReflectionModule();
+	for (auto& comp : engine->Components)
 	{
 		ReflectionRegistry::Get().push_back(comp);
 	}
 
-	std::filesystem::path path = s_projectDirectoryPath / "Library" / "Game.dll";
-	if (!std::filesystem::exists(path))
-	{
-		return;
-	}
+	std::filesystem::path path = s_projectDirectoryPath / "Library" / "Game";
 
-	auto lib = LoadLibrary(path.string().c_str());
+	void* lib = ModuleLoader::Load(path.string().c_str());
 	if (!lib)
 	{
 		return;
 	}
-	auto fn = GetProcAddress(lib, "GetReflectionModule");
+	using GetReflectionModuleFn = ReflectionModule* (*)();
 
-	ReflectionModule* game = (ReflectionModule*)fn();
+	auto fn = ModuleLoader::GetSymbol(lib, "GetReflectionModule");
+	GetReflectionModuleFn GetReflectionModule = reinterpret_cast<GetReflectionModuleFn>(fn);
+
+	ReflectionModule* game = GetReflectionModule();
 	std::cout << game->Components.size() << std::endl;
 	for (auto& comp : game->Components)
 	{

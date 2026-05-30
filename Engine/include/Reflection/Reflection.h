@@ -20,6 +20,6 @@
 #define REFLECT(Component) \
     static inline bool _reg_##Component = []() { \
 		std::cout << "Registering: " << #Component << std::endl; \
-        GetReflectionModule().Components.push_back(std::make_shared<ComponentReflection<Component>>(#Component, props)); \
+        GetReflectionModule()->Components.push_back(std::make_shared<ComponentReflection<Component>>(#Component, props)); \
         return true; \
     }();

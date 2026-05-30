@@ -28,7 +28,6 @@ Application* CreateApplication()
 
 void Editor::Initialise(std::vector<std::string> args)
 {
-
 	AddSubsystem<EventSystem>(UpdatePhase::Always);
 
 	{

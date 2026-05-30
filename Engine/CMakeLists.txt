@@ -29,6 +29,7 @@ target_sources(${CORE_LIBRARY}
         "src/Rendering/ShaderDataTypes.cpp"
         "src/Assets/TextureAssetCache.cpp"
         "src/Rendering/TextureUnitAllocator.cpp"
+        "src/ECS/ECSManager.cpp"
 
     PUBLIC
     FILE_SET HEADERS
@@ -74,7 +75,7 @@ target_sources(${CORE_LIBRARY}
         "include/Assets/AssetHandle.h"
         "include/Assets/TextureAssetCache.h"
         "include/Rendering/TextureUnitAllocator.h"
-)
+        "include/ECS/ECSManager.h"  "include/ECS/System.h" )
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

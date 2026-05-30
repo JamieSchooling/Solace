@@ -20,13 +20,20 @@ struct IComponentReflection
 	virtual TypeID GetTypeID() = 0;
 
     template<typename T>
-    T* GetTarget(entt::registry& r, entt::entity e) const 
-    {
-        if (!IsOnEntity(r, e))
-            return nullptr;
+	T* GetTarget(entt::registry& r, entt::entity e) const
+	{
+		if (!IsOnEntity(r, e))
+			return nullptr;
 
-        return &r.get<T>(e);
-    }
+		if constexpr (std::is_empty_v<T>)
+		{
+			return nullptr;
+		}
+		else
+		{
+			return &r.get<T>(e);
+		}
+	}
 };
 
 template<typename T>

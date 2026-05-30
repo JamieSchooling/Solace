@@ -19,6 +19,7 @@
 #include <Reflection/ReflectionModule.h>
 #include <Reflection/ReflectionRegistry.h>
 #include <Core/ModuleLoader.h>
+#include <ECS/ECSManager.h>
 
 Application* CreateApplication()
 {
@@ -53,7 +54,6 @@ void Editor::Initialise(std::vector<std::string> args)
 	s_startupScene = m_projectManager.GetStartupScene();
 	Window::Get().SetTitle("Solace Editor - " + s_projectDirectoryPath.filename().string());
 
-	BuildReflectionRegistry();
 
 	{
 		AssetRegistryProps props;
@@ -74,6 +74,14 @@ void Editor::Initialise(std::vector<std::string> args)
 		props.StartupScene = s_startupScene;
 		AddSubsystem<SceneSystem>(UpdatePhase::Always, props);
 	}
+
+	{
+		ECSManagerProps props;
+		props.SceneSystem = &SceneSystem::Get();
+		AddSubsystem<ECSManager>(UpdatePhase::Simulation, props);
+	}
+
+	BuildReflectionRegistry();
 
 	{
 		AddSubsystem<RenderSystem>(UpdatePhase::Always);
@@ -191,5 +199,18 @@ void Editor::BuildReflectionRegistry()
 	for (auto& comp : game->Components)
 	{
 		ReflectionRegistry::Get().push_back(comp);
+	}
+
+
+	using GetModuleSystemsFn = ModuleSystems* (*)();
+
+	auto fnA = ModuleLoader::GetSymbol(lib, "GetModuleSystems");
+	GetModuleSystemsFn GetModuleSystems = reinterpret_cast<GetModuleSystemsFn>(fnA);
+
+	ModuleSystems* gameSystems = GetModuleSystems();
+	std::cout << gameSystems->Systems.size() << std::endl;
+	for (auto& system : gameSystems->Systems)
+	{
+		ECSManager::Get().AddSystem(system);
 	}
 }

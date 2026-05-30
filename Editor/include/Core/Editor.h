@@ -39,4 +39,6 @@ private:
 	ProjectManager m_projectManager;
 
 	void RunProjectManager(std::vector<std::string> args);
+
+	void BuildReflectionRegistry();
 };

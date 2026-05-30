@@ -16,6 +16,8 @@
 #include "Core/EditorSystem.h"
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <Reflection/ReflectionModule.h>
+#include <Reflection/ReflectionRegistry.h>
 
 Application* CreateApplication()
 {
@@ -24,6 +26,7 @@ Application* CreateApplication()
 
 void Editor::Initialise(std::vector<std::string> args)
 {
+
 	AddSubsystem<EventSystem>(UpdatePhase::Always);
 
 	{
@@ -48,6 +51,8 @@ void Editor::Initialise(std::vector<std::string> args)
 	s_projectAssetsPath = m_projectManager.GetProjectAssetsPath();
 	s_startupScene = m_projectManager.GetStartupScene();
 	Window::Get().SetTitle("Solace Editor - " + s_projectDirectoryPath.filename().string());
+
+	BuildReflectionRegistry();
 
 	{
 		AssetRegistryProps props;
@@ -157,5 +162,34 @@ void Editor::RunProjectManager(std::vector<std::string> args)
 		m_projectManager.Update();
 		PostUpdate();
 		FinaliseUpdate();
+	}
+}
+
+void Editor::BuildReflectionRegistry()
+{
+	ReflectionModule engine = GetReflectionModule();
+	for (auto& comp : engine.Components)
+	{
+		ReflectionRegistry::Get().push_back(comp);
+	}
+
+	std::filesystem::path path = s_projectDirectoryPath / "Library" / "Game.dll";
+	if (!std::filesystem::exists(path))
+	{
+		return;
+	}
+
+	auto lib = LoadLibrary(path.string().c_str());
+	if (!lib)
+	{
+		return;
+	}
+	auto fn = GetProcAddress(lib, "GetReflectionModule");
+
+	ReflectionModule* game = (ReflectionModule*)fn();
+	std::cout << game->Components.size() << std::endl;
+	for (auto& comp : game->Components)
+	{
+		ReflectionRegistry::Get().push_back(comp);
 	}
 }

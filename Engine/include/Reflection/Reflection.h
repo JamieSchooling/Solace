@@ -2,7 +2,9 @@
 
 #include "Reflection/Property.h"
 #include "Reflection/ComponentReflection.h"
-#include "Reflection/ReflectionRegistry.h"
+#include "Reflection/ReflectionModule.h"
+
+#include <iostream>
 
 #define INIT_REFLECTION(Component) \
     using COMPONENT = Component; \
@@ -17,6 +19,7 @@
 
 #define REFLECT(Component) \
     static inline bool _reg_##Component = []() { \
-        ReflectionRegistry::Get().push_back(std::make_shared<ComponentReflection<Component>>(#Component, props)); \
+		std::cout << "Registering: " << #Component << std::endl; \
+        GetReflectionModule().Components.push_back(std::make_shared<ComponentReflection<Component>>(#Component, props)); \
         return true; \
     }();

@@ -5,6 +5,7 @@
 #include "Rendering/MeshRender.h"
 #include "Transform/Transform.h"
 #include <Scenes/SceneSerialiser.h>
+#include "Reflection/ReflectionRegistry.h"
 
 
 void SceneSystem::Start(const SubsystemParams& params)

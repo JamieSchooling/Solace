@@ -9,6 +9,8 @@
 #include <fstream>
 #include <Rendering/Colour.h>
 
+#include "Reflection/ReflectionRegistry.h"
+
 SceneSerialiser::SceneSerialiser(Scene& scene) : m_scene(scene)
 {
 }
@@ -174,6 +176,7 @@ void SceneSerialiser::DeserialiseEntity(JSON entityData)
 	{
 		if (m_name == "Name") continue;
 		auto component = ReflectionRegistry::Get(m_name.c_str());
+		if (!component) { continue; }
 		component->Emplace(m_scene.Registry, entity);
 		if (m_name == "Camera")
 		{

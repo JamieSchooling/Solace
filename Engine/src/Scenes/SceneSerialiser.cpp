@@ -84,6 +84,7 @@ JSON SceneSerialiser::SerialiseEntity(entt::entity entity)
 	auto componentReflections = ReflectionRegistry::View(m_scene.Registry, entity);
 	for (auto& component : componentReflections)
 	{
+		out[component->Name()] = JSON();
 		for (auto property : component->GetProperties())
 		{
 			out[component->Name()][property->Name()] = SerialiseProperty(property, entity);

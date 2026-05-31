@@ -3,10 +3,12 @@
 #include "Core/Subsystem.h"
 #include "ECS/System.h"
 #include <Scenes/SceneSystem.h>
+#include <Input/InputSystem.h>
 
 struct ECSManagerProps : public SubsystemParams
 {
 	SceneSystem* SceneSystem = nullptr;
+	InputSystem* InputSystem = nullptr;
 };
 
 class ECSManager : public SingletonSubsystem<ECSManager>
@@ -21,6 +23,7 @@ public:
 private:
 	std::vector<std::shared_ptr<ISystem>> m_systems;
 	SceneSystem* m_sceneSystem;
+	InputSystem* m_inputSystem;
 
 	bool m_hasInitSystems = false;
 };

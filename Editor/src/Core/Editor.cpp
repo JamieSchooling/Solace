@@ -77,6 +77,7 @@ void Editor::Initialise(std::vector<std::string> args)
 	{
 		ECSManagerProps props;
 		props.SceneSystem = &SceneSystem::Get();
+		props.InputSystem = &InputSystem::Get();
 		AddSubsystem<ECSManager>(UpdatePhase::Simulation, props);
 	}
 

@@ -4,11 +4,13 @@
 #include <vector>
 #include <memory>
 
+class InputSystem;
+
 class ISystem
 {
 public:
-	virtual void Initialise(entt::registry& registry) {};
-	virtual void Update(entt::registry& registry, float deltaTime) = 0;
+	virtual void Initialise(entt::registry& registry, InputSystem* inputSystem) {};
+	virtual void Update(entt::registry& registry, float deltaTime, InputSystem* inputSystem) = 0;
 };
 
 struct ModuleSystems

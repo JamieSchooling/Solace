@@ -71,7 +71,7 @@ void InputSystem::OnEvent(Event& event)
 
 void InputSystem::AddAction(std::string action, InputBinding key)
 {
-	m_actionBindings[key] = action;
+	m_actionBindings[key].push_back(action);
 	m_inputActions[action] = InputAction{
 		action,
 		{ key },
@@ -81,8 +81,8 @@ void InputSystem::AddAction(std::string action, InputBinding key)
 
 void InputSystem::AddTwoComponentAction(std::string action, InputBinding leftKey, InputBinding rightKey)
 {
-	m_actionBindings[leftKey] = action;
-	m_actionBindings[rightKey] = action;
+	m_actionBindings[leftKey].push_back(action);
+	m_actionBindings[rightKey].push_back(action);
 	m_inputActions[action] = InputAction{
 		action,
 		{ leftKey, rightKey },
@@ -100,10 +100,10 @@ void InputSystem::AddTwoComponentAction(std::string action, InputBinding leftKey
 
 void InputSystem::AddFourComponentAction(std::string action, InputBinding upKey, InputBinding leftKey, InputBinding downKey, InputBinding rightKey, bool normalise)
 {
-	m_actionBindings[upKey] = action;
-	m_actionBindings[leftKey] = action;
-	m_actionBindings[downKey] = action;
-	m_actionBindings[rightKey] = action;
+	m_actionBindings[upKey].push_back(action);
+	m_actionBindings[leftKey].push_back(action);
+	m_actionBindings[downKey].push_back(action);
+	m_actionBindings[rightKey].push_back(action);
 	m_inputActions[action] = InputAction{
 		action,
 		{ upKey, leftKey, downKey, rightKey },
@@ -200,10 +200,12 @@ void InputSystem::HandleKeyEvent(int keycode, int action)
 
 	if (m_actionBindings.contains(key))
 	{
-		std::string actionName = m_actionBindings.at(key);
-		InputAction& action = m_inputActions.at(actionName);
-		if (action.computeEvent != nullptr)
-			action.computeEvent(action);
+		for (auto actionName : m_actionBindings.at(key))
+		{
+			InputAction& action = m_inputActions.at(actionName);
+			if (action.computeEvent != nullptr)
+				action.computeEvent(action);
+		}
 	}
 }
 
@@ -212,6 +214,16 @@ void InputSystem::HandleMouseButtonEvent(int buttonCode, int action)
 	InputBinding button = (InputBinding)buttonCode;
 	InputPhase inputPhase = (InputPhase)action;
 	m_keyStates[button] = inputPhase;
+
+	if (m_actionBindings.contains(button))
+	{
+		for (auto& actionName : m_actionBindings.at(button))
+		{
+			InputAction& action = m_inputActions.at(actionName);
+			if (action.computeEvent != nullptr)
+				action.computeEvent(action);
+		}
+	}
 }
 
 void InputSystem::HandleMouseMoveEvent(double mouseX, double mouseY)

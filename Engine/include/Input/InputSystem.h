@@ -69,7 +69,7 @@ private:
 	EventSystem* m_eventSystem;
 	std::unordered_map<InputBinding, InputPhase> m_keyStates;
 	std::unordered_map<InputBinding, InputPhase> m_lastFrameKeyStates;
-	std::unordered_map<InputBinding, std::string> m_actionBindings;
+	std::unordered_map<InputBinding, std::vector<std::string>> m_actionBindings;
 	std::unordered_map<std::string, InputAction> m_inputActions;
 	glm::vec2 m_lastMousePos;
 	glm::vec2 m_mouseDelta = glm::vec2(-1.0f);

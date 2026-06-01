@@ -292,6 +292,8 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 			{
 				std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl");
 				std::shared_ptr<Material> material = std::make_shared<Material>(shader, InitWithDefaultValues);
+				material->SetValue("u_prop_colour", glm::vec3(1.0));
+				material->SetValue("u_prop_specularAmount", 0.5f);
 				MaterialSerialiser ms;
 				auto path = m_currentDirectory / "Material.mat";
 				AppendDuplicateCount(path);

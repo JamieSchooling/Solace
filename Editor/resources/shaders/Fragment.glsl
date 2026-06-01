@@ -34,6 +34,8 @@ layout (std140, binding = 1) uniform b_lights
 
 uniform vec3 u_prop_colour;
 uniform sampler2D u_prop_albedo;
+uniform sampler2D u_prop_specular;
+uniform float u_prop_specularAmount;
 
 uniform sampler2D u_shadowMap;
 
@@ -57,7 +59,7 @@ float getShadowAmount()
 	float closestDepth = texture(u_shadowMap, projCoords.xy).r; 
 	float currentDepth = projCoords.z;
 
-	float bias = 0.015;
+	float bias = 0.000;
 	if (currentDepth - bias > closestDepth) shadowAmount = 1.0;
 
 	vec2 texelSize = 1.0 / textureSize(u_shadowMap, 0);
@@ -80,7 +82,7 @@ vec3 getDirectionalLight()
 	vec3 ambient = ambientStrength * u_dLight.colour.rgb;
 	float diff = max(dot(normal, -u_dLight.direction.rgb), 0.0);
 	vec3 diffuse = diff * u_dLight.colour.rgb * u_dLight.intensity;
-	float specularStrength = 0.8;
+	float specularStrength = texture(u_prop_specular, texCoord).r * u_prop_specularAmount;
 	vec3 viewDir = normalize(u_viewPos - posWorldSpace);
 	vec3 reflectDir = reflect(u_dLight.direction.rgb, normal);  
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64);
@@ -116,8 +118,9 @@ vec3 getPointLight(int idx)
 	vec3 reflectDir = reflect(-lightDir, normal);
 
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64.0);
-
-	vec3 specular = 0.8 * spec * attn * u_pLights[idx].colour.rgb * u_pLights[idx].intensity;
+	
+	float specularStrength = texture(u_prop_specular, texCoord).r * u_prop_specularAmount;
+	vec3 specular = specularStrength * spec * attn * u_pLights[idx].colour.rgb * u_pLights[idx].intensity;
 	
 	return diffuse + specular;
 }

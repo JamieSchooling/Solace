@@ -3,9 +3,12 @@
 #include "Rendering/Camera.h"
 #include "Rendering/Light.h"
 #include "Rendering/MeshRender.h"
+#include "Rendering/Material.h"
 #include "Transform/Transform.h"
 #include <Scenes/SceneSerialiser.h>
 
+#include <glm/glm.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
 
 void SceneSystem::Start(const SubsystemParams& params)
 {
@@ -13,6 +16,10 @@ void SceneSystem::Start(const SubsystemParams& params)
 
 	m_eventSystem = props.EventSystem;
 	m_eventSystem->AddListener(this);
+
+	std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/shadowVert.glsl", "./resources/shaders/shadowFrag.glsl");
+	m_shadowPassMaterial = std::make_shared<::Material>(shader);
+	m_shadowView.RenderTarget = std::make_shared<FBO>(glm::ivec2(4096, 4096), AttachmentType::Depth);
 
 	Scene scene = Scene::CreateDefault();
 	if (!props.StartupScene.is_nil() && AssetRegistry::Get().Exists(props.StartupScene))
@@ -31,6 +38,7 @@ void SceneSystem::Shutdown()
 void SceneSystem::OnAppUpdate()
 {
 	m_renderQueue.clear();
+	m_shadowQueue.clear();
 
 	if (m_activeScene.MainCamera == entt::null)
 	{
@@ -53,6 +61,16 @@ void SceneSystem::OnAppUpdate()
 			m_lightData.DLight.Colour = light.Colour.ColourValue;
 			m_lightData.DLight.Direction = glm::vec4(transform.Forward(), 0.0f);
 			m_lightData.DLight.Intensity = light.Intensity;
+
+			m_shadowView.Camera.Position = -40.0f * m_lightData.DLight.Direction;
+
+			float orthoSize = 40.0f * 0.75f;
+			m_shadowView.Camera.Projection = glm::ortho(
+				-orthoSize, orthoSize,
+				-orthoSize, orthoSize,
+				0.1f, 100.f
+			);
+			m_shadowView.Camera.View = glm::lookAt(glm::vec3(m_shadowView.Camera.Position), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		}
 		if (light.Type == LightType::Point)
 		{
@@ -69,7 +87,8 @@ void SceneSystem::OnAppUpdate()
 
 	for (auto [entity, render, transform] : view.each()) 
 	{
-		m_renderQueue.emplace_back(render.Geometry, render.Material, transform.GetTransformMatrix());
+		m_shadowQueue.emplace_back(render.DepthGeometry, m_shadowPassMaterial, transform.GetTransformMatrix());
+		m_renderQueue.emplace_back(render.Geometry, render.Material, transform.GetTransformMatrix()); 
 	}
 }
 

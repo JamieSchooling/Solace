@@ -49,6 +49,8 @@ struct RenderView
 
 struct FrameRenderData
 {
+	RenderView ShadowView;
+	std::vector<RenderItem> ShadowQueue;
 	std::vector<RenderItem> RenderQueue;
 	std::vector<RenderView> RenderViews;
 	LightData Lights;

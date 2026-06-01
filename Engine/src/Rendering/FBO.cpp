@@ -4,14 +4,25 @@
 
 #include <iostream>
 
-FBO::FBO(glm::ivec2 size)
+FBO::FBO(glm::ivec2 size, AttachmentType attachmentType)
 {
 	glCreateFramebuffers(1, &m_id);
 
 	m_size = size;
 
-	m_target = std::make_shared<Texture>(m_size);
-	glNamedFramebufferTexture(m_id, GL_COLOR_ATTACHMENT0, m_target->GetID(), 0);
+	switch (attachmentType)
+	{
+	case AttachmentType::Colour:
+		m_target = std::make_shared<Texture>(m_size);
+		glNamedFramebufferTexture(m_id, GL_COLOR_ATTACHMENT0, m_target->GetID(), 0);
+		break;
+	case AttachmentType::Depth:
+		m_target = std::make_shared<Texture>(m_size, TextureFormat::Depth32F);
+		glNamedFramebufferTexture(m_id, GL_DEPTH_ATTACHMENT, m_target->GetID(), 0);
+		glNamedFramebufferDrawBuffer(m_id, GL_NONE);
+		glNamedFramebufferReadBuffer(m_id, GL_NONE);
+		break;
+	}
 
 	GLenum status = glCheckNamedFramebufferStatus(m_id, GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -34,9 +45,14 @@ FBO::~FBO()
 	if (m_id > 0) glDeleteFramebuffers(1, &m_id);
 }
 
-void FBO::Use() const
+void FBO::Use()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+	if (m_id == 0)
+	{
+		m_size = glm::ivec2(Window::Get().GetWidth(), Window::Get().GetHeight());
+	}
+	glViewport(0, 0, m_size.x, m_size.y);
 }
 
 void FBO::Unbind() const

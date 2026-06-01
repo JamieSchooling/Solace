@@ -18,9 +18,47 @@ void RenderSystem::Shutdown()
 void RenderSystem::PostAppUpdate()
 {	
 	TextureUnitAllocator::Reset();
-
 	m_lightUBO->Upload(m_renderData->Lights);
 
+	{
+		m_renderData->ShadowView.RenderTarget->Use();
+		m_cameraUBO->Upload(m_renderData->ShadowView.Camera);
+		//glDepthFunc(GL_GREATER);
+
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+		glDepthMask(GL_TRUE);
+		glCullFace(GL_FRONT);
+		glEnable(GL_CULL_FACE);
+
+		glClearDepth(1.0);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		for (RenderItem& depthItem : m_renderData->ShadowQueue)
+		{
+			// Render
+			if (!depthItem.Geometry) continue;
+			depthItem.Geometry->Use();
+			if (depthItem.Material)
+			{
+				depthItem.Material->SetValue("u_model", depthItem.Transform);
+				depthItem.Material->Use();
+			}
+			glDrawElements(GL_TRIANGLES, depthItem.Geometry->Count(), GL_UNSIGNED_INT, NULL);
+		}
+		m_renderData->ShadowView.RenderTarget->Unbind();
+	}
+
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glDepthMask(GL_TRUE);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+
+	glClearDepth(1.0);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	//glDepthFunc(GL_LESS);
 	for (auto view : m_renderData->RenderViews)
 	{
 		view.RenderTarget->Use(); 
@@ -34,6 +72,8 @@ void RenderSystem::PostAppUpdate()
 			if (item.Material)
 			{
 				item.Material->SetValue("u_model", item.Transform);
+				item.Material->SetValue("u_shadowMap", m_renderData->ShadowView.RenderTarget->GetTarget());
+				item.Material->SetValue("u_lightSpaceTransform", m_renderData->ShadowView.Camera.Projection * m_renderData->ShadowView.Camera.View);
 				item.Material->Use();
 			}
 			glDrawElements(GL_TRIANGLES, item.Geometry->Count(), GL_UNSIGNED_INT, NULL);

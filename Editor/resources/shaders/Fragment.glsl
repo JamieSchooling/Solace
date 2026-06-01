@@ -35,9 +35,44 @@ layout (std140, binding = 1) uniform b_lights
 uniform vec3 u_prop_colour;
 uniform sampler2D u_prop_albedo;
 
+uniform sampler2D u_shadowMap;
+
 in vec3 posWorldSpace;
 in vec3 normal;
 in vec2 texCoord;
+in vec4 fragmentPosLightSpace;
+
+float getShadowAmount()
+{
+	float shadowAmount = 0.0;
+
+	vec3 projCoords = fragmentPosLightSpace.xyz / fragmentPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+	if (projCoords.z > 1.0 || projCoords.x < 0.0 || projCoords.x > 1.0 || projCoords.y < 0.0 || projCoords.y > 1.0)
+    {
+        return 0.0;
+    }
+
+	float closestDepth = texture(u_shadowMap, projCoords.xy).r; 
+	float currentDepth = projCoords.z;
+
+	float bias = 0.015;
+	if (currentDepth - bias > closestDepth) shadowAmount = 1.0;
+
+	vec2 texelSize = 1.0 / textureSize(u_shadowMap, 0);
+	for(int x = -1; x <= 1; ++x)
+	{
+		for(int y = -1; y <= 1; ++y)
+		{
+			float pcfDepth = texture(u_shadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
+			shadowAmount += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+		}
+	}
+	shadowAmount /= 9.0;
+
+	return shadowAmount;
+}
 
 vec3 getDirectionalLight()
 {
@@ -50,7 +85,7 @@ vec3 getDirectionalLight()
 	vec3 reflectDir = reflect(u_dLight.direction.rgb, normal);  
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64);
 	vec3 specular = specularStrength * spec * u_dLight.colour.rgb * u_dLight.intensity;      
-	return ambient + diffuse + specular;
+	return ambient + ((1.0 - getShadowAmount()) * (diffuse + specular));
 }
 
 vec3 getPointLight(int idx)

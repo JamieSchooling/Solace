@@ -32,6 +32,7 @@ void MeshRenderComponent::ReloadMesh()
 
 	std::vector<uint32_t> indices;
 	std::vector<float> verts;
+	std::vector<float> depthVerts;
 
 	const aiMesh* mesh = scene->mMeshes[0];
 
@@ -44,6 +45,7 @@ void MeshRenderComponent::ReloadMesh()
 		}
 	}
 	Geometry = std::make_shared<VAO>(indices);
+	DepthGeometry = std::make_shared<VAO>(indices);
 
 	for (size_t i = 0; i < mesh->mNumVertices; ++i)
 	{
@@ -51,6 +53,10 @@ void MeshRenderComponent::ReloadMesh()
 		verts.push_back(mesh->mVertices[i].x);
 		verts.push_back(mesh->mVertices[i].y);
 		verts.push_back(mesh->mVertices[i].z);
+
+		depthVerts.push_back(mesh->mVertices[i].x);
+		depthVerts.push_back(mesh->mVertices[i].y);
+		depthVerts.push_back(mesh->mVertices[i].z);
 
 		// Normals
 		verts.push_back(mesh->mNormals[i].x);
@@ -63,6 +69,7 @@ void MeshRenderComponent::ReloadMesh()
 	}
 
 	Geometry->AddVertexBuffer(verts, { { 3, ShaderDataType::Float, false, 0 }, { 3, ShaderDataType::Float, false, 3 * sizeof(float) }, { 2, ShaderDataType::Float, false, 6 * sizeof(float) } });
+	DepthGeometry->AddVertexBuffer(depthVerts, { { 3, ShaderDataType::Float, false, 0 } });
 }
 
 void MeshRenderComponent::ReloadMaterial()

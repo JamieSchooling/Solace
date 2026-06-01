@@ -161,8 +161,22 @@ void Shader::SetUniform(const std::string& m_name, UniformData uniformData)
 	case ShaderDataType::Matrix4:
 		UploadUniform(desc.location, std::get<glm::mat4>(uniformData)); break;
 	case ShaderDataType::Texture2D:
-		if (auto texture = TextureAssetCache::Load(std::get<AssetHandle>(uniformData)))
+		if (std::holds_alternative<AssetHandle>(uniformData))
 		{
+			if (auto texture = TextureAssetCache::Load(std::get<AssetHandle>(uniformData)))
+			{
+				uint32_t texID = texture->GetID();
+				UploadUniform(desc.location, texID, TextureUnitAllocator::GetNext(texID));
+			}
+			else
+			{
+				uint32_t texID = Texture::WhiteTexture().GetID();
+				UploadUniform(desc.location, texID, TextureUnitAllocator::GetNext(texID));
+			}
+		}
+		else if (std::holds_alternative<std::shared_ptr<Texture>>(uniformData))
+		{
+			auto texture = std::get<std::shared_ptr<Texture>>(uniformData);
 			uint32_t texID = texture->GetID();
 			UploadUniform(desc.location, texID, TextureUnitAllocator::GetNext(texID));
 		} 
@@ -217,5 +231,6 @@ void Shader::UploadUniform(uint32_t location, const glm::mat4& mat) const
 
 void Shader::UploadUniform(uint32_t location, const uint32_t textureID, const uint32_t slot) const
 {
+	glUniform1i(location, slot);
 	glBindTextureUnit(slot, textureID);
 }

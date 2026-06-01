@@ -5,14 +5,21 @@
 #include <memory>
 
 #include "Rendering/Texture.h"
+#include "Rendering/Window.h"
+
+enum class AttachmentType
+{
+	Colour,
+	Depth
+};
 
 class FBO
 {
 public:
 	FBO() { m_id = 0; }; // Default framebuffer
-	FBO(glm::ivec2 size);
+	FBO(glm::ivec2 size, AttachmentType attachmentType = AttachmentType::Colour);
 	~FBO();
-	void Use() const;
+	void Use();
 	void Unbind() const;
 	void Resize(glm::ivec2 size);
 	std::shared_ptr<Texture> GetTarget();

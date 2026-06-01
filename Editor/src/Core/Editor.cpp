@@ -93,6 +93,8 @@ void Editor::Run()
 		FrameRenderData frame;
 		frame.RenderQueue = SceneSystem::Get().GetRenderQueue();
 		frame.Lights = SceneSystem::Get().GetLightData();
+		frame.ShadowView = SceneSystem::Get().GetShadowView();
+		frame.ShadowQueue = SceneSystem::Get().GetShadowQueue();
 
 		if (s_state == EditorState::Edit)
 		{

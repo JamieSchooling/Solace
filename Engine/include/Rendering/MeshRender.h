@@ -12,6 +12,7 @@ struct MeshRenderComponent
 
 	std::shared_ptr<Material> Material;
 	std::shared_ptr<VAO> Geometry;
+	std::shared_ptr<VAO> DepthGeometry;
 	AssetHandle Mesh;
 	PROPERTY(Mesh)
 	AssetHandle MaterialAsset;

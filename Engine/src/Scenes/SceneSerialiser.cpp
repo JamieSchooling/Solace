@@ -16,6 +16,10 @@ SceneSerialiser::SceneSerialiser(Scene& scene) : m_scene(scene)
 void SceneSerialiser::SerialiseTo(std::filesystem::path path)
 {
 	JSON out;
+	if (m_scene.Name != path.stem())
+	{
+		m_scene.Name = path.stem().string();
+	}
 	out["Scene"] = m_scene.Name;
 	for (auto& entity : m_scene.Registry.view<entt::entity>())
 	{
@@ -63,6 +67,10 @@ void SceneSerialiser::DeserialiseFrom(std::filesystem::path path)
 	if (!data.contains("Entities")) return;
 
 	m_scene.Name = data["Scene"];
+	if (m_scene.Name != path.stem())
+	{
+		m_scene.Name = path.stem().string();
+	}
 	for (auto& entity : data["Entities"])
 	{
 		DeserialiseEntity(entity);

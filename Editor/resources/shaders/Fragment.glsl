@@ -78,7 +78,7 @@ float getShadowAmount()
 
 vec3 getDirectionalLight()
 {
-	float ambientStrength = 0.4;
+	float ambientStrength = 0.2 * u_dLight.intensity;
 	vec3 ambient = ambientStrength * u_dLight.colour.rgb;
 	float diff = max(dot(normal, -u_dLight.direction.rgb), 0.0);
 	vec3 diffuse = diff * u_dLight.colour.rgb * u_dLight.intensity;

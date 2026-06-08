@@ -44,8 +44,8 @@ inline bool EditorProperty<T>::Draw(bool samelineAfterDraw)
 {
 	if (ImGui::BeginTable(std::format("##{}Property", m_label).c_str(), 2))
 	{
-		ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
-		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+		ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthStretch, 0.25f);
+		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch, 0.75f);
 
 		ImGui::TableNextRow();
 

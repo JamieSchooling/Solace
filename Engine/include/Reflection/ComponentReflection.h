@@ -25,7 +25,14 @@ struct IComponentReflection
         if (!IsOnEntity(r, e))
             return nullptr;
 
-        return &r.get<T>(e);
+		if constexpr (std::is_empty_v<T>)
+		{
+			return nullptr;
+		}
+		else
+		{
+			return &r.get<T>(e);
+		}
     }
 };
 

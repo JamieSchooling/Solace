@@ -2,6 +2,7 @@
 
 #include <Scenes/Scene.h>
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_glfw.h>
 #include <Scenes/NameComponent.h>
@@ -50,9 +51,6 @@ void EditorSystem::Start(const SubsystemParams& params)
 		ImGui::LoadIniSettingsFromDisk((Application::GetResourcePath() / "Layouts" / "Default.ini").string().c_str());
 		m_newLayout = LayoutOption::Default;
 	}
-
-	io.Fonts->AddFontFromFileTTF((Application::GetResourcePath()/"Fonts"/"RobotoMono-Regular.ttf").string().c_str(), 16.0f);
-	ImGui::StyleColorsDark();
 
 	OpenWindow<SceneHierarchy>();
 	OpenWindow<InspectorWindow>();
@@ -280,7 +278,10 @@ void EditorSystem::DrawMenuNode(MenuNode& node)
 
 void EditorSystem::DrawToolbar()
 {
-	ImGui::Begin("##Toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+	ImGuiWindowClass c;
+	c.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar | ImGuiDockNodeFlags_NoUndocking;
+	ImGui::SetNextWindowClass(&c);
+	ImGui::Begin("##Toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoMove );
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));

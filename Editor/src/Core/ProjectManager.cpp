@@ -20,9 +20,6 @@ void ProjectManager::Initialise(std::filesystem::path projectPath)
 		LoadProject(projectPath);
 	}
 
-	ImGuiIO& io = ImGui::GetIO();
-	io.Fonts->AddFontFromFileTTF((Application::GetResourcePath() / "Fonts" / "RobotoMono-Regular.ttf").string().c_str(), 16.0f);
-
 	if (std::filesystem::exists(Application::GetDataPath() / "ProjectList.json"))
 	{
 		std::ifstream stream(Application::GetDataPath() / "ProjectList.json");

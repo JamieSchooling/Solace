@@ -69,7 +69,11 @@ void InspectorWindow::DrawContent(entt::entity& selected, Scene& scene)
 	{
 		if (!inspector->GetComponent()->IsOnEntity(scene.Registry, selected))
 		{
-			m_inspectors.erase(selected);
+			auto it = std::find(m_inspectors.at(selected).begin(), m_inspectors.at(selected).end(), inspector);
+			if (it != m_inspectors.at(selected).end())
+			{
+				m_inspectors.at(selected).erase(it);
+			}
 			continue;
 		}
 		inspector->Draw(scene.Registry, selected);

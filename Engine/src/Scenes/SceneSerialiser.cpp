@@ -8,6 +8,7 @@
 #include <sstream>
 #include <fstream>
 #include <Rendering/Colour.h>
+#include <Scenes/OrderComponent.h>
 
 SceneSerialiser::SceneSerialiser(Scene& scene) : m_scene(scene)
 {
@@ -21,7 +22,16 @@ void SceneSerialiser::SerialiseTo(std::filesystem::path path)
 		m_scene.Name = path.stem().string();
 	}
 	out["Scene"] = m_scene.Name;
-	for (auto& entity : m_scene.Registry.view<entt::entity>())
+	auto view = m_scene.Registry.view<entt::entity>();
+
+	std::vector<entt::entity> entities(view.begin(), view.end());
+
+	std::sort(entities.begin(), entities.end(), [&](entt::entity a, entt::entity b)
+	{
+		return m_scene.Registry.get<OrderComponent>(a).Order < m_scene.Registry.get<OrderComponent>(b).Order;
+	});
+
+	for (auto entity : entities)
 	{
 		out["Entities"].push_back(SerialiseEntity(entity));
 	}
@@ -80,12 +90,19 @@ void SceneSerialiser::DeserialiseFrom(std::filesystem::path path)
 JSON SceneSerialiser::SerialiseEntity(entt::entity entity)
 {
 	JSON out;
-	std::string m_name = "Unnamed Entity";
+	std::string name = "Unnamed Entity";
 	if (m_scene.Registry.all_of<NameComponent>(entity))
 	{
-		m_name = m_scene.Registry.get<NameComponent>(entity).Name;
+		name = m_scene.Registry.get<NameComponent>(entity).Name;
 	}
-	out["Name"] = m_name;
+	out["Name"] = name;
+
+	int order = 0;
+	if (m_scene.Registry.all_of<OrderComponent>(entity))
+	{
+		order = m_scene.Registry.get<OrderComponent>(entity).Order;
+	}
+	out["Order"] = order;
 
 	auto componentReflections = ReflectionRegistry::View(m_scene.Registry, entity);
 	for (auto& component : componentReflections)
@@ -178,13 +195,13 @@ void SceneSerialiser::DeserialiseEntity(JSON entityData)
 {
 	entt::entity entity = m_scene.Registry.create();
 	m_scene.Registry.emplace<NameComponent>(entity).Name = entityData["Name"];
-
-	for (auto& [m_name, compData] : entityData.items())
+	m_scene.Registry.emplace<OrderComponent>(entity).Order = entityData["Order"];
+	for (auto& [name, compData] : entityData.items())
 	{
-		if (m_name == "Name") continue;
-		auto component = ReflectionRegistry::Get(m_name.c_str());
+		if (name == "Name" || name == "Order") continue;
+		auto component = ReflectionRegistry::Get(name.c_str());
 		component->Emplace(m_scene.Registry, entity);
-		if (m_name == "Camera")
+		if (name == "Camera")
 		{
 			m_scene.MainCamera = entity;
 		}

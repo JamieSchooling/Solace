@@ -5,6 +5,7 @@
 #include <Transform/Transform.h>
 
 #include "Core/EditorSystem.h"
+#include <Scenes/OrderComponent.h>
 
 void SceneHierarchy::Open()
 {
@@ -29,7 +30,16 @@ void SceneHierarchy::DrawContent(entt::entity& selected, Scene& scene)
 
 	if (ImGui::TreeNodeEx(scene.Name.c_str(), ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow))
 	{
-		for (auto& entity : scene.Registry.view<entt::entity>())
+		auto view = scene.Registry.view<entt::entity>();
+
+		std::vector<entt::entity> entities(view.begin(), view.end());
+
+		std::sort(entities.begin(), entities.end(), [&](entt::entity a, entt::entity b)
+		{
+			return scene.Registry.get<OrderComponent>(a).Order < scene.Registry.get<OrderComponent>(b).Order;
+		});
+
+		for (auto entity : entities)
 		{
 			std::string m_name = "Unnamed Entity";
 			if (scene.Registry.all_of<NameComponent>(entity))

@@ -332,10 +332,11 @@ void AssetBrowser::DrawTruncatedPath(const std::filesystem::path& path, float ma
 void AssetBrowser::DrawFilenameEdit(const std::filesystem::path& path, float maxWidth)
 {
 	ImGui::SetNextItemWidth(maxWidth);
-	std::string filename = m_currentEditFilepathModified.filename().string();
+	std::string filename = m_currentEditFilepathModified.stem().string();
+	std::string extension = m_currentEditFilepathModified.extension().string();
 	if (ImGui::InputText("##Filename", &filename, ImGuiInputTextFlags_AutoSelectAll))
 	{
-		m_currentEditFilepathModified = m_currentDirectory / filename;
+		m_currentEditFilepathModified = m_currentDirectory / (filename + extension);
 	}
 
 	if (ImGui::IsKeyPressed(ImGuiKey_Enter))

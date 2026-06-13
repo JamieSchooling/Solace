@@ -18,27 +18,35 @@ void MaterialWindow::Open(AssetHandle materialHandle)
 
 void MaterialWindow::DrawContent(entt::entity& selected, Scene& scene)
 {
-	if (!m_material) return;
+	auto material = m_material.lock();
+	if (!material)
+	{
+		ShowUnsaved(false);
+		return;
+	}
 
-	for (auto [name, data] : m_material->GetUniformData())
+	for (auto [name, data] : material->GetUniformData())
 	{
 		bool isProperty = name.rfind("u_prop_", 0) == 0;
 		if (!isProperty) { continue; }
 
-		UniformDescription desc = m_material->GetUniformDescription(name);
+		UniformDescription desc = material->GetUniformDescription(name);
 		DrawProperty(name, data, desc);
 	}
 
 	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S, ImGuiInputFlags_RouteAlways))
 	{
 		MaterialSerialiser ms;
-		ms.SerialiseTo(m_material, m_materialPath);
+		ms.SerialiseTo(material, m_materialPath);
 		ShowUnsaved(false);
 	}
 }
 
 void MaterialWindow::DrawProperty(const std::string& name, UniformData data, UniformDescription desc)
 {
+	auto material = m_material.lock();
+	if (!material) { return; }
+
 	std::string prefix = "u_prop_";
 	std::string displayName = name.substr(prefix.length());
 	if (desc.type == ShaderDataType::Bool)
@@ -46,7 +54,7 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		bool value = std::get<bool>(data);
 		if (EditorProperty<bool>(displayName, value).Draw())
 		{
-			m_material->SetValue(name, value);
+			material->SetValue(name, value);
 			ShowUnsaved();
 		}
 	}
@@ -55,7 +63,7 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		int value = std::get<int>(data);
 		if (EditorProperty<int>(displayName, value).Draw())
 		{
-			m_material->SetValue(name, value);
+			material->SetValue(name, value);
 			ShowUnsaved();
 		}
 	}
@@ -64,7 +72,7 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		float value = std::get<float>(data);
 		if (EditorProperty<float>(displayName, value).Draw())
 		{
-			m_material->SetValue(name, value);
+			material->SetValue(name, value);
 			ShowUnsaved();
 		}
 	}
@@ -73,7 +81,7 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		glm::vec2 value = std::get<glm::vec2>(data);
 		if (EditorProperty<glm::vec2>(displayName, value).Draw())
 		{
-			m_material->SetValue(name, value);
+			material->SetValue(name, value);
 			ShowUnsaved();
 		}
 	}
@@ -87,7 +95,7 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 			c.ColourValue = glm::vec4(value.r, value.g, value.b, 1.0f);
 			if (EditorProperty<Colour>(displayName, c).Draw())
 			{
-				m_material->SetValue(name, glm::vec3(c.ColourValue));
+				material->SetValue(name, glm::vec3(c.ColourValue));
 				ShowUnsaved();
 			}
 		}
@@ -95,7 +103,7 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		{
 			if (EditorProperty<glm::vec3>(displayName, value).Draw())
 			{
-				m_material->SetValue(name, value);
+				material->SetValue(name, value);
 				ShowUnsaved();
 			}
 		}
@@ -110,7 +118,7 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 			c.ColourValue = value;
 			if (EditorProperty<Colour>(displayName, c).Draw())
 			{
-				m_material->SetValue(name, c.ColourValue);
+				material->SetValue(name, c.ColourValue);
 				ShowUnsaved();
 			}
 
@@ -119,7 +127,7 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		{
 			if (EditorProperty<glm::vec4>(displayName, value).Draw())
 			{
-				m_material->SetValue(name, value);
+				material->SetValue(name, value);
 				ShowUnsaved();
 			}
 		}
@@ -129,7 +137,7 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		AssetHandle value = std::get<AssetHandle>(data);
 		if (EditorProperty<AssetHandle>(displayName, value).Draw())
 		{
-			m_material->SetValue(name, value);
+			material->SetValue(name, value);
 			ShowUnsaved();
 		}
 		if (ImGui::BeginDragDropTarget())
@@ -140,7 +148,7 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 				std::filesystem::path path = AssetRegistry::Get().GetFullPath(handle);
 				if (Texture::IsImageFile(path))
 				{
-					m_material->SetValue(name, handle);
+					material->SetValue(name, handle);
 				}
 			}
 			ImGui::EndDragDropTarget();

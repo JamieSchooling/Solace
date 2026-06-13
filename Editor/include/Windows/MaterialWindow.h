@@ -19,7 +19,7 @@ protected:
 	void DrawContent(entt::entity& selected, Scene& scene) override;
 
 private:
-	std::shared_ptr<Material> m_material;
+	std::weak_ptr<Material> m_material;
 	std::filesystem::path m_materialPath;
 
 	void DrawProperty(const std::string& name, UniformData data, UniformDescription desc);

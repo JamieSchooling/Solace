@@ -9,6 +9,7 @@
 #include <Rendering/Material.h>
 #include <Windows/MaterialWindow.h>
 #include <Scenes/SceneSerialiser.h>
+#include <Assets/MaterialAssetCache.h>
 
 void AssetBrowser::Open()
 {
@@ -240,6 +241,10 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 				auto path = std::filesystem::relative(filePath, m_baseDirectory);
 				AssetHandle handle = AssetRegistry::Get().GetHandle(path);
 				AssetRegistry::Get().DeleteAsset(handle);
+				if (filePath.extension() == ".mat")
+				{
+					MaterialAssetCache::Delete(handle);
+				}
 			}
 
 			if (m_editingFilename && filePath == m_currentEditFilepath)

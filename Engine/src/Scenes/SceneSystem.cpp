@@ -18,7 +18,7 @@ void SceneSystem::Start(const SubsystemParams& params)
 	m_eventSystem->AddListener(this);
 
 	std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/shadowVert.glsl", "./resources/shaders/shadowFrag.glsl");
-	m_shadowPassMaterial = std::make_shared<::Material>(shader);
+	m_shadowPassMaterial = std::make_shared<Material>(shader);
 	m_shadowView.RenderTarget = std::make_shared<FBO>(glm::ivec2(4096, 4096), AttachmentType::Depth);
 
 	Scene scene = Scene::CreateDefault();
@@ -87,8 +87,12 @@ void SceneSystem::OnAppUpdate()
 
 	for (auto [entity, render, transform] : view.each()) 
 	{
+		if (render.Material.expired())
+		{
+			render.ReloadMaterial();
+		}
 		m_shadowQueue.emplace_back(render.DepthGeometry, m_shadowPassMaterial, transform.GetTransformMatrix());
-		m_renderQueue.emplace_back(render.Geometry, render.Material, transform.GetTransformMatrix()); 
+		m_renderQueue.emplace_back(render.Geometry, render.Material.lock(), transform.GetTransformMatrix());
 	}
 }
 

@@ -91,8 +91,11 @@ void SceneSystem::OnAppUpdate()
 		{
 			render.ReloadMaterial();
 		}
-		m_shadowQueue.emplace_back(render.DepthGeometry, m_shadowPassMaterial, transform.GetTransformMatrix());
-		m_renderQueue.emplace_back(render.Geometry, render.Material.lock(), transform.GetTransformMatrix());
+		if (auto mesh = render.Mesh.lock())
+		{
+			m_shadowQueue.emplace_back(mesh->DepthGeometry, m_shadowPassMaterial, transform.GetTransformMatrix());
+			m_renderQueue.emplace_back(mesh->Geometry, render.Material.lock(), transform.GetTransformMatrix());
+		}
 	}
 }
 

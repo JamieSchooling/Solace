@@ -2,7 +2,7 @@
 
 #include "Core/EditorSystem.h"
 #include <Assets/MaterialSerialiser.h>
-#include <Assets/MaterialAssetCache.h>
+#include <Assets/AssetCache.h>
 
 void MaterialWindow::Open()
 {
@@ -13,7 +13,7 @@ void MaterialWindow::Open(AssetHandle materialHandle)
 {
 	auto& window = EditorSystem::Get().OpenWindow<MaterialWindow>();
 	window.m_materialPath = AssetRegistry::Get().GetFullPath(materialHandle);
-	window.m_material = MaterialAssetCache::Load(materialHandle);
+	window.m_material = AssetCache::Load<Material>(materialHandle);
 }
 
 void MaterialWindow::DrawContent(entt::entity& selected, Scene& scene)

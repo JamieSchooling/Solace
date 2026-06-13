@@ -8,7 +8,7 @@
 
 void MeshRenderInspector::DrawInspector(entt::registry& r, entt::entity e)
 {
-	auto meshProp = m_component->GetProperty("Mesh");
+	auto meshProp = m_component->GetProperty("MeshAsset");
 	if (meshProp)
 	{
 		AssetHandle meshHandle = std::any_cast<AssetHandle>(meshProp->Get(r, e));

@@ -6,6 +6,7 @@
 #include "Scenes/NameComponent.h"
 #include <Rendering/MeshRender.h>
 #include <Core/Application.h>
+#include <Scenes/OrderComponent.h>
 
 Scene::Scene()
 {
@@ -19,23 +20,25 @@ Scene Scene::CreateDefault()
 
 	entt::entity mainCamera = scene.Registry.create();
 	scene.Registry.emplace<NameComponent>(mainCamera).Name = "Main Camera";
+	scene.Registry.emplace<OrderComponent>(mainCamera).Order = 0;
 	scene.Registry.emplace<Transform>(mainCamera);
 	scene.Registry.emplace<Camera>(mainCamera);
 	scene.MainCamera = mainCamera;
 
 	entt::entity directionalLight = scene.Registry.create();
 	scene.Registry.emplace<NameComponent>(directionalLight).Name = "Directional Light";
+	scene.Registry.emplace<OrderComponent>(directionalLight).Order = 1;
 	scene.Registry.emplace<Transform>(directionalLight).Rotation = glm::quat(glm::radians(glm::vec3(-15.0f, 20.0f, 0.0f)));
 	scene.Registry.emplace<Light>(directionalLight);
 
 	entt::entity cube = scene.Registry.create();
 
 	scene.Registry.emplace<NameComponent>(cube).Name = "Cube";
+	scene.Registry.emplace<OrderComponent>(cube).Order = 2;
 
 	MeshRenderComponent& meshRender = scene.Registry.emplace<MeshRenderComponent>(cube);
 	std::filesystem::path path = Application::GetResourcePath() / "meshes" / "cube.obj";
-	meshRender.Mesh = AssetRegistry::Get().RegisterNewAsset(path, AssetRelativeRoot::Resources);
-	//meshRender.Mesh = (Application::GetResourcePath() / "meshes" / "cube.obj").string();
+	meshRender.MeshAsset = AssetRegistry::Get().RegisterNewAsset(path, AssetRelativeRoot::Resources);
 	
 	scene.Registry.emplace<Transform>(cube);
 

@@ -23,7 +23,7 @@ target_sources(${CORE_LIBRARY}
         "src/Rendering/MeshRender.cpp"
         "src/Rendering/UBO.cpp"
         "src/Assets/MaterialSerialiser.cpp" 
-        "src/Assets/MaterialAssetCache.cpp"
+        "src/Assets/AssetCache.cpp"
         "src/Input/InputSystem.cpp"
         "src/Assets/AssetRegistry.cpp"
         "src/Rendering/ShaderDataTypes.cpp"
@@ -67,14 +67,14 @@ target_sources(${CORE_LIBRARY}
         "include/Rendering/Colour.h"
         "include/Reflection/PropertyType.h"
         "include/Assets/MaterialSerialiser.h"
-        "include/Assets/MaterialAssetCache.h"
+        "include/Assets/AssetCache.h"
         "include/Input/InputSystem.h"
         "include/Input/KeyCodes.h"
         "include/Assets/AssetRegistry.h" 
         "include/Assets/AssetHandle.h"
         "include/Assets/TextureAssetCache.h"
         "include/Rendering/TextureUnitAllocator.h"
-)
+ "include/Rendering/Mesh.h")
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

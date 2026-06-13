@@ -4,6 +4,7 @@
 #include "Rendering/VAO.h"
 
 #include "Reflection/Reflection.h"
+#include "Rendering/Mesh.h"
 #include <Assets/AssetRegistry.h>
 
 struct MeshRenderComponent
@@ -11,10 +12,9 @@ struct MeshRenderComponent
 	INIT_REFLECTION(MeshRenderComponent)
 
 	std::weak_ptr<Material> Material;
-	std::shared_ptr<VAO> Geometry;
-	std::shared_ptr<VAO> DepthGeometry;
-	AssetHandle Mesh;
-	PROPERTY(Mesh)
+	std::weak_ptr<Mesh> Mesh;
+	AssetHandle MeshAsset;
+	PROPERTY(MeshAsset)
 	AssetHandle MaterialAsset;
 	PROPERTY(MaterialAsset)
 

@@ -9,7 +9,7 @@
 #include <Rendering/Material.h>
 #include <Windows/MaterialWindow.h>
 #include <Scenes/SceneSerialiser.h>
-#include <Assets/MaterialAssetCache.h>
+#include <Assets/AssetCache.h>
 
 void AssetBrowser::Open()
 {
@@ -241,9 +241,14 @@ void AssetBrowser::DrawContent(entt::entity& selected, Scene& scene)
 				auto path = std::filesystem::relative(filePath, m_baseDirectory);
 				AssetHandle handle = AssetRegistry::Get().GetHandle(path);
 				AssetRegistry::Get().DeleteAsset(handle);
+				Assimp::Importer importer;
 				if (filePath.extension() == ".mat")
 				{
-					MaterialAssetCache::Delete(handle);
+					AssetCache::Delete<Material>(handle);
+				}
+				else if(importer.IsExtensionSupported(filePath.extension().string()))
+				{
+					AssetCache::Delete<Mesh>(handle);
 				}
 			}
 

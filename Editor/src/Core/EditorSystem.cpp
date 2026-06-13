@@ -163,6 +163,7 @@ void EditorSystem::PostAppUpdate()
 	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S, ImGuiInputFlags_RouteAlways))
 	{
 		FileMenu::Save();
+		SetSceneDirty(false);
 	}
 
 	ImGui::Render();
@@ -210,6 +211,16 @@ std::filesystem::path EditorSystem::GetCurrentlyOpenScene() const
 void EditorSystem::SetCurrentlyOpenScene(std::filesystem::path path)
 {
 	m_currentlyOpenScene = path;
+}
+
+void EditorSystem::SetSceneDirty(bool dirty)
+{
+	m_sceneDirty = dirty;
+}
+
+bool EditorSystem::IsSceneDirty()
+{
+	return m_sceneDirty;
 }
 
 void EditorSystem::HandleLayoutChange()

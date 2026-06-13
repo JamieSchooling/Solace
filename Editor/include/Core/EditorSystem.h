@@ -71,6 +71,8 @@ public:
 
 	std::filesystem::path GetCurrentlyOpenScene() const;
 	void SetCurrentlyOpenScene(std::filesystem::path path);
+	void SetSceneDirty(bool dirty = true);
+	bool IsSceneDirty();
 
 	CameraData GetEditorCameraData() 
 	{
@@ -97,6 +99,8 @@ private:
 	Transform m_editorCamTransform;
 	glm::vec3 m_editorCamRotation;
 	float m_editorFlyCamSpeed = 2.5f;
+
+	bool m_sceneDirty = false;
 
 	void HandleLayoutChange();
 	void DrawMenuBar();

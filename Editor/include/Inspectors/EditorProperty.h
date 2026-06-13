@@ -11,6 +11,7 @@
 #include <Reflection/Property.h>
 
 #include <Rendering/Colour.h>
+#include "Core/EditorSystem.h"
 
 template<typename T>
 using PropertyCallback = std::function<void(T&)>;
@@ -55,6 +56,7 @@ inline bool EditorProperty<T>::Draw(bool samelineAfterDraw)
 
 		ImGui::TableSetColumnIndex(1);
 		bool changed = DrawPropertyWidget();
+		if (changed) { EditorSystem::Get().SetSceneDirty(); }
 		if (changed && m_onChange)
 		{
 			m_onChange(m_data);

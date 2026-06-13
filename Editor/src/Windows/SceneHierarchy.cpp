@@ -13,6 +13,8 @@ void SceneHierarchy::Open()
 
 void SceneHierarchy::DrawContent(entt::entity& selected, Scene& scene)
 {
+	ShowUnsaved(EditorSystem::Get().IsSceneDirty());
+
 	if (ImGui::BeginPopupContextWindow())
 	{
 		if (ImGui::MenuItem("Create Entity"))
@@ -128,6 +130,8 @@ void SceneHierarchy::DrawDropSlot(Scene& scene, size_t insertIndex)
 			{
 				scene.Registry.get<OrderComponent>(entities[i]).Order = i;
 			}
+
+			EditorSystem::Get().SetSceneDirty();
 		}
 
 		ImGui::EndDragDropTarget();

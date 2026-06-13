@@ -52,6 +52,10 @@ void Window::Start(const SubsystemParams& params)
         Event e;
         e.Type = EventType::WindowClose;
         self->m_eventSystem->DispatchEvent(e);
+		if (e.Handled)
+		{
+			glfwSetWindowShouldClose(window, GLFW_FALSE);
+		}
     });
 
     glfwSetFramebufferSizeCallback(m_glfwInstance, [](GLFWwindow* window, int width, int height) {

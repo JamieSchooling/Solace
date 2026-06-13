@@ -6,6 +6,9 @@
 
 #include <Events/Event.h>
 
+#include <imgui.h>
+#include <misc/cpp/imgui_stdlib.h>
+
 class EditorWindow
 {
 public:

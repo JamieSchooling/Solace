@@ -1,4 +1,5 @@
 #include "Inspectors/TransformInspector.h"
+#include "Inspectors/EditorProperty.h"
 
 #include <ImGuizmo.h>
 #include <Input/InputSystem.h>
@@ -87,10 +88,13 @@ void TransformInspector::DrawGizmos(Camera& editorCamera, Transform& editorCamTr
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
 	bool setEulerCache = false;
-	if (ImGuizmo::Manipulate(&view[0][0], &proj[0][0], s_currentGizmoOperation, s_currentGizmoMode, &matrix[0][0], NULL, NULL) 
-		&& s_currentGizmoOperation == ImGuizmo::ROTATE)
+	if (ImGuizmo::Manipulate(&view[0][0], &proj[0][0], s_currentGizmoOperation, s_currentGizmoMode, &matrix[0][0], NULL, NULL))
 	{
-		setEulerCache = true;
+		EditorSystem::Get().SetSceneDirty();
+		if (s_currentGizmoOperation == ImGuizmo::ROTATE)
+		{
+			setEulerCache = true;
+		}
 	}
 
 	glm::vec3 skew;

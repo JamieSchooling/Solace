@@ -1,4 +1,5 @@
 #include "Inspectors/LightInspector.h"
+#include "Inspectors/EditorProperty.h"
 
 void LightInspector::DrawInspector(entt::registry& registry, entt::entity entity)
 {

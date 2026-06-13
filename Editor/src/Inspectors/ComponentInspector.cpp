@@ -1,5 +1,7 @@
 #include "Inspectors/ComponentInspector.h"
 
+#include "Inspectors/EditorProperty.h"
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 

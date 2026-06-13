@@ -1,4 +1,5 @@
 #include "Windows/MaterialWindow.h"
+#include "Inspectors/EditorProperty.h"
 
 #include "Core/EditorSystem.h"
 #include <Assets/MaterialSerialiser.h>

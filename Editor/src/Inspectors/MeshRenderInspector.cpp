@@ -1,4 +1,5 @@
 #include "Inspectors/MeshRenderInspector.h"
+#include "Inspectors/EditorProperty.h"
 #include <nfd.h>
 
 #include <assimp/Importer.hpp>

@@ -1,4 +1,5 @@
 #include "Inspectors/CameraInspector.h"
+#include "Inspectors/EditorProperty.h"
 
 void CameraInspector::DrawInspector(entt::registry& registry, entt::entity entity)
 {

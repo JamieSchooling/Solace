@@ -2,7 +2,6 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include "EditorProperty.h"
 
 #include <Reflection/ComponentReflection.h>
 #include "InspectorRegistry.h"

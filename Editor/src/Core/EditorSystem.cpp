@@ -130,6 +130,14 @@ void EditorSystem::PostAppUpdate()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+void EditorSystem::FinaliseAppUpdate()
+{
+	for (auto&& window : m_windows)
+	{
+		window->DispatchEvents();
+	}
+}
+
 void EditorSystem::OnEvent(Event& e)
 {
 	if (e.Type == EventType::WindowClose)

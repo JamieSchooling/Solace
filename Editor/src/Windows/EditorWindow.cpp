@@ -10,13 +10,13 @@ void EditorWindow::Draw(entt::entity& selected, Scene& scene)
 	{
 		Event e;
 		e.Type = EventType::WindowFocus;
-		OnEvent(e);
+		m_eventQueue.push_back(e);
 	}
 	else if (!focused && m_wasFocused)
 	{
 		Event e;
 		e.Type = EventType::WindowFocusLost;
-		OnEvent(e);
+		m_eventQueue.push_back(e);
 	}
 	m_wasFocused = focused;
 
@@ -29,7 +29,7 @@ void EditorWindow::Draw(entt::entity& selected, Scene& scene)
 		e.Type = EventType::WindowResize;
 		e.WindowResizeArgs.Width = m_windowSize.x;
 		e.WindowResizeArgs.Height = m_windowSize.y;
-		OnEvent(e);
+		m_eventQueue.push_back(e);
 	}
 
 	m_lastFrameWindowSize = m_windowSize;
@@ -37,4 +37,13 @@ void EditorWindow::Draw(entt::entity& selected, Scene& scene)
 
 	DrawContent(selected, scene);
 	ImGui::End();
+}
+
+void EditorWindow::DispatchEvents()
+{
+	for (auto event : m_eventQueue)
+	{
+		OnEvent(event);
+	}
+	m_eventQueue.clear();
 }

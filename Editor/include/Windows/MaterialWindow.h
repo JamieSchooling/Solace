@@ -17,6 +17,7 @@ public:
 	static void Open(AssetHandle materialHandle);
 protected:
 	void DrawContent(entt::entity& selected, Scene& scene) override;
+	void OnEvent(Event& e) override;
 
 private:
 	std::weak_ptr<Material> m_material;

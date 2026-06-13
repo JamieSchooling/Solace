@@ -42,6 +42,19 @@ void MaterialWindow::DrawContent(entt::entity& selected, Scene& scene)
 	}
 }
 
+void MaterialWindow::OnEvent(Event& e)
+{
+	if (e.Type == EventType::WindowFocusLost)
+	{
+		if (auto material = m_material.lock())
+		{
+			MaterialSerialiser ms;
+			ms.SerialiseTo(material, m_materialPath);
+			ShowUnsaved(false);
+		}
+	}
+}
+
 void MaterialWindow::DrawProperty(const std::string& name, UniformData data, UniformDescription desc)
 {
 	auto material = m_material.lock();

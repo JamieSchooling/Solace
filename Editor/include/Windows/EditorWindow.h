@@ -22,4 +22,5 @@ protected:
 private:
 	const char* m_title;
 	bool m_showUnsaved = false;
+	bool m_wasFocused = false;
 };

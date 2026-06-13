@@ -422,7 +422,7 @@ bool ProjectManager::ProjectEntry(const std::string& projectName, const std::str
 
 	ImVec2 avail = ImGui::GetContentRegionAvail();
 
-	bool opened = ImGui::Selectable("##select", false, 0, avail);
+	bool opened = ImGui::Selectable("##select", false, ImGuiSelectableFlags_AllowOverlap, avail);
 
 	ImGui::SetCursorPos(ImVec2(10, 0));	
 
@@ -430,6 +430,13 @@ bool ProjectManager::ProjectEntry(const std::string& projectName, const std::str
 	ImGui::AlignTextToFramePadding();
 	ImGui::TextUnformatted(projectName.c_str());
 	ImGui::PopFont();
+
+	ImGui::SameLine(avail.x - 50);
+	if (ImGui::Button("X"))
+	{
+		m_projectList.erase(std::find(m_projectList.begin(), m_projectList.end(), projectPath));
+		SerialiseProjectList();
+	}
 
 	ImGui::SetCursorPosX(10);
 	ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(180, 180, 180, 255));

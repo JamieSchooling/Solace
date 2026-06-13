@@ -23,6 +23,7 @@ target_sources(${APPLICATION}
         "src/Inspectors/LightInspector.cpp"
         "src/Windows/MaterialWindow.cpp"
         "src/Core/ProjectManager.cpp"
+        "src/Windows/SceneViewport.cpp"
 
     PRIVATE
     FILE_SET HEADERS
@@ -47,7 +48,8 @@ target_sources(${APPLICATION}
         "include/Windows/AssetBrowser.h" 
         "include/Inspectors/LightInspector.h"
         "include/Windows/MaterialWindow.h"
-        "include/Core/ProjectManager.h")
+        "include/Core/ProjectManager.h"
+        "include/Windows/SceneViewport.h")
 
 include(FetchContent)
 

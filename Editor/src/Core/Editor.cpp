@@ -76,12 +76,15 @@ void Editor::Initialise(std::vector<std::string> args)
 		AddSubsystem<RenderSystem>(UpdatePhase::Always);
 	};
 	m_gameViewTarget = std::make_shared<FBO>();
-	m_editorViewTarget = std::make_shared<FBO>();
+	m_editorViewTarget = std::make_shared<FBO>(glm::ivec2(Window::Get().GetWidth(), Window::Get().GetWidth()), std::vector<FBOAttachment>{ {AttachmentType::Colour}, {AttachmentType::Depth} });
+	//m_editorViewTarget = std::make_shared<FBO>();
 
 	{
 		EditorSystemProps props;
 		props.GLFWInstance = Window::Get().GetGLFWInstance();
 		props.EventSystem = &EventSystem::Get();
+		props.EditorRenderTarget = m_editorViewTarget;
+		props.GameRenderTarget = m_gameViewTarget;
 		AddSubsystem<EditorSystem>(UpdatePhase::Always, props);
 		EditorSystem::Get().SetCurrentlyOpenScene(AssetRegistry::Get().GetFullPath(s_startupScene));
 	}

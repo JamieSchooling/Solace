@@ -4,7 +4,7 @@ Material::Material(std::shared_ptr<Shader> shader, MaterialInitFlags flags) : m_
 {
 	for (auto& [name, desc] : m_shader->m_uniformLookup)
 	{
-		if ((flags & MaterialInitFlags::InitWithDefaultValues) != 0)
+		if ((flags & MaterialInitFlags_InitWithDefaultValues) != 0)
 		{
 			SetDefaultValue(name, desc);
 		}

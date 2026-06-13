@@ -26,6 +26,20 @@ void Camera::RecalculateProjection()
 	}();
 }
 
+void Camera::RecalculateProjection(glm::vec2 size)
+{
+	float aspect = size.x / size.y;
+
+	m_projection = [&]()
+	{
+		switch (ProjectionType)
+		{
+		case CameraProjectionType::Perspective: return glm::perspective(glm::radians(FOV), aspect, Near, Far);
+		case CameraProjectionType::Orthographic: return glm::ortho(-aspect * Size, aspect * Size, -Size, Size, Near, Far);
+		}
+	}();
+}
+
 const glm::mat4& Camera::GetProjection() const
 {
 	return m_projection;

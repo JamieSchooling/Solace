@@ -17,6 +17,7 @@
 #include "Windows/SceneHierarchy.h"
 #include "Windows/InspectorWindow.h"
 #include "Windows/AssetBrowser.h"
+#include "Windows/SceneViewport.h"
 #include <Input/InputSystem.h>
 #include <Menu/FileMenu.h>
 #include <Core/Editor.h>
@@ -29,8 +30,8 @@ void EditorSystem::Start(const SubsystemParams& params)
 	GLFWwindow* window = props.GLFWInstance;
 	props.EventSystem->AddListener(this);
 	
-	// For later use when viewport windows are implemented
-	//m_gameRenderTarget = props.GameRenderTarget;
+	m_editorRenderTarget = props.EditorRenderTarget;
+	m_gameRenderTarget = props.GameRenderTarget;
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -55,12 +56,9 @@ void EditorSystem::Start(const SubsystemParams& params)
 	OpenWindow<SceneHierarchy>();
 	OpenWindow<InspectorWindow>();
 	OpenWindow<AssetBrowser>();
+	OpenWindow<SceneViewport>();
 
 	InputSystem::Get().AddFourComponentAction("Move", InputBinding::W, InputBinding::A, InputBinding::S, InputBinding::D);
-	m_editorCamTransform.Position = glm::vec3(4.0f, 4.0f, 4.0f);
-	m_editorCamRotation = glm::vec3(-45.0f, 45.0f, 0.0f);
-	m_editorCamTransform.Rotation = glm::quat(glm::radians(m_editorCamRotation));
-
 
 	m_playIcon = std::make_unique<Texture>(Application::GetResourcePath() / "Icons" / "PlayButton.png");
 	m_stopIcon = std::make_unique<Texture>(Application::GetResourcePath() / "Icons" / "StopButton.png");
@@ -76,55 +74,12 @@ void EditorSystem::PreAppUpdate()
 	HandleLayoutChange(); // Done on frame start to preserve docking in layout
 }
 
-void EditorSystem::OnAppUpdate()
-{
-	if (Editor::CurrentState() != EditorState::Edit) { return; }
-
-	if (InputSystem::Get().WasKeyPressedThisFrame(InputBinding::MouseButtonRight))
-	{
-		Window::Get().SetCursorMode(CursorMode::Disabled);
-	}
-	else if (InputSystem::Get().WasKeyReleasedThisFrame(InputBinding::MouseButtonRight))
-	{
-		Window::Get().SetCursorMode(CursorMode::Visible);
-	}
-
-	if (InputSystem::Get().IsKeyDown(InputBinding::MouseButtonRight))
-	{
-		float lookSpeed = 0.08f;
-		glm::vec2 mouseDelta = InputSystem::Get().MouseDelta();
-
-		m_editorCamRotation.x += -mouseDelta.y * lookSpeed;
-		m_editorCamRotation.y += -mouseDelta.x * lookSpeed;
-		m_editorCamTransform.Rotation = glm::quat(glm::radians(m_editorCamRotation));
-
-		auto moveAction = InputSystem::Get().GetAction("Move");
-		if (!moveAction) { return; }
-
-		float flightSpeed = m_editorFlyCamSpeed;
-		if (InputSystem::Get().IsKeyDown(InputBinding::LeftShift))
-		{
-			flightSpeed *= 2.0f;
-		}
-		glm::vec2 inputVector = moveAction->Get<glm::vec2>();
-		glm::vec3 position = m_editorCamTransform.Position;
-		float curSpeedX = inputVector.x * flightSpeed * Window::Get().DeltaTime();
-		float curSpeedZ = inputVector.y * flightSpeed * Window::Get().DeltaTime();
-		glm::vec3 moveDirection = (m_editorCamTransform.Forward() * curSpeedZ) + (m_editorCamTransform.Right() * -curSpeedX);
-		position += moveDirection;
-
-		m_editorCamTransform.Position = position;
-	}
-
-	
-}
-
 void EditorSystem::PostAppUpdate()
 {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	ImGui::DockSpaceOverViewport(0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingOverCentralNode);
+	ImGui::DockSpaceOverViewport(0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode /*| ImGuiDockNodeFlags_NoDockingOverCentralNode*/);
 	ImGuizmo::BeginFrame();
 
 	DrawMenuBar();
@@ -238,6 +193,26 @@ bool EditorSystem::IsSceneDirty() const
 void EditorSystem::ShowSceneSaveModal()
 {
 	m_showSceneSaveModal = true;
+}
+
+void EditorSystem::RecalcCamProjection()
+{
+	m_editorCamera.RecalculateProjection(m_editorRenderTarget->GetSize());
+}
+
+std::shared_ptr<FBO> EditorSystem::GetSceneRenderTarget()
+{
+	return m_editorRenderTarget;
+}
+
+std::shared_ptr<FBO> EditorSystem::GetGameRenderTarget()
+{
+	return m_gameRenderTarget;
+}
+
+Transform& EditorSystem::GetEditorCamTransform()
+{
+	return m_editorCamTransform;
 }
 
 void EditorSystem::DrawSceneSaveModal()

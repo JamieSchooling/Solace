@@ -19,7 +19,7 @@ void SceneSystem::Start(const SubsystemParams& params)
 
 	std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/shadowVert.glsl", "./resources/shaders/shadowFrag.glsl");
 	m_shadowPassMaterial = std::make_shared<Material>(shader);
-	m_shadowView.RenderTarget = std::make_shared<FBO>(glm::ivec2(4096, 4096), AttachmentType::Depth);
+	m_shadowView.RenderTarget = std::make_shared<FBO>(glm::ivec2(4096, 4096), std::vector<FBOAttachment>{ {AttachmentType::Depth} });
 
 	Scene scene = Scene::CreateDefault();
 	if (!props.StartupScene.is_nil() && AssetRegistry::Get().Exists(props.StartupScene))

@@ -45,5 +45,6 @@ private:
 
 public:
 	void RecalculateProjection();
+	void RecalculateProjection(glm::vec2 size);
 	const glm::mat4& GetProjection() const;
 };	

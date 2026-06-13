@@ -6,14 +6,14 @@
 
 enum MaterialInitFlags
 {
-	None = 0,
-	InitWithDefaultValues = 1 << 0,
+	MaterialInitFlags_None = 0,
+	MaterialInitFlags_InitWithDefaultValues = 1 << 0,
 };
 
 class Material
 {
 public:
-	Material(std::shared_ptr<Shader> shader, MaterialInitFlags flags = MaterialInitFlags::None);
+	Material(std::shared_ptr<Shader> shader, MaterialInitFlags flags = MaterialInitFlags_None);
 
 	template<typename T>
 	void SetValue(const std::string& m_name, T data)

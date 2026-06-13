@@ -28,7 +28,8 @@ struct EditorSystemProps : public SubsystemParams
 	GLFWwindow* GLFWInstance;
 	EventSystem* EventSystem;
 	// For later use when viewport windows are implemented
-	//std::shared_ptr<FBO> GameRenderTarget;
+	std::shared_ptr<FBO> EditorRenderTarget;
+	std::shared_ptr<FBO> GameRenderTarget;
 };
 
 class EditorSystem : public SingletonSubsystem<EditorSystem>
@@ -38,7 +39,6 @@ public:
 	void Shutdown() override;
 
 	void PreAppUpdate() override;
-	void OnAppUpdate() override;
 	void PostAppUpdate() override;
 	void OnEvent(Event& e) override;
 
@@ -85,8 +85,15 @@ public:
 
 		return data;
 	}
+
+	void RecalcCamProjection();
+
+	std::shared_ptr<FBO> GetSceneRenderTarget();
+	std::shared_ptr<FBO> GetGameRenderTarget();
+	Transform& GetEditorCamTransform();
 private:
 	std::shared_ptr<FBO> m_gameRenderTarget;
+	std::shared_ptr<FBO> m_editorRenderTarget;
 	LayoutOption m_currentLayout = LayoutOption::Default;
 	LayoutOption m_newLayout = LayoutOption::Default;
 	entt::entity m_selectedEntity = entt::null;
@@ -99,8 +106,6 @@ private:
 
 	Camera m_editorCamera;
 	Transform m_editorCamTransform;
-	glm::vec3 m_editorCamRotation;
-	float m_editorFlyCamSpeed = 2.5f;
 
 	bool m_sceneDirty = false;
 	bool m_showSceneSaveModal = false;

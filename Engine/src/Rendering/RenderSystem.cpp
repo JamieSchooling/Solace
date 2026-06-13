@@ -49,7 +49,6 @@ void RenderSystem::PostAppUpdate()
 		m_renderData->ShadowView.RenderTarget->Unbind();
 	}
 
-
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glDepthMask(GL_TRUE);
@@ -58,10 +57,13 @@ void RenderSystem::PostAppUpdate()
 
 	glClearDepth(1.0);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	//glDepthFunc(GL_LESS);
+
 	for (auto view : m_renderData->RenderViews)
 	{
-		view.RenderTarget->Use(); 
+		view.RenderTarget->Use();
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		m_cameraUBO->Upload(view.Camera);
 
 		for (RenderItem& item : m_renderData->RenderQueue)
@@ -72,7 +74,7 @@ void RenderSystem::PostAppUpdate()
 			if (item.Material)
 			{
 				item.Material->SetValue("u_model", item.Transform);
-				item.Material->SetValue("u_shadowMap", m_renderData->ShadowView.RenderTarget->GetTarget());
+				item.Material->SetValue("u_shadowMap", m_renderData->ShadowView.RenderTarget->GetDepthTarget());
 				item.Material->SetValue("u_lightSpaceTransform", m_renderData->ShadowView.Camera.Projection * m_renderData->ShadowView.Camera.View);
 				item.Material->Use();
 			}

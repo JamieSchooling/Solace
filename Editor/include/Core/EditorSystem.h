@@ -72,7 +72,9 @@ public:
 	std::filesystem::path GetCurrentlyOpenScene() const;
 	void SetCurrentlyOpenScene(std::filesystem::path path);
 	void SetSceneDirty(bool dirty = true);
-	bool IsSceneDirty();
+	bool IsSceneDirty() const;
+
+	void ShowSceneSaveModal();
 
 	CameraData GetEditorCameraData() 
 	{
@@ -101,7 +103,9 @@ private:
 	float m_editorFlyCamSpeed = 2.5f;
 
 	bool m_sceneDirty = false;
+	bool m_showSceneSaveModal = false;
 
+	void DrawSceneSaveModal();
 	void HandleLayoutChange();
 	void DrawMenuBar();
 	void DrawMenuNode(MenuNode& node);

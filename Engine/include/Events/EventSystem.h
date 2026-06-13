@@ -16,7 +16,7 @@ public:
 	void AddListener(Subsystem* subsystem);
 	void RemoveListener(Subsystem& subsystem);
 
-	void DispatchEvent(Event event);
+	void DispatchEvent(Event& event);
 
 	// TODO: Implement event queue for deferred events (e.g. End of frame, Next frame, in 0.5 secs) <- No idea how to schedule like that yet though
 private:

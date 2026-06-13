@@ -26,7 +26,7 @@ void EventSystem::RemoveListener(Subsystem& subsystem)
 	m_listenerSystems.erase(std::find(m_listenerSystems.begin(), m_listenerSystems.end(), &subsystem));
 }
 
-void EventSystem::DispatchEvent(Event event)
+void EventSystem::DispatchEvent(Event& event)
 {
 	for (auto it = m_listenerSystems.rbegin(); it != m_listenerSystems.rend(); it++)
 	{

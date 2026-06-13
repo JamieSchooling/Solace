@@ -32,6 +32,7 @@ public:
 
 	bool IsOpen();
 	void SetTitle(std::string title);
+	void Close();
 
 	inline float GetWidth() const { return m_width; }
 	inline float GetHeight() const { return m_height; }

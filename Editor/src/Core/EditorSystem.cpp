@@ -166,21 +166,33 @@ void EditorSystem::PostAppUpdate()
 		SetSceneDirty(false);
 	}
 
+	if (m_showSceneSaveModal)
+	{
+		DrawSceneSaveModal();
+	}
+
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void EditorSystem::OnEvent(Event& e)
 {
-	if (e.Type == EventType::WindowResize)
+	if (e.Type == EventType::WindowClose)
+	{
+		if (IsSceneDirty())
+		{
+			e.Handled = true;
+			ShowSceneSaveModal();
+		}
+	}
+	else if (e.Type == EventType::WindowResize)
 	{
 		if (e.WindowResizeArgs.Width > 0 && e.WindowResizeArgs.Height > 0)
 		{
 			m_editorCamera.RecalculateProjection();
 		}
 	}
-
-	if (e.Type == EventType::SceneLoad)
+	else if (e.Type == EventType::SceneLoad)
 	{
 		Scene& scene = SceneSystem::Get().GetActiveScene();
 		for (auto&& window : m_windows)
@@ -188,18 +200,18 @@ void EditorSystem::OnEvent(Event& e)
 			window->Initialise(scene);
 		}
 	}
-	for (auto&& window : m_windows)
-	{
-		window->OnEvent(e);
-	}
-
-	if (e.Type == EventType::InputKey && ImGui::GetIO().WantCaptureKeyboard)
+	else if (e.Type == EventType::InputKey && ImGui::GetIO().WantCaptureKeyboard)
 	{
 		e.Handled = true;
 	}
 	else if (e.Type == EventType::InputMouseButton && ImGui::GetIO().WantCaptureMouse)
 	{
 		e.Handled = true;
+	}
+	for (auto&& window : m_windows)
+	{
+		if (e.Handled) break;
+		window->OnEvent(e);
 	}
 }
 
@@ -218,9 +230,59 @@ void EditorSystem::SetSceneDirty(bool dirty)
 	m_sceneDirty = dirty;
 }
 
-bool EditorSystem::IsSceneDirty()
+bool EditorSystem::IsSceneDirty() const
 {
 	return m_sceneDirty;
+}
+
+void EditorSystem::ShowSceneSaveModal()
+{
+	m_showSceneSaveModal = true;
+}
+
+void EditorSystem::DrawSceneSaveModal()
+{
+	if (m_showSceneSaveModal)
+	{
+		ImGui::OpenPopup("Unsaved Changes");
+	}
+
+	// Always center this window when appearing
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("Unsaved Changes", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Are you sure you want to  quit?\nYou have unsaved changes.");
+		ImGui::Separator();
+
+		if (ImGui::Button("Save", ImVec2(120, 0)))
+		{
+			m_showSceneSaveModal = false;
+			ImGui::CloseCurrentPopup();
+			ImGui::EndPopup();
+			FileMenu::Save();
+			Window::Get().Close();
+			return;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Don't Save", ImVec2(120, 0)))
+		{
+			m_showSceneSaveModal = false;
+			ImGui::CloseCurrentPopup();
+			ImGui::EndPopup();
+			Window::Get().Close();
+			return;
+		}
+		ImGui::SetItemDefaultFocus();
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			m_showSceneSaveModal = false;
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
 }
 
 void EditorSystem::HandleLayoutChange()

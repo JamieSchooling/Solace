@@ -29,7 +29,8 @@ void ComponentInspector::Draw(entt::registry& r, entt::entity e)
 		ImGui::EndPopup();
 		if (removed) 
 		{ 
-			ImGui::PopID(); 
+			ImGui::PopID();
+			EditorSystem::Get().SetSceneDirty();
 			return; 
 		}
 	}

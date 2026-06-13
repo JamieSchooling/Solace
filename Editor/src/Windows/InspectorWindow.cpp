@@ -48,6 +48,7 @@ void InspectorWindow::DrawContent(entt::entity& selected, Scene& scene)
 					component->Emplace(scene.Registry, selected);
 					component->Initialise(scene.Registry, selected);
 					CacheEntityInspectors(selected, scene.Registry);
+					EditorSystem::Get().SetSceneDirty();
 				}
 			}
 			ImGui::EndMenu();

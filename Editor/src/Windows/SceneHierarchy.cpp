@@ -24,6 +24,7 @@ void SceneHierarchy::DrawContent(entt::entity& selected, Scene& scene)
 			scene.Registry.emplace<OrderComponent>(entity).Order = scene.Registry.view<entt::entity>().size();
 			scene.Registry.emplace<Transform>(entity);
 			selected = entity;
+			EditorSystem::Get().SetSceneDirty();
 		}
 		ImGui::EndPopup();
 	}
@@ -89,6 +90,7 @@ void SceneHierarchy::DrawEntity(Scene& scene, entt::entity entity, entt::entity&
 		{
 			if (selected == entity) { selected = entt::null; }
 			scene.Registry.destroy(entity);
+			EditorSystem::Get().SetSceneDirty();
 		}
 		ImGui::EndPopup();
 	}

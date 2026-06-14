@@ -84,6 +84,14 @@ void SceneViewport::DrawGizmosToViewport(entt::entity& selected, Scene& scene)
 
 	auto& transform = scene.Registry.get<Transform>(selected);
 	glm::mat4 matrix = transform.GetTransformMatrix();
+
+	bool isUsing = ImGuizmo::IsUsing();
+	static glm::mat4 beforeMatrix;
+	if (isUsing && !m_wasUsingGizmo)
+	{
+		beforeMatrix = matrix;
+	}
+
 	ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
 	ImGuizmo::SetRect(m_windowPos.x, m_windowPos.y, m_windowSize.x, m_windowSize.y);
 	bool setEulerCache = false;
@@ -95,4 +103,24 @@ void SceneViewport::DrawGizmosToViewport(entt::entity& selected, Scene& scene)
 		EditorSystem::Get().SetSceneDirty();
 		Gizmos::WasManipulatedThisFrame = true;
 	}
+	if (!isUsing && m_wasUsingGizmo)
+	{
+		glm::mat4 before = beforeMatrix;
+		glm::mat4 after = matrix;
+		UndoCommand undo;
+		undo.Action = [after, &transform]()
+		{
+			glm::vec3 skew;
+			glm::vec4 perspective;
+			glm::decompose(after, transform.Scale, transform.Rotation, transform.Position, skew, perspective);
+		};
+		undo.UndoAction = [before, &transform]()
+		{
+			glm::vec3 skew;
+			glm::vec4 perspective;
+			glm::decompose(before, transform.Scale, transform.Rotation, transform.Position, skew, perspective);
+		};
+		UndoSystem::AddUndoCommand(undo);
+	}
+	m_wasUsingGizmo = isUsing;
 }

@@ -25,6 +25,7 @@ private:
 	glm::vec3 m_editorCamRotation;
 	float m_editorFlyCamSpeed = 2.5f;
 	bool m_capturingViewport = false;
+	bool m_wasUsingGizmo = false;
 
 	void DrawGizmosToViewport(entt::entity& selected, Scene& scene);
 };

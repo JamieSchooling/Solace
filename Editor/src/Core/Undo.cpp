@@ -72,7 +72,7 @@ void UndoSystem::EndPropertyEdit(entt::registry& registry, entt::entity entity, 
 
 	UndoCommand undo;
 
-	ActiveEdit activeEdit = UndoSystem::GetActiveEdit();
+	ActiveEdit activeEdit = GetActiveEdit();
 
 	IProperty* property = activeEdit.Property;
 
@@ -121,7 +121,50 @@ void UndoSystem::EndPropertyEdit(entt::registry& registry, entt::entity entity, 
 		};
 	}
 
-	UndoSystem::AddUndoCommand(undo);
+	AddUndoCommand(undo);
+
+	m_activeEdit = {};
+}
+
+void UndoSystem::BeginValueEdit(std::any beforeValue)
+{
+	if (m_activeEdit.Active)
+	{
+		return;
+	}
+
+	m_activeEdit.Active = true;
+	m_activeEdit.BeforeValue = beforeValue;
+}
+
+void UndoSystem::EndValueEdit(std::any afterValue, std::function<void(std::any)> undoAction, std::function<void(std::any)> redoAction)
+{
+	if (!m_activeEdit.Active)
+	{
+		return;
+	}
+
+	UndoCommand undo;
+
+	ActiveEdit activeEdit = GetActiveEdit();
+
+	auto before = activeEdit.BeforeValue;
+	undo.Action = [afterValue, redoAction]()
+	{
+		if (redoAction)
+		{
+			redoAction(afterValue);
+		}
+	};
+	undo.UndoAction = [before, undoAction]()
+	{
+		if (undoAction)
+		{
+			undoAction(before);
+		}
+	};
+
+	AddUndoCommand(undo);
 
 	m_activeEdit = {};
 }

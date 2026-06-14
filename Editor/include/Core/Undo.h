@@ -39,6 +39,9 @@ public:
 
 	static void BeginPropertyEdit(IProperty* property, entt::registry& registry, entt::entity entity);
 	static void EndPropertyEdit(entt::registry& registry, entt::entity entity, std::function<void(bool)> sideEffect = nullptr);
+
+	static void BeginValueEdit(std::any beforeValue);
+	static void EndValueEdit(std::any afterValue, std::function<void(std::any)> undo, std::function<void(std::any)> redo);
 private:
 	static inline std::vector<UndoCommand> m_undoStack;
 	static inline std::vector<RedoCommand> m_redoStack;

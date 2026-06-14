@@ -61,46 +61,110 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 	auto material = m_material.lock();
 	if (!material) { return; }
 
+	EditResult result;
+
 	std::string prefix = "u_prop_";
 	std::string displayName = name.substr(prefix.length());
 	if (desc.type == ShaderDataType::Bool)
 	{
 		bool value = std::get<bool>(data);
-		EditResult result = EditorProperty<bool>(displayName, value).Draw();
+		result = EditorProperty<bool>(displayName, value).Draw();
 		if (result.Changed)
 		{
 			material->SetValue(name, value);
 			ShowUnsaved();
+		}
+		if (result.EditStarted)
+		{
+			UndoSystem::BeginValueEdit(value);
+		}
+		if (result.EditEnded)
+		{
+			UndoSystem::EndValueEdit(value, 
+			[name, material](std::any before) {
+				material->SetValue(name, std::any_cast<bool>(before));
+			}, 
+			[name, material](std::any after) {
+				material->SetValue(name, std::any_cast<bool>(after));
+			});
 		}
 	}
 	else if (desc.type == ShaderDataType::Int)
 	{
 		int value = std::get<int>(data);
-		EditResult result = EditorProperty<int>(displayName, value).Draw();
+		result = EditorProperty<int>(displayName, value).Draw();
 		if (result.Changed)
 		{
 			material->SetValue(name, value);
 			ShowUnsaved();
+		}
+		if (result.EditStarted)
+		{
+			UndoSystem::BeginValueEdit(value);
+		}
+		if (result.EditEnded)
+		{
+			UndoSystem::EndValueEdit(value,
+			[name, material](std::any before)
+			{
+				material->SetValue(name, std::any_cast<int>(before));
+			},
+			[name, material](std::any after)
+			{
+				material->SetValue(name, std::any_cast<int>(after));
+			});
 		}
 	}
 	else if (desc.type == ShaderDataType::Float)
 	{
 		float value = std::get<float>(data);
-		EditResult result = EditorProperty<float>(displayName, value).Draw();
+		result = EditorProperty<float>(displayName, value).Draw();
 		if (result.Changed)
 		{
 			material->SetValue(name, value);
 			ShowUnsaved();
 		}
+		if (result.EditStarted)
+		{
+			UndoSystem::BeginValueEdit(value);
+		}
+		if (result.EditEnded)
+		{
+			UndoSystem::EndValueEdit(value,
+			[name, material](std::any before)
+			{
+				material->SetValue(name, std::any_cast<float>(before));
+			},
+			[name, material](std::any after)
+			{
+				material->SetValue(name, std::any_cast<float>(after));
+			});
+		}
 	}
 	else if (desc.type == ShaderDataType::Vector2)
 	{
 		glm::vec2 value = std::get<glm::vec2>(data);
-		EditResult result = EditorProperty<glm::vec2>(displayName, value).Draw();
+		result = EditorProperty<glm::vec2>(displayName, value).Draw();
 		if (result.Changed)
 		{
 			material->SetValue(name, value);
 			ShowUnsaved();
+		}
+		if (result.EditStarted)
+		{
+			UndoSystem::BeginValueEdit(value);
+		}
+		if (result.EditEnded)
+		{
+			UndoSystem::EndValueEdit(value,
+			[name, material](std::any before)
+			{
+				material->SetValue(name, std::any_cast<glm::vec2>(before));
+			},
+			[name, material](std::any after)
+			{
+				material->SetValue(name, std::any_cast<glm::vec2>(after));
+			});
 		}
 	}
 	else if (desc.type == ShaderDataType::Vector3)
@@ -111,20 +175,52 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		{
 			Colour c;
 			c.ColourValue = glm::vec4(value.r, value.g, value.b, 1.0f);
-			EditResult result = EditorProperty<Colour>(displayName, c).Draw();
+			result = EditorProperty<Colour>(displayName, c).Draw();
 			if (result.Changed)
 			{
 				material->SetValue(name, glm::vec3(c.ColourValue));
 				ShowUnsaved();
 			}
+			if (result.EditStarted)
+			{
+				UndoSystem::BeginValueEdit(c.ColourValue);
+			}
+			if (result.EditEnded)
+			{
+				UndoSystem::EndValueEdit(c.ColourValue,
+				[name, material](std::any before)
+				{
+					material->SetValue(name, glm::vec3(std::any_cast<glm::vec4>(before)));
+				},
+				[name, material](std::any after)
+				{
+					material->SetValue(name, glm::vec3(std::any_cast<glm::vec4>(after)));
+				});
+			}
 		}
 		else
 		{
-			EditResult result = EditorProperty<glm::vec3>(displayName, value).Draw();
+			result = EditorProperty<glm::vec3>(displayName, value).Draw();
 			if (result.Changed)
 			{
 				material->SetValue(name, value);
 				ShowUnsaved();
+			}
+			if (result.EditStarted)
+			{
+				UndoSystem::BeginValueEdit(value);
+			}
+			if (result.EditEnded)
+			{
+				UndoSystem::EndValueEdit(value,
+				[name, material](std::any before)
+				{
+					material->SetValue(name, std::any_cast<glm::vec3>(before));
+				},
+				[name, material](std::any after)
+				{
+					material->SetValue(name, std::any_cast<glm::vec3>(after));
+				});
 			}
 		}
 	}
@@ -136,28 +232,60 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		{
 			Colour c;
 			c.ColourValue = value;
-			EditResult result = EditorProperty<Colour>(displayName, c).Draw();
+			result = EditorProperty<Colour>(displayName, c).Draw();
 			if (result.Changed)
 			{
 				material->SetValue(name, c.ColourValue);
 				ShowUnsaved();
 			}
+			if (result.EditStarted)
+			{
+				UndoSystem::BeginValueEdit(c.ColourValue);
+			}
+			if (result.EditEnded)
+			{
+				UndoSystem::EndValueEdit(c.ColourValue,
+				[name, material](std::any before)
+				{
+					material->SetValue(name, std::any_cast<glm::vec4>(before));
+				},
+				[name, material](std::any after)
+				{
+					material->SetValue(name, std::any_cast<glm::vec4>(after));
+				});
+			}
 
 		}
 		else
 		{
-			EditResult result = EditorProperty<glm::vec4>(displayName, value).Draw();
+			result = EditorProperty<glm::vec4>(displayName, value).Draw();
 			if (result.Changed)
 			{
 				material->SetValue(name, value);
 				ShowUnsaved();
+			}
+			if (result.EditStarted)
+			{
+				UndoSystem::BeginValueEdit(value);
+			}
+			if (result.EditEnded)
+			{
+				UndoSystem::EndValueEdit(value,
+				[name, material](std::any before)
+				{
+					material->SetValue(name, std::any_cast<glm::vec4>(before));
+				},
+				[name, material](std::any after)
+				{
+					material->SetValue(name, std::any_cast<glm::vec4>(after));
+				});
 			}
 		}
 	}
 	else if (desc.type == ShaderDataType::Texture2D)
 	{
 		AssetHandle value = std::get<AssetHandle>(data);
-		EditResult result = EditorProperty<AssetHandle>(displayName, value).Draw();
+		result = EditorProperty<AssetHandle>(displayName, value).Draw();
 		if (result.Changed)
 		{
 			material->SetValue(name, value);
@@ -171,7 +299,19 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 				std::filesystem::path path = AssetRegistry::Get().GetFullPath(handle);
 				if (Texture::IsImageFile(path))
 				{
+					UndoSystem::BeginValueEdit(value);
+
 					material->SetValue(name, handle);
+
+					UndoSystem::EndValueEdit(handle,
+					[name, material](std::any before)
+					{
+						material->SetValue(name, std::any_cast<AssetHandle>(before));
+					},
+					[name, material](std::any after)
+					{
+						material->SetValue(name, std::any_cast<AssetHandle>(after));
+					});
 				}
 			}
 			ImGui::EndDragDropTarget();

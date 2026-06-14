@@ -21,6 +21,7 @@ public:
 	void DispatchEvents();
 	glm::vec2 Position();
 	glm::vec2 Size();
+	const char* Title();
 	virtual void DrawGizmos(entt::entity& selected, Scene& scene) {}
 	virtual void EndFrame(entt::entity& selected, Scene& scene) {}
 protected:

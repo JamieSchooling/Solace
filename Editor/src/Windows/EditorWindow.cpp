@@ -58,3 +58,8 @@ glm::vec2 EditorWindow::Size()
 {
 	return { m_windowSize.x, m_windowSize.y };
 }
+
+const char* EditorWindow::Title()
+{
+	return m_title;
+}

@@ -56,11 +56,14 @@ public:
 		bool instanceExists = it != m_windows.end();
 		if (instanceExists)
 		{
-			return *dynamic_cast<T*>(it->get());
+			T& instance = *dynamic_cast<T*>(it->get());
+			ImGui::SetWindowFocus(instance.Title());
+			return instance;
 		}
 
 		auto window = std::make_unique<T>();
 		T& windowRef = *window;
+		ImGui::SetWindowFocus(windowRef.Title());
 		m_windows.push_back(std::move(window));
 		m_windows.back()->Initialise(SceneSystem::Get().GetActiveScene());
 		m_windows.back()->Initialise();

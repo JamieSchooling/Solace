@@ -18,6 +18,7 @@
 #include "Windows/InspectorWindow.h"
 #include "Windows/AssetBrowser.h"
 #include "Windows/SceneViewport.h"
+#include "Windows/GameViewport.h"
 #include <Input/InputSystem.h>
 #include <Menu/FileMenu.h>
 #include <Core/Editor.h>
@@ -57,6 +58,7 @@ void EditorSystem::Start(const SubsystemParams& params)
 	OpenWindow<SceneHierarchy>();
 	OpenWindow<InspectorWindow>();
 	OpenWindow<AssetBrowser>();
+	OpenWindow<GameViewport>();
 	OpenWindow<SceneViewport>();
 
 	InputSystem::Get().AddFourComponentAction("Move", InputBinding::W, InputBinding::A, InputBinding::S, InputBinding::D);
@@ -356,6 +358,7 @@ void EditorSystem::DrawToolbar()
 		{
 			FileMenu::Save();
 			Editor::SetCurrentState(EditorState::Play);
+			OpenWindow<GameViewport>();
 		}
 		else if (Editor::CurrentState() == EditorState::Play)
 		{

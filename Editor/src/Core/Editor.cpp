@@ -75,10 +75,9 @@ void Editor::Initialise(std::vector<std::string> args)
 	{
 		AddSubsystem<RenderSystem>(UpdatePhase::Always);
 	};
-	m_gameViewTarget = std::make_shared<FBO>();
+	m_gameViewTarget = std::make_shared<FBO>(glm::ivec2(Window::Get().GetWidth(), Window::Get().GetWidth()), std::vector<FBOAttachment>{ {AttachmentType::Colour}, { AttachmentType::Depth } });
 	m_editorViewTarget = std::make_shared<FBO>(glm::ivec2(Window::Get().GetWidth(), Window::Get().GetWidth()), std::vector<FBOAttachment>{ {AttachmentType::Colour}, {AttachmentType::Depth} });
-	//m_editorViewTarget = std::make_shared<FBO>();
-
+	
 	{
 		EditorSystemProps props;
 		props.GLFWInstance = Window::Get().GetGLFWInstance();
@@ -103,16 +102,11 @@ void Editor::Run()
 		frame.ShadowView = SceneSystem::Get().GetShadowView();
 		frame.ShadowQueue = SceneSystem::Get().GetShadowQueue();
 
-		if (s_state == EditorState::Edit)
-		{
-			RenderView editorView{ EditorSystem::Get().GetEditorCameraData(), m_editorViewTarget };
-			frame.RenderViews.push_back(editorView);
-		}
-		else if (s_state == EditorState::Play)
-		{
-			RenderView gameView{ SceneSystem::Get().GetActiveScene().GetMainCameraData(), m_gameViewTarget };
-			frame.RenderViews.push_back(gameView);
-		}
+		RenderView editorView{ EditorSystem::Get().GetEditorCameraData(), m_editorViewTarget };
+		frame.RenderViews.push_back(editorView);
+
+		RenderView gameView{ SceneSystem::Get().GetActiveScene().GetMainCameraData(), m_gameViewTarget };
+		frame.RenderViews.push_back(gameView);
 
 		RenderSystem::Get().SetFrameRenderData(frame);
 		PostUpdate();

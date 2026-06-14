@@ -24,6 +24,7 @@ target_sources(${APPLICATION}
         "src/Windows/MaterialWindow.cpp"
         "src/Core/ProjectManager.cpp"
         "src/Windows/SceneViewport.cpp"
+        "src/Windows/GameViewport.cpp"
 
     PRIVATE
     FILE_SET HEADERS
@@ -51,7 +52,7 @@ target_sources(${APPLICATION}
         "include/Core/ProjectManager.h"
         "include/Windows/SceneViewport.h"
         "include/Windows/Gizmos.h"
-)
+        "include/Windows/GameViewport.h")
 
 include(FetchContent)
 

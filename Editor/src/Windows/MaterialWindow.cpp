@@ -66,7 +66,8 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 	if (desc.type == ShaderDataType::Bool)
 	{
 		bool value = std::get<bool>(data);
-		if (EditorProperty<bool>(displayName, value).Draw())
+		EditResult result = EditorProperty<bool>(displayName, value).Draw();
+		if (result.Changed)
 		{
 			material->SetValue(name, value);
 			ShowUnsaved();
@@ -75,7 +76,8 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 	else if (desc.type == ShaderDataType::Int)
 	{
 		int value = std::get<int>(data);
-		if (EditorProperty<int>(displayName, value).Draw())
+		EditResult result = EditorProperty<int>(displayName, value).Draw();
+		if (result.Changed)
 		{
 			material->SetValue(name, value);
 			ShowUnsaved();
@@ -84,7 +86,8 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 	else if (desc.type == ShaderDataType::Float)
 	{
 		float value = std::get<float>(data);
-		if (EditorProperty<float>(displayName, value).Draw())
+		EditResult result = EditorProperty<float>(displayName, value).Draw();
+		if (result.Changed)
 		{
 			material->SetValue(name, value);
 			ShowUnsaved();
@@ -93,7 +96,8 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 	else if (desc.type == ShaderDataType::Vector2)
 	{
 		glm::vec2 value = std::get<glm::vec2>(data);
-		if (EditorProperty<glm::vec2>(displayName, value).Draw())
+		EditResult result = EditorProperty<glm::vec2>(displayName, value).Draw();
+		if (result.Changed)
 		{
 			material->SetValue(name, value);
 			ShowUnsaved();
@@ -107,7 +111,8 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		{
 			Colour c;
 			c.ColourValue = glm::vec4(value.r, value.g, value.b, 1.0f);
-			if (EditorProperty<Colour>(displayName, c).Draw())
+			EditResult result = EditorProperty<Colour>(displayName, c).Draw();
+			if (result.Changed)
 			{
 				material->SetValue(name, glm::vec3(c.ColourValue));
 				ShowUnsaved();
@@ -115,7 +120,8 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		}
 		else
 		{
-			if (EditorProperty<glm::vec3>(displayName, value).Draw())
+			EditResult result = EditorProperty<glm::vec3>(displayName, value).Draw();
+			if (result.Changed)
 			{
 				material->SetValue(name, value);
 				ShowUnsaved();
@@ -130,7 +136,8 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		{
 			Colour c;
 			c.ColourValue = value;
-			if (EditorProperty<Colour>(displayName, c).Draw())
+			EditResult result = EditorProperty<Colour>(displayName, c).Draw();
+			if (result.Changed)
 			{
 				material->SetValue(name, c.ColourValue);
 				ShowUnsaved();
@@ -139,7 +146,8 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 		}
 		else
 		{
-			if (EditorProperty<glm::vec4>(displayName, value).Draw())
+			EditResult result = EditorProperty<glm::vec4>(displayName, value).Draw();
+			if (result.Changed)
 			{
 				material->SetValue(name, value);
 				ShowUnsaved();
@@ -149,7 +157,8 @@ void MaterialWindow::DrawProperty(const std::string& name, UniformData data, Uni
 	else if (desc.type == ShaderDataType::Texture2D)
 	{
 		AssetHandle value = std::get<AssetHandle>(data);
-		if (EditorProperty<AssetHandle>(displayName, value).Draw())
+		EditResult result = EditorProperty<AssetHandle>(displayName, value).Draw();
+		if (result.Changed)
 		{
 			material->SetValue(name, value);
 			ShowUnsaved();

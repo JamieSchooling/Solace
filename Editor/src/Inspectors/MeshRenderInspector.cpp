@@ -13,9 +13,18 @@ void MeshRenderInspector::DrawInspector(entt::registry& r, entt::entity e)
 	if (meshProp)
 	{
 		AssetHandle meshHandle = std::any_cast<AssetHandle>(meshProp->Get(r, e));
-		if (EditorProperty<AssetHandle>("Mesh", meshHandle).Draw())
+		EditResult result = EditorProperty<AssetHandle>("Mesh", meshHandle).Draw();
+		if (result.Changed)
 		{
 			meshProp->Set(meshHandle, r, e);
+		}
+		if (result.EditStarted)
+		{
+			UndoSystem::BeginPropertyEdit(meshProp, r, e);
+		}
+		if (result.EditEnded)
+		{
+			UndoSystem::EndPropertyEdit(r, e);
 		}
 
 		if (ImGui::BeginDragDropTarget())
@@ -27,8 +36,12 @@ void MeshRenderInspector::DrawInspector(entt::registry& r, entt::entity e)
 				Assimp::Importer importer;
 				if (importer.IsExtensionSupported(path.extension().string().c_str()))
 				{
+					UndoSystem::BeginPropertyEdit(meshProp, r, e);
 					meshProp->Set(handle, r, e);
 					m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMesh();
+					UndoSystem::EndPropertyEdit(r, e, [this, &r, e](bool isUndo) { m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMesh(); });
+
+					EditorSystem::Get().SetSceneDirty();
 				}
 			}
 			ImGui::EndDragDropTarget();
@@ -39,9 +52,18 @@ void MeshRenderInspector::DrawInspector(entt::registry& r, entt::entity e)
 	if (materialProp)
 	{
 		AssetHandle materialHandle = std::any_cast<AssetHandle>(materialProp->Get(r, e));
-		if (EditorProperty<AssetHandle>("material", materialHandle).Draw())
+		EditResult result = EditorProperty<AssetHandle>("Material", materialHandle).Draw();
+		if (result.Changed)
 		{
 			materialProp->Set(materialHandle, r, e);
+		}
+		if (result.EditStarted)
+		{
+			UndoSystem::BeginPropertyEdit(materialProp, r, e);
+		}
+		if (result.EditEnded)
+		{
+			UndoSystem::EndPropertyEdit(r, e);
 		}
 
 		if (ImGui::BeginDragDropTarget())
@@ -52,8 +74,12 @@ void MeshRenderInspector::DrawInspector(entt::registry& r, entt::entity e)
 				std::filesystem::path path = AssetRegistry::Get().GetFullPath(handle);
 				if (path.extension() == ".mat")
 				{
+					UndoSystem::BeginPropertyEdit(materialProp, r, e);
 					materialProp->Set(handle, r, e);
 					m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMaterial();
+					UndoSystem::EndPropertyEdit(r, e, [this, &r, e](bool isUndo) { m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMaterial(); });
+
+					EditorSystem::Get().SetSceneDirty();
 				}
 			}
 			ImGui::EndDragDropTarget();

@@ -88,7 +88,6 @@ void EditorSystem::PostAppUpdate()
 	DrawMenuBar();
 	DrawToolbar();
 
-	ImGui::ShowDemoWindow();
 
 	ImGui::Begin("Debug Window");
 	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);

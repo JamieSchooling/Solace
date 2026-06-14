@@ -6,6 +6,8 @@
 #include "Windows/EditorWindow.h"
 #include "Menu/MenuRegistry.h"
 
+#include "Windows/Gizmos.h"
+
 
 class SceneViewport : public EditorWindow
 {
@@ -23,4 +25,6 @@ private:
 	glm::vec3 m_editorCamRotation;
 	float m_editorFlyCamSpeed = 2.5f;
 	bool m_capturingViewport = false;
+
+	void DrawGizmosToViewport(entt::entity& selected, Scene& scene);
 };

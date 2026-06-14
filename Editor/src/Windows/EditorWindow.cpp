@@ -4,6 +4,7 @@
 void EditorWindow::Draw(entt::entity& selected, Scene& scene)
 {
 	ImGui::Begin(m_title, nullptr, m_showUnsaved ? m_flags | ImGuiWindowFlags_UnsavedDocument : m_flags);
+	m_windowPos = ImGui::GetCursorScreenPos();
 
 	bool focused = ImGui::IsWindowFocused();
 	if (focused && !m_wasFocused)
@@ -46,4 +47,14 @@ void EditorWindow::DispatchEvents()
 		OnEvent(event);
 	}
 	m_eventQueue.clear();
+}
+
+glm::vec2 EditorWindow::Position()
+{
+	return { m_windowPos.x, m_windowPos.y };
+}
+
+glm::vec2 EditorWindow::Size()
+{
+	return { m_windowSize.x, m_windowSize.y };
 }

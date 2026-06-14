@@ -4,6 +4,8 @@
 #include <ImGuizmo.h>
 #include <Input/InputSystem.h>
 
+#include "Windows/Gizmos.h"
+
 #include <glm/gtx/matrix_decompose.hpp>
 
 void TransformInspector::Initialise(entt::registry& r, entt::entity e)
@@ -58,57 +60,36 @@ void TransformInspector::DrawInspector(entt::registry& registry, entt::entity en
 	}
 }
 
-void TransformInspector::DrawGizmos(Camera& editorCamera, Transform& editorCamTransform, entt::registry& registry, entt::entity entity)
+void TransformInspector::EndFrame(entt::registry& registry, entt::entity entity)
 {
-	glm::mat4 view = editorCamera.GetView(editorCamTransform);
-	glm::mat4 proj = editorCamera.GetProjection();
-	
-	static ImGuizmo::OPERATION s_currentGizmoOperation(ImGuizmo::TRANSLATE);
-	static ImGuizmo::MODE s_currentGizmoMode(ImGuizmo::WORLD);
+	glm::mat4 matrix = m_transform->GetTransformMatrix();
 
+	float matrixTranslation[3], matrixScale[3];
+	ImGuizmo::DecomposeMatrixToComponents(&matrix[0][0], matrixTranslation, &m_currentEuler.x, matrixScale);
+	m_eulerCache = m_currentEuler;
+	if (auto eulerProp = m_component->GetProperty("m_EulerAngles"))
+	{
+		eulerProp->Set(m_eulerCache, registry, entity);
+	}
+}
+
+void TransformInspector::DrawGizmos(entt::registry& registry, entt::entity entity)
+{
 	if (InputSystem::Get().WasKeyPressedThisFrame(InputBinding::W))
 	{
-		s_currentGizmoOperation = ImGuizmo::TRANSLATE;
+		Gizmos::CurrentGizmoOperation = ImGuizmo::TRANSLATE;
 	}
 	else if (InputSystem::Get().WasKeyPressedThisFrame(InputBinding::E))
 	{
-		s_currentGizmoOperation = ImGuizmo::ROTATE;
+		Gizmos::CurrentGizmoOperation = ImGuizmo::ROTATE;
 	}
 	else if (InputSystem::Get().WasKeyPressedThisFrame(InputBinding::R))
 	{
-		s_currentGizmoOperation = ImGuizmo::SCALE;
+		Gizmos::CurrentGizmoOperation = ImGuizmo::SCALE;
 	}
 
 	if (InputSystem::Get().WasKeyPressedThisFrame(InputBinding::X))
 	{
-		s_currentGizmoMode = s_currentGizmoMode == ImGuizmo::WORLD ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
-	}
-
-	glm::mat4 matrix = m_transform->GetTransformMatrix();
-	ImGuiIO& io = ImGui::GetIO();
-	ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
-	bool setEulerCache = false;
-	if (ImGuizmo::Manipulate(&view[0][0], &proj[0][0], s_currentGizmoOperation, s_currentGizmoMode, &matrix[0][0], NULL, NULL))
-	{
-		EditorSystem::Get().SetSceneDirty();
-		if (s_currentGizmoOperation == ImGuizmo::ROTATE)
-		{
-			setEulerCache = true;
-		}
-	}
-
-	glm::vec3 skew;
-	glm::vec4 perspective;
-	glm::decompose(matrix, m_transform->Scale, m_transform->Rotation, m_transform->Position, skew, perspective);
-
-	if (setEulerCache)
-	{
-		float matrixTranslation[3], matrixScale[3];
-		ImGuizmo::DecomposeMatrixToComponents(&matrix[0][0], matrixTranslation, &m_currentEuler.x, matrixScale);
-		m_eulerCache = m_currentEuler; 
-		if (auto eulerProp = m_component->GetProperty("m_EulerAngles"))
-		{
-			eulerProp->Set(m_eulerCache, registry, entity);
-		}
+		Gizmos::CurrentGizmoMode = Gizmos::CurrentGizmoMode == ImGuizmo::WORLD ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
 	}
 }

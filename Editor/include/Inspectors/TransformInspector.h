@@ -12,7 +12,8 @@ class TransformInspector : public ComponentInspector
 protected:
 	void Initialise(entt::registry& r, entt::entity e) override;
 	void DrawInspector(entt::registry& r, entt::entity e) override;
-	void DrawGizmos(Camera& editorCamera, Transform& editorCamTransform, entt::registry& registry, entt::entity entity) override;
+	void DrawGizmos(entt::registry& registry, entt::entity entity) override;
+	void EndFrame(entt::registry& registry, entt::entity entity) override;
 private:
 	bool m_eulerCached = false;
 	Transform* m_transform;

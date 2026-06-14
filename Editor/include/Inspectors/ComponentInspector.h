@@ -15,7 +15,8 @@ public:
 
 	virtual void Initialise(entt::registry& r, entt::entity e) {}
 	void Draw(entt::registry& r, entt::entity e);
-	virtual void DrawGizmos(Camera& editorCamera, Transform& editorCamTransform, entt::registry& registry, entt::entity entity) {}
+	virtual void DrawGizmos(entt::registry& registry, entt::entity entity) {}
+	virtual void EndFrame(entt::registry& registry, entt::entity entity) {}
 
 	std::shared_ptr<IComponentReflection> GetComponent() { return m_component; }
 protected:

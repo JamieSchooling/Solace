@@ -2,6 +2,7 @@
 
 #include "Core/EditorSystem.h"
 #include "Input/InputSystem.h"
+#include <glm/gtx/matrix_decompose.hpp>
 
 void SceneViewport::Open()
 {
@@ -59,6 +60,8 @@ void SceneViewport::DrawContent(entt::entity& selected, Scene& scene)
 	ImVec2 uv0 = ImVec2(0.0f, 1.0f);
 	ImVec2 uv1 = ImVec2(1.0f, 0.0f);
 	ImGui::Image((void*)(intptr_t)textureID, m_windowSize, uv0, uv1);
+
+	DrawGizmosToViewport(selected, scene);
 }
 
 void SceneViewport::OnEvent(Event& e)
@@ -67,5 +70,26 @@ void SceneViewport::OnEvent(Event& e)
 	{
 		EditorSystem::Get().GetSceneRenderTarget()->Resize(glm::ivec2(e.WindowResizeArgs.Width, e.WindowResizeArgs.Height));
 		EditorSystem::Get().RecalcCamProjection();
+	}
+}
+
+void SceneViewport::DrawGizmosToViewport(entt::entity& selected, Scene& scene)
+{
+	if (selected == entt::null) { return; }
+
+	glm::mat4 view = EditorSystem::Get().GetEditorCameraData().View;
+	glm::mat4 proj = EditorSystem::Get().GetEditorCameraData().Projection;
+
+	auto& transform = scene.Registry.get<Transform>(selected);
+	glm::mat4 matrix = transform.GetTransformMatrix();
+	ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+	ImGuizmo::SetRect(m_windowPos.x, m_windowPos.y, m_windowSize.x, m_windowSize.y);
+	bool setEulerCache = false;
+	if (ImGuizmo::Manipulate(&view[0][0], &proj[0][0], Gizmos::CurrentGizmoOperation, Gizmos::CurrentGizmoMode, &matrix[0][0], NULL, NULL))
+	{
+		glm::vec3 skew;
+		glm::vec4 perspective;
+		glm::decompose(matrix, transform.Scale, transform.Rotation, transform.Position, skew, perspective);
+		EditorSystem::Get().SetSceneDirty();
 	}
 }

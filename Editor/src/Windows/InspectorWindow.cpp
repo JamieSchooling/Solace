@@ -21,11 +21,19 @@ void InspectorWindow::Initialise(Scene& scene)
 	}
 }
 
-void InspectorWindow::DrawGizmos(entt::entity& selected, Camera& editorCamera, Transform& editorCamTransform, Scene& scene)
+void InspectorWindow::DrawGizmos(entt::entity& selected, Scene& scene)
 {
 	for (auto& inspector : m_inspectors[selected])
 	{
-		inspector->DrawGizmos(editorCamera, editorCamTransform, scene.Registry, selected);
+		inspector->DrawGizmos(scene.Registry, selected);
+	}
+}
+
+void InspectorWindow::EndFrame(entt::entity& selected, Scene& scene)
+{
+	for (auto& inspector : m_inspectors[selected])
+	{
+		inspector->EndFrame(scene.Registry, selected);
 	}
 }
 

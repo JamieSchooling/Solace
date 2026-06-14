@@ -49,7 +49,9 @@ target_sources(${APPLICATION}
         "include/Inspectors/LightInspector.h"
         "include/Windows/MaterialWindow.h"
         "include/Core/ProjectManager.h"
-        "include/Windows/SceneViewport.h")
+        "include/Windows/SceneViewport.h"
+        "include/Windows/Gizmos.h"
+)
 
 include(FetchContent)
 

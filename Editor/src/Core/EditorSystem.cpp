@@ -35,6 +35,7 @@ void EditorSystem::Start(const SubsystemParams& params)
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
 	io.IniFilename = nullptr;
 	if (!std::filesystem::exists(Application::GetConfigPath() / "Layouts"))
@@ -92,28 +93,16 @@ void EditorSystem::PostAppUpdate()
 	ImGui::End();
 
 	Scene& scene = SceneSystem::Get().GetActiveScene();
+
+	for (auto&& window : m_windows)
+	{
+		window->DrawGizmos(m_selectedEntity, scene);
+	}
+
 	for (auto&& window : m_windows)
 	{
 		window->Draw(m_selectedEntity, scene);
 	}
-
-	if (Editor::CurrentState() == EditorState::Edit)
-	{
-		for (auto&& window : m_windows)
-		{
-			window->DrawGizmos(m_selectedEntity, m_editorCamera, m_editorCamTransform, scene);
-		}
-	}
-
-	// Framework is there to make game render to an ImGui window (Editor Viewport Window), 
-	// for now I use a dockspace with a passthrough central node, with the scene rendered to the default framebuffer
-	//ImGui::Begin("Game");
-	//GLuint textureID = m_gameRenderTarget->GetTarget()->GetID();
-	//ImVec2 uv0 = ImVec2(0.0f, 1.0f);  // Top-left (flipped)
-	//ImVec2 uv1 = ImVec2(1.0f, 0.0f);  // Bottom-right (flipped)
-	//ImVec2 imageSize = ImGui::GetContentRegionAvail();  // (width, height)
-	//ImGui::Image((void*)(intptr_t)textureID, imageSize, uv0, uv1);
-	//ImGui::End();
 
 	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S, ImGuiInputFlags_RouteAlways))
 	{
@@ -126,12 +115,19 @@ void EditorSystem::PostAppUpdate()
 		DrawSceneSaveModal();
 	}
 
-	ImGui::Render();
+	ImGui::Render(); 
+
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void EditorSystem::FinaliseAppUpdate()
 {
+	Scene& scene = SceneSystem::Get().GetActiveScene();
+	for (auto&& window : m_windows)
+	{
+		window->EndFrame(m_selectedEntity, scene);
+	}
+
 	for (auto&& window : m_windows)
 	{
 		window->DispatchEvents();

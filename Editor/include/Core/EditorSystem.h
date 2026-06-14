@@ -14,6 +14,7 @@
 
 #include "Windows/EditorWindow.h"
 #include "Menu/MenuRegistry.h"
+#include "Core/Undo.h"
 
 class Scene;
 
@@ -77,6 +78,7 @@ public:
 	void SetCurrentlyOpenScene(std::filesystem::path path);
 	void SetSceneDirty(bool dirty = true);
 	bool IsSceneDirty() const;
+	void AddUndoCommand(UndoCommand command);
 
 	void ShowSceneSaveModal();
 
@@ -102,6 +104,9 @@ private:
 	LayoutOption m_newLayout = LayoutOption::Default;
 	entt::entity m_selectedEntity = entt::null;
 	std::vector<std::unique_ptr<EditorWindow>> m_windows;
+
+	std::vector<UndoCommand> m_undoStack;
+	std::vector<RedoCommand> m_redoStack;
 
 	std::unique_ptr<Texture> m_playIcon;
 	std::unique_ptr<Texture> m_stopIcon;

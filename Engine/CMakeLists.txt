@@ -74,7 +74,8 @@ target_sources(${CORE_LIBRARY}
         "include/Assets/AssetHandle.h"
         "include/Assets/TextureAssetCache.h"
         "include/Rendering/TextureUnitAllocator.h"
- "include/Rendering/Mesh.h")
+        "include/Rendering/Mesh.h"
+)
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

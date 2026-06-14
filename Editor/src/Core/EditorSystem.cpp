@@ -111,6 +111,31 @@ void EditorSystem::PostAppUpdate()
 		SetSceneDirty(false);
 	}
 
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Z, ImGuiInputFlags_RouteAlways) && !m_undoStack.empty())
+	{
+		UndoCommand undo = m_undoStack.back();
+		m_undoStack.pop_back();
+		undo.UndoAction();
+
+		RedoCommand redo;
+		redo.RedoAction = undo.Action;
+		redo.UndoAction = undo.UndoAction;
+		m_redoStack.push_back(redo);
+	}
+
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Y, ImGuiInputFlags_RouteAlways) && !m_redoStack.empty())
+	{
+		RedoCommand redo = m_redoStack.back();
+		m_redoStack.pop_back();
+		redo.RedoAction();
+
+		UndoCommand undo;
+		undo.Action = redo.RedoAction;
+		undo.UndoAction = redo.UndoAction;
+		m_undoStack.push_back(undo);
+
+	}
+
 	if (m_showSceneSaveModal)
 	{
 		DrawSceneSaveModal();
@@ -193,6 +218,12 @@ void EditorSystem::SetSceneDirty(bool dirty)
 bool EditorSystem::IsSceneDirty() const
 {
 	return m_sceneDirty;
+}
+
+void EditorSystem::AddUndoCommand(UndoCommand command)
+{
+	m_redoStack.clear();
+	m_undoStack.push_back(command);
 }
 
 void EditorSystem::ShowSceneSaveModal()

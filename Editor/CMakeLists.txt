@@ -52,7 +52,8 @@ target_sources(${APPLICATION}
         "include/Core/ProjectManager.h"
         "include/Windows/SceneViewport.h"
         "include/Windows/Gizmos.h"
-        "include/Windows/GameViewport.h")
+        "include/Windows/GameViewport.h"
+        "include/Core/Undo.h")
 
 include(FetchContent)
 

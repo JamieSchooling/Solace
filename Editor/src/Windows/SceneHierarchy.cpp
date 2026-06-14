@@ -109,6 +109,8 @@ void SceneHierarchy::DrawDropSlot(Scene& scene, size_t insertIndex)
 		{
 			entt::entity dragged = *static_cast<entt::entity*>(payload->Data);
 
+			size_t insertPos = insertIndex;
+
 			auto view = scene.Registry.view<entt::entity>();
 
 			std::vector<entt::entity> entities(view.begin(), view.end());
@@ -123,10 +125,10 @@ void SceneHierarchy::DrawDropSlot(Scene& scene, size_t insertIndex)
 
 			entities.erase(it);
 
-			if (insertIndex > oldIndex)
-				insertIndex--;
+			if (insertPos > oldIndex)
+				insertPos--;
 
-			entities.insert(entities.begin() + insertIndex, dragged);
+			entities.insert(entities.begin() + insertPos, dragged);
 
 			for (size_t i = 0; i < entities.size(); ++i)
 			{
@@ -134,6 +136,66 @@ void SceneHierarchy::DrawDropSlot(Scene& scene, size_t insertIndex)
 			}
 
 			EditorSystem::Get().SetSceneDirty();
+			UndoCommand undo;
+			undo.Action = [dragged, insertIndex, &scene]()
+			{
+				size_t insertPos = insertIndex;
+
+				auto view = scene.Registry.view<entt::entity>();
+
+				std::vector<entt::entity> entities(view.begin(), view.end());
+
+				std::sort(entities.begin(), entities.end(), [&](entt::entity a, entt::entity b)
+				{
+					return scene.Registry.get<OrderComponent>(a).Order < scene.Registry.get<OrderComponent>(b).Order;
+				});
+
+				auto it = std::find(entities.begin(), entities.end(), dragged);
+				size_t oldIndex = scene.Registry.get<OrderComponent>(dragged).Order;
+
+				entities.erase(it);
+
+				if (insertPos > oldIndex)
+					insertPos--;
+
+				entities.insert(entities.begin() + insertPos, dragged);
+
+				for (size_t i = 0; i < entities.size(); ++i)
+				{
+					scene.Registry.get<OrderComponent>(entities[i]).Order = i;
+				}
+
+				EditorSystem::Get().SetSceneDirty();
+			};
+			undo.UndoAction = [dragged, oldIndex, insertIndex, &scene]()
+			{
+				auto view = scene.Registry.view<entt::entity>();
+
+				size_t insertPos = oldIndex;
+
+				std::vector<entt::entity> entities(view.begin(), view.end());
+
+				std::sort(entities.begin(), entities.end(), [&](entt::entity a, entt::entity b)
+				{
+					return scene.Registry.get<OrderComponent>(a).Order < scene.Registry.get<OrderComponent>(b).Order;
+				});
+
+				auto it = std::find(entities.begin(), entities.end(), dragged);
+				size_t oldIndex = scene.Registry.get<OrderComponent>(dragged).Order;
+
+				entities.erase(it);
+
+				if (insertPos > insertIndex)
+					insertPos--;
+
+				entities.insert(entities.begin() + insertPos, dragged);
+
+				for (size_t i = 0; i < entities.size(); ++i)
+				{
+					scene.Registry.get<OrderComponent>(entities[i]).Order = i;
+				}
+			};
+			EditorSystem::Get().AddUndoCommand(undo);
 		}
 
 		ImGui::EndDragDropTarget();

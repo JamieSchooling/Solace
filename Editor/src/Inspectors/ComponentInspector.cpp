@@ -23,8 +23,36 @@ void ComponentInspector::Draw(entt::registry& r, entt::entity e)
 		bool removed = false;
 		if (ImGui::MenuItem("Remove Component"))
 		{
+			std::vector<std::pair<std::string, std::any>> componentValues;
+			for (auto property : m_component->GetProperties())
+			{
+				std::any value = property->Get(r, e);
+				if (property->Type() == PropertyType::Enum)
+				{
+					EnumInfo info = std::any_cast<EnumInfo>(value);
+					value = info.CurrentValue;
+				}
+				componentValues.push_back({ property->Name(), value});
+			}
 			m_component->Erase(r, e);
 			removed = true;
+
+			UndoCommand undo;
+			auto component = m_component;
+			undo.Action = [component, &r, e]()
+			{
+				component->Erase(r, e);
+			};
+			undo.UndoAction = [component, &r, e, componentValues]()
+			{
+				component->Emplace(r, e);
+				for (auto& [name, value] : componentValues)
+				{
+					component->GetProperty(name.c_str())->Set(value, r, e);
+				}
+				component->Initialise(r, e);
+			};
+			UndoSystem::AddUndoCommand(undo);
 		}
 		ImGui::EndPopup();
 		if (removed) 

@@ -195,7 +195,7 @@ void SceneHierarchy::DrawDropSlot(Scene& scene, size_t insertIndex)
 					scene.Registry.get<OrderComponent>(entities[i]).Order = i;
 				}
 			};
-			EditorSystem::Get().AddUndoCommand(undo);
+			UndoSystem::AddUndoCommand(undo);
 		}
 
 		ImGui::EndDragDropTarget();

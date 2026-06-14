@@ -1,5 +1,11 @@
 #include "Menu/EditMenu.h"
 
-void EditMenu::Placeholder()
+void EditMenu::Undo()
 {
+	UndoSystem::Undo();
+}
+
+void EditMenu::Redo()
+{
+	UndoSystem::Redo();
 }

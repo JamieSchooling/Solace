@@ -111,29 +111,14 @@ void EditorSystem::PostAppUpdate()
 		SetSceneDirty(false);
 	}
 
-	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Z, ImGuiInputFlags_RouteAlways) && !m_undoStack.empty())
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Z, ImGuiInputFlags_RouteAlways) && UndoSystem::UndoCount() > 0)
 	{
-		UndoCommand undo = m_undoStack.back();
-		m_undoStack.pop_back();
-		undo.UndoAction();
-
-		RedoCommand redo;
-		redo.RedoAction = undo.Action;
-		redo.UndoAction = undo.UndoAction;
-		m_redoStack.push_back(redo);
+		UndoSystem::Undo();
 	}
 
-	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Y, ImGuiInputFlags_RouteAlways) && !m_redoStack.empty())
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Y, ImGuiInputFlags_RouteAlways) && UndoSystem::RedoCount() > 0)
 	{
-		RedoCommand redo = m_redoStack.back();
-		m_redoStack.pop_back();
-		redo.RedoAction();
-
-		UndoCommand undo;
-		undo.Action = redo.RedoAction;
-		undo.UndoAction = redo.UndoAction;
-		m_undoStack.push_back(undo);
-
+		UndoSystem::Redo();
 	}
 
 	if (m_showSceneSaveModal)
@@ -218,12 +203,6 @@ void EditorSystem::SetSceneDirty(bool dirty)
 bool EditorSystem::IsSceneDirty() const
 {
 	return m_sceneDirty;
-}
-
-void EditorSystem::AddUndoCommand(UndoCommand command)
-{
-	m_redoStack.clear();
-	m_undoStack.push_back(command);
 }
 
 void EditorSystem::ShowSceneSaveModal()
@@ -337,8 +316,9 @@ void EditorSystem::DrawMenuNode(MenuNode& node)
 
 	if (leaf)
 	{
-		bool hasCondition = node.SelectedCondition != nullptr;
-		if (ImGui::MenuItem(node.Name.c_str(), nullptr, hasCondition ? node.SelectedCondition() : false))
+		bool hasSelectCondition = node.SelectedCondition != nullptr;
+		bool hasDisableCondition = node.DisabledCondition != nullptr;
+		if (ImGui::MenuItem(node.Name.c_str(), nullptr, hasSelectCondition ? node.SelectedCondition() : false, hasDisableCondition ? !node.DisabledCondition() : true))
 		{
 			if (node.Action)
 			{

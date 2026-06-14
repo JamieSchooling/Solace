@@ -25,6 +25,7 @@ target_sources(${APPLICATION}
         "src/Core/ProjectManager.cpp"
         "src/Windows/SceneViewport.cpp"
         "src/Windows/GameViewport.cpp"
+        "src/Core/Undo.cpp"
 
     PRIVATE
     FILE_SET HEADERS

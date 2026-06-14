@@ -75,6 +75,8 @@ void SceneViewport::OnEvent(Event& e)
 
 void SceneViewport::DrawGizmosToViewport(entt::entity& selected, Scene& scene)
 {
+	Gizmos::WasManipulatedThisFrame = false;
+
 	if (selected == entt::null) { return; }
 
 	glm::mat4 view = EditorSystem::Get().GetEditorCameraData().View;
@@ -91,5 +93,6 @@ void SceneViewport::DrawGizmosToViewport(entt::entity& selected, Scene& scene)
 		glm::vec4 perspective;
 		glm::decompose(matrix, transform.Scale, transform.Rotation, transform.Position, skew, perspective);
 		EditorSystem::Get().SetSceneDirty();
+		Gizmos::WasManipulatedThisFrame = true;
 	}
 }

@@ -62,6 +62,8 @@ void TransformInspector::DrawInspector(entt::registry& registry, entt::entity en
 
 void TransformInspector::EndFrame(entt::registry& registry, entt::entity entity)
 {
+	if (!Gizmos::CurrentGizmoOperation == ImGuizmo::ROTATE || !Gizmos::WasManipulatedThisFrame) { return; }
+
 	glm::mat4 matrix = m_transform->GetTransformMatrix();
 
 	float matrixTranslation[3], matrixScale[3];

@@ -27,6 +27,6 @@ cmake --build build --config Release
 
 **Run:**
 ```bash
-build\Editor\Release\Editor.exe
+build\Editor\Release\Solace.exe
 ```
 </details>

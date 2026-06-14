@@ -31,6 +31,7 @@ void FileMenu::Open()
 		auto path = std::filesystem::relative(outPath, Editor::ProjectAssetsPath());
 		Editor::SetStartupScene(AssetRegistry::Get().GetHandle(path));
 		NFD_FreePath(outPath);
+		EditorSystem::Get().SetSceneDirty(false);
 	}
 }
 
@@ -45,6 +46,7 @@ void FileMenu::Save()
 
 	SceneSerialiser serialiser(SceneSystem::Get().GetActiveScene());
 	serialiser.SerialiseTo(path);
+	EditorSystem::Get().SetSceneDirty(false);
 }
 
 void FileMenu::SaveAs()
@@ -67,6 +69,7 @@ void FileMenu::SaveAs()
 		auto path = std::filesystem::relative(outPath, Editor::ProjectAssetsPath());
 		Editor::SetStartupScene(AssetRegistry::Get().GetHandle(path));
 		NFD_FreePath(outPath);
+		EditorSystem::Get().SetSceneDirty(false);
 	}
 }
 

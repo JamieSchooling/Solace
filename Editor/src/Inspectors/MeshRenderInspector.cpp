@@ -39,7 +39,8 @@ void MeshRenderInspector::DrawInspector(entt::registry& r, entt::entity e)
 					UndoSystem::BeginPropertyEdit(meshProp, r, e);
 					meshProp->Set(handle, r, e);
 					m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMesh();
-					UndoSystem::EndPropertyEdit(r, e, [this, &r, e](bool isUndo) { m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMesh(); });
+					auto component = m_component;
+					UndoSystem::EndPropertyEdit(r, e, [component, &r, e](bool isUndo) { component->GetTarget<MeshRenderComponent>(r, e)->ReloadMesh(); });
 
 					EditorSystem::Get().SetSceneDirty();
 				}

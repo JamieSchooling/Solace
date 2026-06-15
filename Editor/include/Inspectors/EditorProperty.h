@@ -16,11 +16,18 @@
 template<typename T>
 using PropertyCallback = std::function<void(T&)>;
 
+struct EditResult
+{
+	bool Changed = false;
+	bool EditStarted = false;
+	bool EditEnded = false;
+};
+
 class IEditorProperty
 {
 public:
 	virtual ~IEditorProperty() = default;
-	virtual bool Draw(bool samelineAfterDraw = false) = 0;
+	virtual EditResult Draw() = 0;
 };
 
 template<typename T>
@@ -31,7 +38,7 @@ public:
 		: m_label(label), m_data(data), m_onChange(onChange)
 	{}
 
-	bool Draw(bool samelineAfterDraw = false) override;
+	EditResult Draw() override;
 private:
 	T& m_data;
 	std::string m_label;
@@ -41,10 +48,12 @@ private:
 };
 
 template<typename T>
-inline bool EditorProperty<T>::Draw(bool samelineAfterDraw)
+inline EditResult EditorProperty<T>::Draw()
 {
+	EditResult result;
 	if (ImGui::BeginTable(std::format("##{}Property", m_label).c_str(), 2))
 	{
+
 		ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthStretch, 0.25f);
 		ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch, 0.75f);
 
@@ -55,30 +64,40 @@ inline bool EditorProperty<T>::Draw(bool samelineAfterDraw)
 		ImGui::TextUnformatted(m_label.c_str());
 
 		ImGui::TableSetColumnIndex(1);
-		bool changed = DrawPropertyWidget();
-		if (changed) { EditorSystem::Get().SetSceneDirty(); }
-		if (changed && m_onChange)
+		result.Changed = DrawPropertyWidget();
+		if (ImGui::IsItemActivated())
+		{
+			result.EditStarted = true;
+		}
+		if constexpr (std::is_same_v<T, EnumInfo> /*|| std::is_same_v<T, Colour>*/) // TODO: Fix colour undo redo (check if edit ended is occurring and the values at the time if so)
+		{
+			if (result.Changed)
+			{
+				result.EditEnded = true;
+			}
+		}
+		else
+		{
+			if (ImGui::IsItemDeactivatedAfterEdit())
+			{
+				result.EditEnded = true;
+			}
+		}
+
+		if (result.Changed) { EditorSystem::Get().SetSceneDirty(); }
+		if (result.Changed && m_onChange)
 		{
 			m_onChange(m_data);
 		}
 
-		if (samelineAfterDraw)
-		{
-			ImGui::SameLine();
-		}
 		ImVec2 endPos = ImGui::GetCursorScreenPos();
 
 		ImGui::EndTable();
 
-		if (samelineAfterDraw)
-		{
-			ImGui::SetCursorScreenPos(endPos);
-		}
-
-		return changed;
+		return result;
 	}
 
-	return false;
+	return result;
 }
 
 template<typename T>

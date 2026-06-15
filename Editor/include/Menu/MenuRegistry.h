@@ -13,7 +13,14 @@ struct MenuNode
 	uint16_t Priority = UINT16_MAX;
 	std::function<void()> Action;
 	std::function<bool()> SelectedCondition = nullptr;
+	std::function<bool()> DisabledCondition = nullptr;
 	std::vector<std::unique_ptr<MenuNode>> Children;
+};
+
+enum class MenuConditionType
+{
+	Select,
+	Disable
 };
 
 class MenuRegistry
@@ -25,7 +32,8 @@ public:
 		return root;
 	}
 
-	static void Register(const char* path, uint16_t priority, std::function<void()> action, std::function<bool()> selectedCondition = nullptr)
+	static void Register(const char* path, uint16_t priority, std::function<void()> action, 
+						 std::function<bool()> condition = nullptr, MenuConditionType conditionType = MenuConditionType::Select)
 	{
 		std::stringstream ss(path);
 
@@ -49,7 +57,15 @@ public:
 		}
 
 		current->Action = std::move(action);
-		current->SelectedCondition = selectedCondition;
+		switch (conditionType)
+		{
+		case MenuConditionType::Select:
+			current->SelectedCondition = condition;
+			break;
+		case MenuConditionType::Disable:
+			current->DisabledCondition = condition;
+			break;
+		}
 
 		Sort(Root());
 	}
@@ -99,7 +115,14 @@ private:
 #define MENU_ITEM_SELECTION(path, priority, action, selectedCondition) \
 	static inline bool _reg_item_##action = []() \
 	{ \
-		MenuRegistry::Register(path, priority, action, selectedCondition); \
+		MenuRegistry::Register(path, priority, action, selectedCondition, MenuConditionType::Select); \
+		return true; \
+	}();
+
+#define MENU_ITEM_DISABLABLE(path, priority, action, disableCondition) \
+	static inline bool _reg_item_##action = []() \
+	{ \
+		MenuRegistry::Register(path, priority, action, disableCondition, MenuConditionType::Disable); \
 		return true; \
 	}();
 

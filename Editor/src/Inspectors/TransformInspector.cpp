@@ -27,14 +27,24 @@ void TransformInspector::DrawInspector(entt::registry& registry, entt::entity en
 	if (auto positionProp = m_component->GetProperty("Position"))
 	{
 		glm::vec3 position = std::any_cast<glm::vec3>(positionProp->Get(registry, entity));
-		if (EditorProperty<glm::vec3>("Position", position).Draw())
+		EditResult result = EditorProperty<glm::vec3>("Position", position).Draw();
+		if (result.Changed)
 		{
 			positionProp->Set(position, registry, entity);
+		}
+		if (result.EditStarted)
+		{
+			UndoSystem::BeginPropertyEdit(positionProp, registry, entity);
+		}
+		if (result.EditEnded)
+		{
+			UndoSystem::EndPropertyEdit(registry, entity);
 		}
 	}
 	if (auto rotationProp = m_component->GetProperty("Rotation"))
 	{
-		if (EditorProperty<glm::vec3>("Rotation", m_currentEuler).Draw())
+		EditResult result = EditorProperty<glm::vec3>("Rotation", m_currentEuler).Draw();
+		if (result.Changed)
 		{
 			glm::vec3 radianAngles = glm::radians(m_currentEuler);
 
@@ -43,25 +53,57 @@ void TransformInspector::DrawInspector(entt::registry& registry, entt::entity en
 			glm::quat z = glm::angleAxis(radianAngles.z, glm::vec3(0, 0, 1));
 
 			rotationProp->Set(glm::normalize(x * y * z), registry, entity); 
-			m_eulerCache = m_currentEuler;
 			if (auto eulerProp = m_component->GetProperty("m_EulerAngles"))
 			{
-				eulerProp->Set(m_eulerCache, registry, entity);
+				eulerProp->Set(m_currentEuler, registry, entity);
 			}
+		}
+		if (result.EditStarted)
+		{
+			m_eulerCache = m_currentEuler;
+			UndoSystem::BeginPropertyEdit(rotationProp, registry, entity);
+		}
+		if (result.EditEnded)
+		{
+			auto before = m_eulerCache;
+			m_eulerCache = m_currentEuler;
+			auto after = m_eulerCache;
+			UndoSystem::EndPropertyEdit(registry, entity, [this, &registry, entity, before, after](bool isUndo)
+			{
+				if (isUndo)
+				{
+					m_currentEuler = before;
+				}
+				else
+				{
+					m_currentEuler = after;
+				}
+			});
 		}
 	}
 	if (auto scaleProp = m_component->GetProperty("Scale"))
 	{
 		glm::vec3 scale = std::any_cast<glm::vec3>(scaleProp->Get(registry, entity));
-		if (EditorProperty<glm::vec3>("Scale", scale).Draw())
+		EditResult result = EditorProperty<glm::vec3>("Scale", scale).Draw();
+		if (result.Changed)
 		{
 			scaleProp->Set(scale, registry, entity);
+		}
+		if (result.EditStarted)
+		{
+			UndoSystem::BeginPropertyEdit(scaleProp, registry, entity);
+		}
+		if (result.EditEnded)
+		{
+			UndoSystem::EndPropertyEdit(registry, entity);
 		}
 	}
 }
 
 void TransformInspector::EndFrame(entt::registry& registry, entt::entity entity)
 {
+	if (!Gizmos::CurrentGizmoOperation == ImGuizmo::ROTATE || !Gizmos::WasManipulatedThisFrame) { return; }
+
 	glm::mat4 matrix = m_transform->GetTransformMatrix();
 
 	float matrixTranslation[3], matrixScale[3];

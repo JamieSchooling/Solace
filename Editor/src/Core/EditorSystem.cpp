@@ -111,6 +111,16 @@ void EditorSystem::PostAppUpdate()
 		SetSceneDirty(false);
 	}
 
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Z, ImGuiInputFlags_RouteAlways) && UndoSystem::UndoCount() > 0)
+	{
+		UndoSystem::Undo();
+	}
+
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_Y, ImGuiInputFlags_RouteAlways) && UndoSystem::RedoCount() > 0)
+	{
+		UndoSystem::Redo();
+	}
+
 	if (m_showSceneSaveModal)
 	{
 		DrawSceneSaveModal();
@@ -306,8 +316,9 @@ void EditorSystem::DrawMenuNode(MenuNode& node)
 
 	if (leaf)
 	{
-		bool hasCondition = node.SelectedCondition != nullptr;
-		if (ImGui::MenuItem(node.Name.c_str(), nullptr, hasCondition ? node.SelectedCondition() : false))
+		bool hasSelectCondition = node.SelectedCondition != nullptr;
+		bool hasDisableCondition = node.DisabledCondition != nullptr;
+		if (ImGui::MenuItem(node.Name.c_str(), nullptr, hasSelectCondition ? node.SelectedCondition() : false, hasDisableCondition ? !node.DisabledCondition() : true))
 		{
 			if (node.Action)
 			{

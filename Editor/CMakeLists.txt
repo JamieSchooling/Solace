@@ -25,6 +25,7 @@ target_sources(${APPLICATION}
         "src/Core/ProjectManager.cpp"
         "src/Windows/SceneViewport.cpp"
         "src/Windows/GameViewport.cpp"
+        "src/Core/Undo.cpp"
 
     PRIVATE
     FILE_SET HEADERS
@@ -52,7 +53,8 @@ target_sources(${APPLICATION}
         "include/Core/ProjectManager.h"
         "include/Windows/SceneViewport.h"
         "include/Windows/Gizmos.h"
-        "include/Windows/GameViewport.h")
+        "include/Windows/GameViewport.h"
+        "include/Core/Undo.h")
 
 include(FetchContent)
 

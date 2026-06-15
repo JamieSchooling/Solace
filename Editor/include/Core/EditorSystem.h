@@ -14,6 +14,7 @@
 
 #include "Windows/EditorWindow.h"
 #include "Menu/MenuRegistry.h"
+#include "Core/Undo.h"
 
 class Scene;
 

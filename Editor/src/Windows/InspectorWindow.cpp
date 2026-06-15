@@ -39,6 +39,8 @@ void InspectorWindow::EndFrame(entt::entity& selected, Scene& scene)
 
 void InspectorWindow::DrawContent(entt::entity& selected, Scene& scene)
 {
+	CacheEntityInspectors(selected, scene.Registry); // TODO: Implement check for component addition rather than this every frame
+
 	if (selected == entt::null)
 	{
 		return;
@@ -57,6 +59,22 @@ void InspectorWindow::DrawContent(entt::entity& selected, Scene& scene)
 					component->Initialise(scene.Registry, selected);
 					CacheEntityInspectors(selected, scene.Registry);
 					EditorSystem::Get().SetSceneDirty();
+
+					UndoCommand undo;
+					undo.Action = [this, component, selected, &scene]()
+					{
+						component->Emplace(scene.Registry, selected);
+						component->Initialise(scene.Registry, selected);
+						CacheEntityInspectors(selected, scene.Registry);
+						EditorSystem::Get().SetSceneDirty();
+					};
+					undo.UndoAction = [this, component, selected, &scene]()
+					{
+						component->Erase(scene.Registry, selected);
+						CacheEntityInspectors(selected, scene.Registry);
+						EditorSystem::Get().SetSceneDirty();
+					};
+					UndoSystem::AddUndoCommand(undo);
 				}
 			}
 			ImGui::EndMenu();

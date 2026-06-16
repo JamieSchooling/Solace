@@ -25,7 +25,7 @@ void GameViewport::OnEvent(Event& e)
 {
 	if (e.Type == EventType::WindowResize)
 	{
-		EditorSystem::Get().GetSceneRenderTarget()->Resize(glm::ivec2(e.WindowResizeArgs.Width, e.WindowResizeArgs.Height));
+		EditorSystem::Get().GetGameRenderTarget()->Resize(glm::ivec2(e.WindowResizeArgs.Width, e.WindowResizeArgs.Height));
 		SceneSystem::Get().GetActiveScene().Registry.get<Camera>(SceneSystem::Get().GetActiveScene().MainCamera).RecalculateProjection({m_windowSize.x, m_windowSize.y});
 	}
 }

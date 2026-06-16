@@ -431,13 +431,21 @@ bool ProjectManager::ProjectEntry(const std::string& projectName, const std::str
 	ImGui::TextUnformatted(projectName.c_str());
 	ImGui::PopFont();
 
-	ImGui::SameLine(avail.x - 50);
-	if (ImGui::Button("X"))
+	ImVec2 buttonSize = ImVec2(50, 50);
+	float buttonMarginRight = 60.0f;
+	float prevCursorY = ImGui::GetCursorPosY();
+	ImGui::SetCursorPos(ImVec2(avail.x - buttonMarginRight - (buttonSize.x / 2), (avail.y / 2) - (buttonSize.y / 2)));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+	ImGui::PushFont(nullptr, 24.0f);
+	if (ImGui::Button("X", buttonSize))
 	{
 		m_projectList.erase(std::find(m_projectList.begin(), m_projectList.end(), projectPath));
 		SerialiseProjectList();
 	}
+	ImGui::PopFont();
+	ImGui::PopStyleColor();
 
+	ImGui::SetCursorPosY(prevCursorY);
 	ImGui::SetCursorPosX(10);
 	ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(180, 180, 180, 255));
 	ImGui::TextUnformatted(projectPath.c_str());

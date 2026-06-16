@@ -15,7 +15,7 @@ public:
 	SceneViewport() : EditorWindow("Scene") {}
 
 	static void Open();
-	MENU_ITEM("Window/General/Scene Viewport", 440, Open);
+	MENU_ITEM("Window/General/Scene Viewport", 440, Open, "");
 
 	virtual void Initialise() override;
 protected:

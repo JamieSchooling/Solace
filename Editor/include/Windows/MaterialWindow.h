@@ -12,7 +12,7 @@ public:
 	MaterialWindow() : EditorWindow("Material") {}
 
 	static void Open();
-	MENU_ITEM("Window/General/Material", 430, Open);
+	MENU_ITEM("Window/General/Material", 430, Open, "");
 	
 	static void Open(AssetHandle materialHandle);
 protected:

@@ -14,7 +14,7 @@ public:
 	AssetBrowser() : EditorWindow("Asset Browser") {}
 
 	static void Open();
-	MENU_ITEM("Window/General/Asset Browser", 420, Open);
+	MENU_ITEM("Window/General/Asset Browser", 420, Open, "");
 
 	void Initialise() override;
 	void OnEvent(Event& e) override;

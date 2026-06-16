@@ -11,7 +11,7 @@ public:
 	SceneHierarchy() : EditorWindow("Hierarchy") {}
 
 	static void Open();
-	MENU_ITEM("Window/General/Hierarchy", 410, Open);
+	MENU_ITEM("Window/General/Hierarchy", 410, Open, "");
 protected:
 	void DrawContent(entt::entity& selected, Scene& scene) override;
 

@@ -318,7 +318,7 @@ void EditorSystem::DrawMenuNode(MenuNode& node)
 	{
 		bool hasSelectCondition = node.SelectedCondition != nullptr;
 		bool hasDisableCondition = node.DisabledCondition != nullptr;
-		if (ImGui::MenuItem(node.Name.c_str(), nullptr, hasSelectCondition ? node.SelectedCondition() : false, hasDisableCondition ? !node.DisabledCondition() : true))
+		if (ImGui::MenuItem(node.Name.c_str(), node.Shortcut.c_str(), hasSelectCondition ? node.SelectedCondition() : false, hasDisableCondition ? !node.DisabledCondition() : true))
 		{
 			if (node.Action)
 			{

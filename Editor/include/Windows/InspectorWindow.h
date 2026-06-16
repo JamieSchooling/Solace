@@ -10,7 +10,7 @@ public:
 	InspectorWindow() : EditorWindow("Inspector") {}
 
 	static void Open();
-	MENU_ITEM("Window/General/Inspector", 400, Open);
+	MENU_ITEM("Window/General/Inspector", 400, Open, "");
 
 	void Initialise(Scene& scene) override;
 	void DrawGizmos(entt::entity& selected, Scene& scene) override;

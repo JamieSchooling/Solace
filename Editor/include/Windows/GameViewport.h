@@ -15,7 +15,7 @@ public:
 	GameViewport() : EditorWindow("Game") {}
 
 	static void Open();
-	MENU_ITEM("Window/General/Game Viewport", 450, Open);
+	MENU_ITEM("Window/General/Game Viewport", 450, Open, "");
 protected:
 	void DrawContent(entt::entity& selected, Scene& scene) override;
 	void OnEvent(Event& e) override;

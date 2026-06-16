@@ -10,6 +10,7 @@
 struct MenuNode
 {
 	std::string Name; 
+	std::string Shortcut;
 	uint16_t Priority = UINT16_MAX;
 	std::function<void()> Action;
 	std::function<bool()> SelectedCondition = nullptr;
@@ -32,7 +33,7 @@ public:
 		return root;
 	}
 
-	static void Register(const char* path, uint16_t priority, std::function<void()> action, 
+	static void Register(const char* path, uint16_t priority, std::function<void()> action, std::string shortcut, 
 						 std::function<bool()> condition = nullptr, MenuConditionType conditionType = MenuConditionType::Select)
 	{
 		std::stringstream ss(path);
@@ -50,6 +51,7 @@ public:
 				current->Children.push_back(std::make_unique<MenuNode>());
 				child = current->Children.back().get();
 				child->Name = segment;
+				child->Shortcut = shortcut;
 			}
 
 			child->Priority = std::min(current->Priority, priority);
@@ -105,24 +107,24 @@ private:
 
 };
 
-#define MENU_ITEM(path, priority, action) \
+#define MENU_ITEM(path, priority, action, shortcut) \
 	static inline bool _reg_item_##action = []() \
 	{ \
-		MenuRegistry::Register(path, priority, action); \
+		MenuRegistry::Register(path, priority, action, shortcut); \
 		return true; \
 	}();
 
 #define MENU_ITEM_SELECTION(path, priority, action, selectedCondition) \
 	static inline bool _reg_item_##action = []() \
 	{ \
-		MenuRegistry::Register(path, priority, action, selectedCondition, MenuConditionType::Select); \
+		MenuRegistry::Register(path, priority, action, "", selectedCondition, MenuConditionType::Select); \
 		return true; \
 	}();
 
-#define MENU_ITEM_DISABLABLE(path, priority, action, disableCondition) \
+#define MENU_ITEM_DISABLABLE(path, priority, action, shortcut, disableCondition) \
 	static inline bool _reg_item_##action = []() \
 	{ \
-		MenuRegistry::Register(path, priority, action, disableCondition, MenuConditionType::Disable); \
+		MenuRegistry::Register(path, priority, action, shortcut, disableCondition, MenuConditionType::Disable); \
 		return true; \
 	}();
 

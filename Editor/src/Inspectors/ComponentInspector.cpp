@@ -17,7 +17,7 @@ void ComponentInspector::Draw(entt::registry& r, entt::entity e)
 	ImGui::Separator();
 	ImGui::TextUnformatted(m_component->Name());
 	ImGui::PushID(m_component->Name());
-	ImGui::SameLine(ImGui::GetWindowWidth() - 30.f);
+	ImGui::SameLine(ImGui::GetWindowWidth() - 40.f);
 	if (ImGui::BeginPopupContextItem("##ComponentMenu"))
 	{
 		bool removed = false;
@@ -62,10 +62,12 @@ void ComponentInspector::Draw(entt::registry& r, entt::entity e)
 			return; 
 		}
 	}
-	if (ImGui::SmallButton("="))
+	ImGui::PushFont(nullptr, 14.0f);
+	if (ImGui::SmallButton("..."))
 	{
 		ImGui::OpenPopup("##ComponentMenu");
 	}
+	ImGui::PopFont();
 	DrawInspector(r, e);
 	ImGui::PopID();
 	ImGui::Separator();

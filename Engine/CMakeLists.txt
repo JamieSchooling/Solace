@@ -90,6 +90,8 @@ FetchContent_Declare(
 	glfw 
 	GIT_REPOSITORY	https://github.com/glfw/glfw.git 
 	GIT_TAG			3.4
+	GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
 )
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -99,21 +101,29 @@ FetchContent_Declare(
 	glm
 	GIT_REPOSITORY	https://github.com/g-truc/glm.git
 	GIT_TAG 	1.0.3
+	GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
 )
 
 FetchContent_Declare(entt
 	GIT_REPOSITORY	https://github.com/skypjack/entt.git
 	GIT_TAG			v3.16.0
+	GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
 )
 
 FetchContent_Declare(json 
     GIT_REPOSITORY https://github.com/nlohmann/json.git
     GIT_TAG v3.12.0
+	GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
 )
 
 FetchContent_Declare(assimp
     GIT_REPOSITORY https://github.com/assimp/assimp.git
     GIT_TAG v6.0.5
+	GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
 )
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -123,9 +133,24 @@ set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(magic_enum
     GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
     GIT_TAG v0.9.8
+	GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
 )
 
-FetchContent_MakeAvailable(glfw glm entt json assimp magic_enum)
+FetchContent_Declare(tracy
+	GIT_REPOSITORY https://github.com/wolfpld/tracy.git 
+	GIT_TAG v0.13.1
+	GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
+)
+
+FetchContent_MakeAvailable(glfw glm entt json assimp magic_enum tracy)
+
+option(TRACY_ENABLE OFF)
+
+#if(ENABLE_TRACY)
+#    target_compile_definitions(Engine PRIVATE TRACY_ENABLE)
+#endif()
 
 target_link_libraries(${CORE_LIBRARY} PUBLIC glfw)
 target_link_libraries(${CORE_LIBRARY} PUBLIC glm)
@@ -133,3 +158,4 @@ target_link_libraries(${CORE_LIBRARY} PUBLIC EnTT)
 target_link_libraries(${CORE_LIBRARY} PUBLIC nlohmann_json::nlohmann_json)
 target_link_libraries(${CORE_LIBRARY} PUBLIC assimp)
 target_link_libraries(${CORE_LIBRARY} PUBLIC magic_enum::magic_enum)
+target_link_libraries(${CORE_LIBRARY} PUBLIC TracyClient)

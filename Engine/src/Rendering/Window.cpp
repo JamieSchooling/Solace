@@ -8,6 +8,9 @@
 
 #include "Events/EventSystem.h"
 
+#include <tracy/Tracy.hpp>
+#include <tracy/TracyOpenGL.hpp>
+
 void Window::Start(const SubsystemParams& params)
 {
 	const WindowProps& props = static_cast<const WindowProps&>(params);
@@ -125,6 +128,7 @@ void Window::Start(const SubsystemParams& params)
 		e.InputMouseMoveArgs.MouseY = ypos;
 		self->m_eventSystem->DispatchEvent(e);
 	});
+	TracyGpuContext;
 }
 
 void Window::Shutdown()
@@ -143,9 +147,24 @@ void Window::PreAppUpdate()
 
 void Window::FinaliseAppUpdate()
 {
-	m_prevFrameTime = m_currentTime;
-    glfwSwapBuffers(m_glfwInstance);
-    glfwPollEvents();
+	ZoneScoped;
+	{
+		ZoneScopedN("Window::FinaliseAppUpdate::UpdateTime");
+		m_prevFrameTime = m_currentTime;
+	}
+	{
+		ZoneScopedN("Window::FinaliseAppUpdate::glFinish");
+		glFinish();
+	}
+	TracyGpuCollect;
+	{
+		ZoneScopedN("Window::FinaliseAppUpdate::SwapBuffers");
+		glfwSwapBuffers(m_glfwInstance);
+	}
+	{
+		ZoneScopedN("Window::FinaliseAppUpdate::PollEvents");
+		glfwPollEvents();
+	}
 }
 
 bool Window::IsOpen()

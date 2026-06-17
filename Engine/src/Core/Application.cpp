@@ -8,6 +8,8 @@
 #include <ShlObj.h>
 #endif
 
+#include <tracy/Tracy.hpp>
+
 void Application::ExecuteLifecycle(std::vector<std::string> args)
 {
 	std::filesystem::current_path(Application::GetExecutableDirectory());
@@ -23,6 +25,7 @@ bool Application::ShouldUpdate(const RegisteredSubsystem& subsystem) const
 
 void Application::PreUpdate()
 {
+	ZoneScoped;
 	for (auto subsystem : m_subsystems)
 	{
 		if (ShouldUpdate(subsystem))
@@ -34,6 +37,7 @@ void Application::PreUpdate()
 
 void Application::Update()
 {
+	ZoneScoped;
 	for (auto subsystem : m_subsystems)
 	{
 		if (ShouldUpdate(subsystem))
@@ -45,6 +49,7 @@ void Application::Update()
 
 void Application::PostUpdate()
 {
+	ZoneScoped;
 	for (auto subsystem : m_subsystems)
 	{
 		if (ShouldUpdate(subsystem))
@@ -56,6 +61,7 @@ void Application::PostUpdate()
 
 void Application::FinaliseUpdate()
 {
+	ZoneScoped;
 	for (auto subsystem : m_subsystems)
 	{
 		if (ShouldUpdate(subsystem))

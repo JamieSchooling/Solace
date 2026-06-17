@@ -4,6 +4,9 @@
 #include <glad/gl.h>
 #include <Rendering/TextureUnitAllocator.h>
 
+#include "tracy/Tracy.hpp"
+#include "tracy/TracyOpenGL.hpp"
+
 void RenderSystem::Start(const SubsystemParams& params)
 {
 	m_cameraUBO = std::make_unique<UBO>(sizeof(CameraData), 0);
@@ -21,6 +24,8 @@ void RenderSystem::PostAppUpdate()
 	m_lightUBO->Upload(m_renderData->Lights);
 
 	{
+		ZoneScopedN("ShadowPass");
+		//TracyGpuZone("ShadowPass");
 		m_renderData->ShadowView.RenderTarget->Use();
 		m_cameraUBO->Upload(m_renderData->ShadowView.Camera);
 		//glDepthFunc(GL_GREATER);
@@ -36,6 +41,7 @@ void RenderSystem::PostAppUpdate()
 
 		for (RenderItem& depthItem : m_renderData->ShadowQueue)
 		{
+			TracyGpuZone("ShadowPass::DrawEntity");
 			// Render
 			if (!depthItem.Geometry) continue;
 			depthItem.Geometry->Use();
@@ -60,6 +66,7 @@ void RenderSystem::PostAppUpdate()
 
 	for (auto view : m_renderData->RenderViews)
 	{
+		TracyGpuZone("RenderPass");
 		view.RenderTarget->Use();
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -68,6 +75,7 @@ void RenderSystem::PostAppUpdate()
 
 		for (RenderItem& item : m_renderData->RenderQueue)
 		{
+			TracyGpuZone("RenderPass::DrawEntity");
 			// Render
 			if (!item.Geometry) continue;
 			item.Geometry->Use();

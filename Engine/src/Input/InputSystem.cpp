@@ -1,6 +1,8 @@
 #include "Input/InputSystem.h"
 #include <iostream>
 
+#include <tracy/Tracy.hpp>
+
 void InputSystem::Start(const SubsystemParams& params)
 {
 	const InputSystemProps& props = static_cast<const InputSystemProps&>(params);
@@ -54,6 +56,7 @@ void InputSystem::PreAppUpdate()
 
 void InputSystem::FinaliseAppUpdate()
 {
+	ZoneScoped;
 	m_lastFrameKeyStates = m_keyStates;
 }
 

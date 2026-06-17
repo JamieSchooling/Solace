@@ -69,10 +69,14 @@ FetchContent_Declare(nfd
 FetchContent_Declare(imguizmo
     GIT_REPOSITORY https://github.com/CedricGuillemet/ImGuizmo.git
     GIT_TAG 1.10
+	GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
 )
 FetchContent_Declare(ziplib
     GIT_REPOSITORY https://bitbucket.org/wbenny/ziplib.git
     GIT_TAG v0.01
+	GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
 )
 FetchContent_MakeAvailable(imgui nfd imguizmo ziplib)
 

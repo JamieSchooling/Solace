@@ -16,6 +16,7 @@
 #include "Core/EditorSystem.h"
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <tracy/Tracy.hpp>
 
 Application* CreateApplication()
 {
@@ -93,6 +94,8 @@ void Editor::Run()
 {
 	while (Window::Get().IsOpen())
 	{
+		ZoneScopedN("Editor::Run");
+
 		PreUpdate();
 		Update();
 

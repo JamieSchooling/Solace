@@ -24,6 +24,8 @@
 #include <Core/Editor.h>
 #include <Scenes/SceneSerialiser.h>
 
+#include <tracy/Tracy.hpp>
+
 void EditorSystem::Start(const SubsystemParams& params)
 {
 	const EditorSystemProps& props = static_cast<const EditorSystemProps&>(params);
@@ -74,11 +76,13 @@ void EditorSystem::Shutdown()
 
 void EditorSystem::PreAppUpdate()
 {
+	ZoneScoped;
 	HandleLayoutChange(); // Done on frame start to preserve docking in layout
 }
 
 void EditorSystem::PostAppUpdate()
 {
+	ZoneScoped;
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
@@ -95,14 +99,20 @@ void EditorSystem::PostAppUpdate()
 
 	Scene& scene = SceneSystem::Get().GetActiveScene();
 
-	for (auto&& window : m_windows)
 	{
-		window->DrawGizmos(m_selectedEntity, scene);
+		ZoneScopedN("EditorSystem::DrawWindowGizmos");
+		for (auto&& window : m_windows)
+		{
+			window->DrawGizmos(m_selectedEntity, scene);
+		}
 	}
 
-	for (auto&& window : m_windows)
 	{
-		window->Draw(m_selectedEntity, scene);
+		ZoneScopedN("EditorSystem::DrawWindows");
+		for (auto&& window : m_windows)
+		{
+			window->Draw(m_selectedEntity, scene);
+		}
 	}
 
 	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S, ImGuiInputFlags_RouteAlways))
@@ -133,6 +143,7 @@ void EditorSystem::PostAppUpdate()
 
 void EditorSystem::FinaliseAppUpdate()
 {
+	ZoneScoped;
 	Scene& scene = SceneSystem::Get().GetActiveScene();
 	for (auto&& window : m_windows)
 	{

@@ -17,6 +17,15 @@ enum class ProjectManagerMode
 	CreateFromPackage,
 };
 
+enum class ProjectLoadResult
+{
+	Unknown,
+	Success,
+	AlreadyOpen,
+	Deleted,
+	Package,
+};
+
 struct ProjectInfo
 {
 	std::string Name;
@@ -39,6 +48,7 @@ public:
 	AssetHandle GetStartupScene() { return m_startupScene; }
 
 	void SerialiseProjectData(AssetHandle startupScene);
+	void FreeProject();
 private:
 	bool m_isProjectLoaded = false;
 	ProjectManagerMode m_mode = ProjectManagerMode::List;
@@ -46,6 +56,8 @@ private:
 	std::filesystem::path m_currentProjectPath;
 	std::filesystem::path m_currentProjectAssetsPath;
 	AssetHandle m_startupScene;
+	bool m_showProjectOpenModal = false;
+	bool m_showProjectDeletedModal = false;
 
 	std::filesystem::path m_currentPackageSource;
 
@@ -54,8 +66,9 @@ private:
 	void DrawProjectList(ImGuiWindowFlags flags);
 	void DrawProjectCreator(ImGuiWindowFlags flags);
 
-	bool LoadProject(std::filesystem::path projectPath);
-	bool ShowProjectExistanceWarn(bool show);
+	ProjectLoadResult LoadProject(std::filesystem::path projectPath);
+	void ShowProjectExistanceWarn();
+	void ShowProjectOpenModal();
 
 	void CreateProject(std::filesystem::path projectPath);
 	void CreateProjectFromPackage(std::filesystem::path projectPath);

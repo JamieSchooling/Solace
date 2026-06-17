@@ -19,8 +19,18 @@ void ProjectManager::Initialise(std::filesystem::path projectPath)
 {
 	if (!projectPath.empty())
 	{
-		LoadProject(projectPath);
-		return;
+		ProjectLoadResult result = LoadProject(projectPath);
+		switch (result)
+		{
+		case ProjectLoadResult::Success:
+			return;
+		case ProjectLoadResult::AlreadyOpen:
+			m_showProjectOpenModal = true;
+			break;
+		case ProjectLoadResult::Deleted:
+			m_showProjectDeletedModal = true;
+			break;
+		}
 	}
 
 	if (std::filesystem::exists(Application::GetDataPath() / "ProjectList.json"))
@@ -70,6 +80,15 @@ void ProjectManager::Update()
 		break;
 	}
 
+	if (m_showProjectOpenModal)
+	{
+		ShowProjectOpenModal();
+	}
+	else if (m_showProjectDeletedModal)
+	{
+		ShowProjectExistanceWarn();
+	}
+
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -109,6 +128,11 @@ void ProjectManager::SerialiseProjectData(AssetHandle startupScene)
 	}
 }
 
+void ProjectManager::FreeProject()
+{
+	std::filesystem::remove(m_currentProjectPath / ".lock");
+}
+
 void ProjectManager::DrawProjectList(ImGuiWindowFlags flags)
 {
 	ImGui::Begin("Project Manager", nullptr, flags);
@@ -132,12 +156,22 @@ void ProjectManager::DrawProjectList(ImGuiWindowFlags flags)
 		{
 			ImGui::Separator();
 			static bool showLoadFailed = false;
+			ProjectLoadResult result = ProjectLoadResult::Unknown;
 			if (ProjectEntry(project.Name, project.Path.string(), project.LastModifiedTimestamp, ImVec2(ImGui::GetContentRegionAvail().x, 65)))
 			{
-				showLoadFailed = !LoadProject(project.Path);
+				result = LoadProject(project.Path);
 			}
 			ImGui::PushID(project.Path.string().c_str());
-			showLoadFailed = ShowProjectExistanceWarn(showLoadFailed);
+
+			switch (result)
+			{
+			case ProjectLoadResult::AlreadyOpen:
+				m_showProjectOpenModal = true;
+				break;
+			case ProjectLoadResult::Deleted:
+				m_showProjectDeletedModal = true;
+				break;
+			}
 			ImGui::PopID();
 		}
 		ImGui::Separator();
@@ -156,7 +190,16 @@ void ProjectManager::DrawProjectList(ImGuiWindowFlags flags)
 		nfdresult_t result = NFD_OpenDialogU8_With(&outPath, &args);
 		if (result == NFD_OKAY)
 		{
-			LoadProject(outPath);
+			ProjectLoadResult loadRes = LoadProject(outPath);
+			switch (loadRes)
+			{
+			case ProjectLoadResult::AlreadyOpen:
+				m_showProjectOpenModal = true;
+				break;
+			case ProjectLoadResult::Deleted:
+				m_showProjectDeletedModal = true;
+				break;
+			}
 			NFD_FreePath(outPath);
 		}
 	}
@@ -241,7 +284,7 @@ void ProjectManager::DrawProjectCreator(ImGuiWindowFlags flags)
 	ImGui::End();
 }
 
-bool ProjectManager::LoadProject(std::filesystem::path projectPath)
+ProjectLoadResult ProjectManager::LoadProject(std::filesystem::path projectPath)
 {
 	if (projectPath.extension() == ".solacepkg")
 	{
@@ -249,12 +292,17 @@ bool ProjectManager::LoadProject(std::filesystem::path projectPath)
 		m_currentProjectPath = projectPath.parent_path();
 		m_currentPackageSource = projectPath;
 		m_mode = ProjectManagerMode::CreateFromPackage;
-		return true;
+		return ProjectLoadResult::Package;
 	}
 	if (!std::filesystem::exists(projectPath))
 	{
-		return false;
+		return ProjectLoadResult::Deleted;
 	}
+	if (std::filesystem::exists(projectPath.parent_path() / ".lock"))
+	{
+		return ProjectLoadResult::AlreadyOpen;
+	}
+
 	m_currentProjectPath = projectPath.parent_path();
 
 	ProjectInfo projectInfo = GetProjectInfo(projectPath);
@@ -266,16 +314,13 @@ bool ProjectManager::LoadProject(std::filesystem::path projectPath)
 	if (!ExistsInProjectList(projectPath)) m_projectList.push_back(projectInfo);
 	SerialiseProjectList();
 	m_isProjectLoaded = true;
-	return true;
+
+	std::ofstream file(projectPath.parent_path() / ".lock");
+	return ProjectLoadResult::Success;
 }
 
-bool ProjectManager::ShowProjectExistanceWarn(bool show)
-{
-	if (!show)
-	{
-		return false;
-	}
-	
+void ProjectManager::ShowProjectExistanceWarn()
+{	
 	ImGui::OpenPopup("Project Not Found");
 
 	// Always center this window when appearing
@@ -293,12 +338,37 @@ bool ProjectManager::ShowProjectExistanceWarn(bool show)
 		{
 			ImGui::CloseCurrentPopup();
 			ImGui::EndPopup();
-			return false;
+			m_showProjectDeletedModal = false;
+			return;
 		}
 		ImGui::EndPopup();
 	}
+}
 
-	return true;
+void ProjectManager::ShowProjectOpenModal()
+{
+	ImGui::OpenPopup("Project Already Open");
+
+	// Always center this window when appearing
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("Project Already Open", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("This project is already open in another instance.");
+		ImGui::Separator();
+
+		ImGui::SetItemDefaultFocus();
+		ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x / 2) - 60);
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+			ImGui::EndPopup();
+			m_showProjectOpenModal = false;
+			return;
+		}
+		ImGui::EndPopup();
+	}
 }
 
 void ProjectManager::CreateProject(std::filesystem::path projectPath)

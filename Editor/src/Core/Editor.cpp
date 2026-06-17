@@ -121,6 +121,7 @@ void Editor::Shutdown()
 	RemoveSubsystem<SceneSystem>();
 	RemoveSubsystem<InputSystem>();
 	NFD_Quit();
+	m_projectManager.FreeProject();
 	m_projectManager.SerialiseProjectData(s_startupScene);
 	RemoveSubsystem<AssetRegistry>();
 	RemoveSubsystem<Window>();

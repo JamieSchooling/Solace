@@ -17,6 +17,15 @@ enum class ProjectManagerMode
 	CreateFromPackage,
 };
 
+struct ProjectInfo
+{
+	std::string Name;
+	std::filesystem::path Path;
+	std::filesystem::path AssetsDirectoryPath;
+	time_t LastModifiedTimestamp;
+	AssetHandle StartupScene;
+};
+
 class ProjectManager
 {
 public:
@@ -40,7 +49,7 @@ private:
 
 	std::filesystem::path m_currentPackageSource;
 
-	std::vector<std::filesystem::path> m_projectList;
+	std::vector<ProjectInfo> m_projectList;
 
 	void DrawProjectList(ImGuiWindowFlags flags);
 	void DrawProjectCreator(ImGuiWindowFlags flags);
@@ -51,9 +60,10 @@ private:
 	void CreateProject(std::filesystem::path projectPath);
 	void CreateProjectFromPackage(std::filesystem::path projectPath);
 	JSON CreateProjectJson();
+	ProjectInfo GetProjectInfo(std::filesystem::path projectPath);
 	void SerialiseProjectList();
 	bool ExistsInProjectList(std::filesystem::path projectPath);
 
-	bool ProjectEntry(const std::string& projectName, const std::string& projectPath, const ImVec2& size);
+	bool ProjectEntry(const std::string& projectName, const std::string& projectPath, time_t timestamp, const ImVec2& size);
 	
 };

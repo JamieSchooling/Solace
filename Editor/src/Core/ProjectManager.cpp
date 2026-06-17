@@ -13,11 +13,14 @@
 #include <ZipLib/ZipArchive.h>
 #include <ZipLib/ZipFile.h>
 
+#include <ctime>
+
 void ProjectManager::Initialise(std::filesystem::path projectPath)
 {
 	if (!projectPath.empty())
 	{
 		LoadProject(projectPath);
+		return;
 	}
 
 	if (std::filesystem::exists(Application::GetDataPath() / "ProjectList.json"))
@@ -30,9 +33,10 @@ void ProjectManager::Initialise(std::filesystem::path projectPath)
 
 		for (auto& project : data["Projects"])
 		{
-			if (std::filesystem::exists(project))
+			std::string p = project.get<std::string>();
+			if (std::filesystem::exists(p))
 			{
-				m_projectList.push_back(project);
+				m_projectList.push_back(GetProjectInfo(p));
 			}
 		}
 
@@ -87,6 +91,9 @@ void ProjectManager::SerialiseProjectData(AssetHandle startupScene)
 	JSON json;
 	json["AssetsFolder"] = "Assets";
 	json["StartupScene"] = uuids::to_string(startupScene);
+	time_t timestamp;
+	std::time(&timestamp);
+	json["LastModified"] = timestamp;
 	
 	std::filesystem::path projectFile = (m_currentProjectPath / m_currentProjectName).replace_extension(".solaceproj");
 	std::ofstream file((m_currentProjectPath / m_currentProjectName).replace_extension(".solaceproj").string());
@@ -125,11 +132,11 @@ void ProjectManager::DrawProjectList(ImGuiWindowFlags flags)
 		{
 			ImGui::Separator();
 			static bool showLoadFailed = false;
-			if (ProjectEntry(project.stem().string(), project.string(), ImVec2(ImGui::GetContentRegionAvail().x, 55)))
+			if (ProjectEntry(project.Name, project.Path.string(), project.LastModifiedTimestamp, ImVec2(ImGui::GetContentRegionAvail().x, 65)))
 			{
-				showLoadFailed = !LoadProject(project);
+				showLoadFailed = !LoadProject(project.Path);
 			}
-			ImGui::PushID(project.string().c_str());
+			ImGui::PushID(project.Path.string().c_str());
 			showLoadFailed = ShowProjectExistanceWarn(showLoadFailed);
 			ImGui::PopID();
 		}
@@ -250,21 +257,13 @@ bool ProjectManager::LoadProject(std::filesystem::path projectPath)
 	}
 	m_currentProjectPath = projectPath.parent_path();
 
-	std::ifstream stream(projectPath);
-	std::stringstream sstream;
-	sstream << stream.rdbuf();
+	ProjectInfo projectInfo = GetProjectInfo(projectPath);
 
-	JSON data = JSON::parse(sstream.str());
+	m_currentProjectName = projectInfo.Name;
+	m_currentProjectAssetsPath = projectInfo.AssetsDirectoryPath;
+	m_startupScene = projectInfo.StartupScene;
 
-	m_currentProjectAssetsPath = m_currentProjectPath / data["AssetsFolder"].get<std::string>();
-	m_currentProjectName = m_currentProjectPath.stem().string();
-	auto handle = AssetHandle::from_string(data["StartupScene"].get<std::string>());
-	if (handle.has_value())
-	{
-		m_startupScene = handle.value();
-	}
-
-	if (!ExistsInProjectList(projectPath)) m_projectList.push_back(projectPath);
+	if (!ExistsInProjectList(projectPath)) m_projectList.push_back(projectInfo);
 	SerialiseProjectList();
 	m_isProjectLoaded = true;
 	return true;
@@ -323,7 +322,9 @@ void ProjectManager::CreateProject(std::filesystem::path projectPath)
 		// Handle file opening errors appropriately
 		throw std::runtime_error("Unable to open file for writing: " + m_currentProjectPath.string());
 	}
-	m_projectList.push_back(projectFile);
+	ProjectInfo project;
+	project.Path = projectFile;
+	m_projectList.push_back(project);
 	SerialiseProjectList();
 	m_isProjectLoaded = true;
 }
@@ -377,23 +378,44 @@ JSON ProjectManager::CreateProjectJson()
 	return out;
 }
 
+ProjectInfo ProjectManager::GetProjectInfo(std::filesystem::path projectPath)
+{
+	ProjectInfo projectInfo;
+	std::ifstream stream(projectPath);
+	std::stringstream sstream;
+	sstream << stream.rdbuf();
+
+	JSON data = JSON::parse(sstream.str());
+
+	projectInfo.Name = projectPath.stem().string();
+	projectInfo.Path = projectPath;
+	projectInfo.AssetsDirectoryPath = projectPath.parent_path() / data["AssetsFolder"].get<std::string>();
+	projectInfo.LastModifiedTimestamp = data["LastModified"].get<time_t>();
+	auto handle = AssetHandle::from_string(data["StartupScene"].get<std::string>());
+	if (handle.has_value())
+	{
+		projectInfo.StartupScene = handle.value();
+	}
+	return projectInfo;
+}
+
 void ProjectManager::SerialiseProjectList()
 {
 	JSON json;
 	// Prevent duplicates
-	std::vector<std::filesystem::path> projectsToSerialise(m_projectList);
+	std::vector<ProjectInfo> projectsToSerialise(m_projectList);
 	m_projectList.clear();
 	for (auto& project : projectsToSerialise)
 	{
-		bool projectNotInList = std::find(m_projectList.begin(), m_projectList.end(), project) == m_projectList.end();
-		if (std::filesystem::exists(project) && projectNotInList)
+		bool projectNotInList = !ExistsInProjectList(project.Path);
+		if (std::filesystem::exists(project.Path) && projectNotInList)
 		{
 			m_projectList.push_back(project);
 		}
 	}
 	for (auto& project : m_projectList)
 	{
-		json["Projects"].push_back(project);
+		json["Projects"].push_back(project.Path);
 	}
 	std::ofstream file(Application::GetDataPath() / "ProjectList.json");
 	if (file.is_open())
@@ -410,11 +432,11 @@ void ProjectManager::SerialiseProjectList()
 
 bool ProjectManager::ExistsInProjectList(std::filesystem::path projectPath)
 {
-	auto it = std::find(m_projectList.begin(), m_projectList.end(), projectPath);
+	auto it = std::find_if(m_projectList.begin(), m_projectList.end(), [=](ProjectInfo project) { return project.Path == projectPath; });
 	return it != m_projectList.end();
 }
 
-bool ProjectManager::ProjectEntry(const std::string& projectName, const std::string& projectPath, const ImVec2& size)
+bool ProjectManager::ProjectEntry(const std::string& projectName, const std::string& projectPath, time_t timestamp, const ImVec2& size)
 {
 	ImGui::PushID(projectPath.c_str());
 	ImGui::SetCursorPosX(30);
@@ -439,7 +461,7 @@ bool ProjectManager::ProjectEntry(const std::string& projectName, const std::str
 	ImGui::PushFont(nullptr, 24.0f);
 	if (ImGui::Button("X", buttonSize))
 	{
-		m_projectList.erase(std::find(m_projectList.begin(), m_projectList.end(), projectPath));
+		m_projectList.erase(std::find_if(m_projectList.begin(), m_projectList.end(), [=](ProjectInfo project) { return project.Path == projectPath; }));
 		SerialiseProjectList();
 	}
 	ImGui::PopFont();
@@ -450,6 +472,12 @@ bool ProjectManager::ProjectEntry(const std::string& projectName, const std::str
 	ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(180, 180, 180, 255));
 	ImGui::TextUnformatted(projectPath.c_str());
 	ImGui::PopStyleColor();
+
+	ImGui::SetCursorPosX(10);
+	tm datetime = *localtime(&timestamp);
+	char output[50];
+	strftime(output, 50, "%b %e, %Y %H:%M", &datetime);
+	ImGui::Text("Last Modified: %s", output);
 
 	ImGui::EndChild();
 

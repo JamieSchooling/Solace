@@ -99,17 +99,6 @@ void SceneSystem::OnAppUpdate()
 	}
 }
 
-void SceneSystem::OnEvent(Event& event)
-{
-	if (event.Type == EventType::WindowResize)
-	{
-		if (event.WindowResizeArgs.Width > 0 && event.WindowResizeArgs.Height > 0)
-		{
-			m_activeScene.Registry.get<Camera>(m_activeScene.MainCamera).RecalculateProjection();
-		}
-	}
-}
-
 void SceneSystem::LoadScene(Scene& scene)
 {
 	m_activeScene.Registry.swap(scene.Registry);

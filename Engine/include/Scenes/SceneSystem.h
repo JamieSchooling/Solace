@@ -17,8 +17,6 @@ public:
 	void Shutdown() override;
 	void OnAppUpdate() override;
 
-	void OnEvent(Event& event) override;
-
 	std::vector<RenderItem>& GetRenderQueue() { return m_renderQueue; }
 	std::vector<RenderItem>& GetShadowQueue() { return m_shadowQueue; }
 	RenderView& GetShadowView() { return m_shadowView; }

@@ -18,24 +18,24 @@ struct Camera
 public:
 	Camera();
 
-	INIT_REFLECTION(Camera)
+	INIT_REFLECTION(Camera);
 
 	float FOV = 70.0f;
-	PROPERTY(FOV)
+	PROPERTY(FOV, Range(10, 180));
 
 	float Size = 2.0f;
-	PROPERTY(Size)
+	PROPERTY(Size);
 
 	float Near = 0.1f;
-	PROPERTY(Near)
+	PROPERTY(Near);
 
 	float Far = 100.0f;
-	PROPERTY(Far)
+	PROPERTY(Far);
 
 	CameraProjectionType ProjectionType = CameraProjectionType::Perspective;
 	PROPERTY(ProjectionType);
 	
-	REFLECT(Camera)
+	REFLECT(Camera);
 
 	void Initialise();
 

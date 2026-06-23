@@ -113,7 +113,7 @@ target_include_directories(ZipLib
       ${ziplib_SOURCE_DIR}/Source
 )
 
-set_target_properties(${APPLICATION} PROPERTIES CXX_STANDARD 20)
+set_property(TARGET ${APPLICATION} PROPERTY CXX_STANDARD 20)
 
 target_link_libraries(${APPLICATION} PUBLIC Engine)
 target_link_libraries(${APPLICATION} PUBLIC imgui)

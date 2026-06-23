@@ -81,7 +81,7 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 		if (property->Type() == PropertyType::Bool)
 		{
 			bool value = std::any_cast<bool>(property->Get(r, e));
-			result = EditorProperty<bool>(property->Name(), value).Draw();
+			result = EditorProperty<bool>(property->Name(), value, property->Attributes()).Draw();
 			if (result.Changed)
 			{
 				property->Set(value, r, e);
@@ -90,7 +90,7 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 		else if (property->Type() == PropertyType::Int)
 		{
 			int value = std::any_cast<int>(property->Get(r, e));
-			result = EditorProperty<int>(property->Name(), value).Draw();
+			result = EditorProperty<int>(property->Name(), value, property->Attributes()).Draw();
 			if (result.Changed)
 			{
 				property->Set(value, r, e);
@@ -99,7 +99,7 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 		else if (property->Type() == PropertyType::Float)
 		{
 			float value = std::any_cast<float>(property->Get(r, e));
-			result = EditorProperty<float>(property->Name(), value).Draw();
+			result = EditorProperty<float>(property->Name(), value, property->Attributes()).Draw();
 			if (result.Changed)
 			{
 				property->Set(value, r, e);
@@ -108,7 +108,7 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 		else if (property->Type() == PropertyType::Vec2)
 		{
 			glm::vec2 value = std::any_cast<glm::vec2>(property->Get(r, e));
-			result = EditorProperty<glm::vec2>(property->Name(), value).Draw();
+			result = EditorProperty<glm::vec2>(property->Name(), value, property->Attributes()).Draw();
 			if (result.Changed)
 			{
 				property->Set(value, r, e);
@@ -117,7 +117,7 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 		else if (property->Type() == PropertyType::Vec3)
 		{
 			glm::vec3 value = std::any_cast<glm::vec3>(property->Get(r, e));
-			result = EditorProperty<glm::vec3>(property->Name(), value).Draw();
+			result = EditorProperty<glm::vec3>(property->Name(), value, property->Attributes()).Draw();
 			if (result.Changed)
 			{
 				property->Set(value, r, e);
@@ -126,7 +126,7 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 		else if (property->Type() == PropertyType::Vec4)
 		{
 			glm::vec4 value = std::any_cast<glm::vec4>(property->Get(r, e));
-			result = EditorProperty<glm::vec4>(property->Name(), value).Draw();
+			result = EditorProperty<glm::vec4>(property->Name(), value, property->Attributes()).Draw();
 			if (result.Changed)
 			{
 				property->Set(value, r, e);
@@ -135,7 +135,7 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 		else if (property->Type() == PropertyType::Quaternion)
 		{
 			glm::quat value = std::any_cast<glm::quat>(property->Get(r, e));
-			result = EditorProperty<glm::quat>(property->Name(), value).Draw();
+			result = EditorProperty<glm::quat>(property->Name(), value, property->Attributes()).Draw();
 			if (result.Changed)
 			{
 				property->Set(value, r, e);
@@ -144,7 +144,7 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 		else if (property->Type() == PropertyType::String)
 		{
 			std::string value = std::any_cast<std::string>(property->Get(r, e));
-			result = EditorProperty<std::string>(property->Name(), value).Draw();
+			result = EditorProperty<std::string>(property->Name(), value, property->Attributes()).Draw();
 			if (result.Changed)
 			{
 				property->Set(value, r, e);
@@ -153,7 +153,7 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 		else if (property->Type() == PropertyType::Colour)
 		{
 			Colour value = std::any_cast<Colour>(property->Get(r, e));
-			result = EditorProperty<Colour>(property->Name(), value).Draw();
+			result = EditorProperty<Colour>(property->Name(), value, property->Attributes()).Draw();
 			if (result.Changed)
 			{
 				property->Set(value, r, e);
@@ -162,7 +162,7 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 		else if (property->Type() == PropertyType::Asset)
 		{
 			AssetHandle value = std::any_cast<AssetHandle>(property->Get(r, e));
-			result = EditorProperty<AssetHandle>(property->Name(), value).Draw();
+			result = EditorProperty<AssetHandle>(property->Name(), value, property->Attributes()).Draw();
 			if (result.Changed)
 			{
 				property->Set(value, r, e);
@@ -171,7 +171,7 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 		else if (property->Type() == PropertyType::Enum)
 		{
 			EnumInfo value = std::any_cast<EnumInfo>(property->Get(r, e));
-			result = EditorProperty<EnumInfo>(property->Name(), value).Draw();
+			result = EditorProperty<EnumInfo>(property->Name(), value, property->Attributes()).Draw();
 			if (result.Changed)
 			{
 				property->Set(value.CurrentValue, r, e);

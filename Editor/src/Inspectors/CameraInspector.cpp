@@ -27,7 +27,7 @@ void CameraInspector::DrawInspector(entt::registry& registry, entt::entity entit
 		{
 			auto fovProp = m_component->GetProperty("FOV");
 			float fov = std::any_cast<float>(fovProp->Get(registry, entity));
-			EditResult result = EditorProperty<float>("FOV", fov).Draw();
+			EditResult result = EditorProperty<float>("FOV", fov, fovProp->Attributes()).Draw();
 			if (result.Changed)
 			{
 				fovProp->Set(fov, registry, entity);

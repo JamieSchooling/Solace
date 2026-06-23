@@ -13,19 +13,19 @@ enum class LightType
 
 struct Light
 {
-	INIT_REFLECTION(Light)
+	INIT_REFLECTION(Light);
 
 	LightType Type = LightType::Directional;
-	PROPERTY(Type)
+	PROPERTY(Type);
 
 	Colour Colour = Colour::White;
-	PROPERTY(Colour)
+	PROPERTY(Colour);
 
 	float Intensity = 1.0f;
-	PROPERTY(Intensity)
+	PROPERTY(Intensity);
 
 	float Radius = 5.0f;
-	PROPERTY(Radius)
+	PROPERTY(Radius);
 
-	REFLECT(Light)
+	REFLECT(Light);
 };

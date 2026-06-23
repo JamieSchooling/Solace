@@ -8,23 +8,23 @@
 
 struct Transform
 {
-	INIT_REFLECTION(Transform)
+	INIT_REFLECTION(Transform);
 
 	glm::vec3 Position{ glm::vec3(0.f) }; //!< Translation i.e. position
-	PROPERTY(Position)
+	PROPERTY(Position);
 
 	glm::quat Rotation{ glm::quat(glm::vec3(0.f)) }; //!< Orientation as a quaternion
-	PROPERTY(Rotation)
+	PROPERTY(Rotation);
 
 	glm::vec3 Scale{ glm::vec3(1.f) }; //!< Scale
-	PROPERTY(Scale)
+	PROPERTY(Scale, Min(0.0f));
 
 private:
 	glm::vec3 m_EulerAngles{glm::vec3(0.f)};
-	PROPERTY(m_EulerAngles)
+	PROPERTY(m_EulerAngles);
 
 public:
-	REFLECT(Transform)
+	REFLECT(Transform);
 
 	glm::vec3 Right() const
 	{

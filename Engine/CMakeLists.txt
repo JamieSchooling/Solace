@@ -29,6 +29,7 @@ target_sources(${CORE_LIBRARY}
         "src/Rendering/ShaderDataTypes.cpp"
         "src/Assets/TextureAssetCache.cpp"
         "src/Rendering/TextureUnitAllocator.cpp"
+        "src/Reflection/PropertyAttributes.cpp"
 
     PUBLIC
     FILE_SET HEADERS
@@ -75,14 +76,14 @@ target_sources(${CORE_LIBRARY}
         "include/Assets/TextureAssetCache.h"
         "include/Rendering/TextureUnitAllocator.h"
         "include/Rendering/Mesh.h"
-)
+        "include/Reflection/PropertyAttributes.h")
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/include"
 )
 
-set_target_properties(${CORE_LIBRARY} PROPERTIES CXX_STANDARD 20)
+set_property(TARGET ${CORE_LIBRARY} PROPERTY CXX_STANDARD 20)
 
 include(FetchContent)
 

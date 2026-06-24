@@ -53,7 +53,7 @@ void CameraInspector::DrawInspector(entt::registry& registry, entt::entity entit
 		else if (projectionType.value() == CameraProjectionType::Orthographic)
 		{
 			float size = std::any_cast<float>(m_sizeProp->Get(registry, entity));
-			EditResult result = EditorProperty<float>("Size", size).Draw();
+			EditResult result = EditorProperty<float>("Size", size, m_sizeProp->Attributes()).Draw();
 			if (result.Changed)
 			{
 				m_sizeProp->Set(size, registry, entity);

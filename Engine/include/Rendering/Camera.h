@@ -24,7 +24,7 @@ public:
 	PROPERTY(FOV, Range(10, 180));
 
 	float Size = 2.0f;
-	PROPERTY(Size);
+	PROPERTY(Size, Min(0.0f));
 
 	float Near = 0.1f;
 	PROPERTY(Near);

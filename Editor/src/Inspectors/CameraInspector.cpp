@@ -46,7 +46,8 @@ void CameraInspector::DrawInspector(entt::registry& registry, entt::entity entit
 			}
 			if (result.EditEnded)
 			{
-				UndoSystem::EndPropertyEdit(registry, entity, [this, entity, &registry](bool isUndo) { m_component->GetTarget<Camera>(registry, entity)->RecalculateProjection(); });
+				auto component = m_component;
+				UndoSystem::EndPropertyEdit(registry, entity, [component, entity, &registry](bool isUndo) { component->GetTarget<Camera>(registry, entity)->RecalculateProjection(); });
 			}
 		}
 		else if (projectionType.value() == CameraProjectionType::Orthographic)
@@ -64,7 +65,8 @@ void CameraInspector::DrawInspector(entt::registry& registry, entt::entity entit
 			}
 			if (result.EditEnded)
 			{
-				UndoSystem::EndPropertyEdit(registry, entity, [this, entity, &registry](bool isUndo) { m_component->GetTarget<Camera>(registry, entity)->RecalculateProjection(); });
+				auto component = m_component;
+				UndoSystem::EndPropertyEdit(registry, entity, [component, entity, &registry](bool isUndo) { component->GetTarget<Camera>(registry, entity)->RecalculateProjection(); });
 			}
 		}
 	}
@@ -82,7 +84,8 @@ void CameraInspector::DrawInspector(entt::registry& registry, entt::entity entit
 	}
 	if (result.EditEnded)
 	{
-		UndoSystem::EndPropertyEdit(registry, entity, [this, entity, &registry](bool isUndo) { m_component->GetTarget<Camera>(registry, entity)->RecalculateProjection(); });
+		auto component = m_component;
+		UndoSystem::EndPropertyEdit(registry, entity, [component, entity, &registry](bool isUndo) { component->GetTarget<Camera>(registry, entity)->RecalculateProjection(); });
 	}
 
 	float far = std::any_cast<float>(m_farProp->Get(registry, entity));
@@ -98,6 +101,7 @@ void CameraInspector::DrawInspector(entt::registry& registry, entt::entity entit
 	}
 	if (result.EditEnded)
 	{
-		UndoSystem::EndPropertyEdit(registry, entity, [this, entity, &registry](bool isUndo) { m_component->GetTarget<Camera>(registry, entity)->RecalculateProjection(); });
+		auto component = m_component;
+		UndoSystem::EndPropertyEdit(registry, entity, [component, entity, &registry](bool isUndo) { component->GetTarget<Camera>(registry, entity)->RecalculateProjection(); });
 	}
 }

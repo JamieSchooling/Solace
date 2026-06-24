@@ -14,63 +14,16 @@ ComponentInspector::ComponentInspector(std::shared_ptr<IComponentReflection> com
 
 void ComponentInspector::Draw(entt::registry& r, entt::entity e)
 {
-	ImGui::Separator();
-	ImGui::TextUnformatted(m_component->Name());
-	ImGui::PushID(m_component->Name());
-	ImGui::SameLine(ImGui::GetWindowWidth() - 40.f);
-	if (ImGui::BeginPopupContextItem("##ComponentMenu"))
-	{
-		bool removed = false;
-		if (ImGui::MenuItem("Remove Component"))
-		{
-			std::vector<std::pair<std::string, std::any>> componentValues;
-			for (auto property : m_component->GetProperties())
-			{
-				std::any value = property->Get(r, e);
-				if (property->Type() == PropertyType::Enum)
-				{
-					EnumInfo info = std::any_cast<EnumInfo>(value);
-					value = info.CurrentValue;
-				}
-				componentValues.push_back({ property->Name(), value});
-			}
-			m_component->Erase(r, e);
-			removed = true;
-
-			UndoCommand undo;
-			auto component = m_component;
-			undo.Action = [component, &r, e]()
-			{
-				component->Erase(r, e);
-			};
-			undo.UndoAction = [component, &r, e, componentValues]()
-			{
-				component->Emplace(r, e);
-				for (auto& [name, value] : componentValues)
-				{
-					component->GetProperty(name.c_str())->Set(value, r, e);
-				}
-				component->Initialise(r, e);
-			};
-			UndoSystem::AddUndoCommand(undo);
-		}
-		ImGui::EndPopup();
-		if (removed) 
-		{ 
-			ImGui::PopID();
-			EditorSystem::Get().SetSceneDirty();
-			return; 
-		}
+	if (ImGui::TreeNodeEx(m_component->Name(), ImGuiTreeNodeFlags_DefaultOpen))
+	{	
+		DrawMenuButton(r, e);
+		DrawInspector(r, e);
+		ImGui::TreePop();
 	}
-	ImGui::PushFont(nullptr, 14.0f);
-	if (ImGui::SmallButton("..."))
+	else
 	{
-		ImGui::OpenPopup("##ComponentMenu");
+		DrawMenuButton(r, e);
 	}
-	ImGui::PopFont();
-	DrawInspector(r, e);
-	ImGui::PopID();
-	ImGui::Separator();
 }
 
 void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
@@ -188,4 +141,61 @@ void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 			UndoSystem::EndPropertyEdit(r, e);
 		}
 	}
+}
+
+void ComponentInspector::DrawMenuButton(entt::registry& r, entt::entity e)
+{
+	ImGui::PushID(m_component->Name());
+	ImGui::SameLine(ImGui::GetWindowWidth() - 40.f);
+	if (ImGui::BeginPopupContextItem("##ComponentMenu"))
+	{
+		bool removed = false;
+		if (ImGui::MenuItem("Remove Component"))
+		{
+			std::vector<std::pair<std::string, std::any>> componentValues;
+			for (auto property : m_component->GetProperties())
+			{
+				std::any value = property->Get(r, e);
+				if (property->Type() == PropertyType::Enum)
+				{
+					EnumInfo info = std::any_cast<EnumInfo>(value);
+					value = info.CurrentValue;
+				}
+				componentValues.push_back({ property->Name(), value });
+			}
+			m_component->Erase(r, e);
+			removed = true;
+
+			UndoCommand undo;
+			auto component = m_component;
+			undo.Action = [component, &r, e]()
+			{
+				component->Erase(r, e);
+			};
+			undo.UndoAction = [component, &r, e, componentValues]()
+			{
+				component->Emplace(r, e);
+				for (auto& [name, value] : componentValues)
+				{
+					component->GetProperty(name.c_str())->Set(value, r, e);
+				}
+				component->Initialise(r, e);
+			};
+			UndoSystem::AddUndoCommand(undo);
+		}
+		ImGui::EndPopup();
+		if (removed)
+		{
+			ImGui::PopID();
+			EditorSystem::Get().SetSceneDirty();
+			return;
+		}
+	}
+	ImGui::PushFont(nullptr, 14.0f);
+	if (ImGui::SmallButton("..."))
+	{
+		ImGui::OpenPopup("##ComponentMenu");
+	}
+	ImGui::PopFont();
+	ImGui::PopID();
 }

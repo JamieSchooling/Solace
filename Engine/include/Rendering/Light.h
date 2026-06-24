@@ -22,10 +22,10 @@ struct Light
 	PROPERTY(Colour);
 
 	float Intensity = 1.0f;
-	PROPERTY(Intensity);
+	PROPERTY(Intensity, Min(0.0f));
 
 	float Radius = 5.0f;
-	PROPERTY(Radius);
+	PROPERTY(Radius, Min(0.0f));
 
 	REFLECT(Light);
 };

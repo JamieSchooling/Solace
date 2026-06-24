@@ -15,7 +15,10 @@ struct RangeAttribute : public PropertyAttribute
 	float Max;
 };
 
-std::shared_ptr<RangeAttribute> Range(float min, float max);
+inline std::shared_ptr<RangeAttribute> Range(float min, float max)
+{
+	return std::make_shared<RangeAttribute>(min, max);
+}
 
 struct MinAttribute : public PropertyAttribute
 {
@@ -24,4 +27,16 @@ struct MinAttribute : public PropertyAttribute
 	float MinValue;
 };
 
-std::shared_ptr<MinAttribute> Min(float min);
+inline std::shared_ptr<MinAttribute> Min(float min)
+{
+	return std::make_shared<MinAttribute>(min);
+}
+
+struct HideInInspectorAttribute : public PropertyAttribute
+{
+};
+
+inline std::shared_ptr<HideInInspectorAttribute> HideInInspector()
+{
+	return std::make_shared<HideInInspectorAttribute>();
+}

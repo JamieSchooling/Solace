@@ -29,7 +29,6 @@ target_sources(${CORE_LIBRARY}
         "src/Rendering/ShaderDataTypes.cpp"
         "src/Assets/TextureAssetCache.cpp"
         "src/Rendering/TextureUnitAllocator.cpp"
-        "src/Reflection/PropertyAttributes.cpp"
 
     PUBLIC
     FILE_SET HEADERS

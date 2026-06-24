@@ -21,7 +21,7 @@ struct Transform
 
 private:
 	glm::vec3 m_EulerAngles{glm::vec3(0.f)};
-	PROPERTY(m_EulerAngles);
+	PROPERTY(m_EulerAngles, HideInInspector());
 
 public:
 	REFLECT(Transform);

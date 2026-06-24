@@ -7,83 +7,81 @@
 #include <assimp/postprocess.h>
 #include <Core/Application.h>
 
+void MeshRenderInspector::Initialise(entt::registry& r, entt::entity e)
+{
+	m_meshProp = m_component->GetProperty("MeshAsset");
+	m_materialProp = m_component->GetProperty("MaterialAsset");
+}
+
 void MeshRenderInspector::DrawInspector(entt::registry& r, entt::entity e)
 {
-	auto meshProp = m_component->GetProperty("MeshAsset");
-	if (meshProp)
+	AssetHandle meshHandle = std::any_cast<AssetHandle>(m_meshProp->Get(r, e));
+	EditResult result = EditorProperty<AssetHandle>("Mesh", meshHandle).Draw();
+	if (result.Changed)
 	{
-		AssetHandle meshHandle = std::any_cast<AssetHandle>(meshProp->Get(r, e));
-		EditResult result = EditorProperty<AssetHandle>("Mesh", meshHandle).Draw();
-		if (result.Changed)
-		{
-			meshProp->Set(meshHandle, r, e);
-		}
-		if (result.EditStarted)
-		{
-			UndoSystem::BeginPropertyEdit(meshProp, r, e);
-		}
-		if (result.EditEnded)
-		{
-			UndoSystem::EndPropertyEdit(r, e);
-		}
-
-		if (ImGui::BeginDragDropTarget())
-		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset_Item"))
-			{
-				AssetHandle handle = *(AssetHandle*)payload->Data;
-				std::filesystem::path path = AssetRegistry::Get().GetFullPath(handle);
-				Assimp::Importer importer;
-				if (importer.IsExtensionSupported(path.extension().string().c_str()))
-				{
-					UndoSystem::BeginPropertyEdit(meshProp, r, e);
-					meshProp->Set(handle, r, e);
-					m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMesh();
-					auto component = m_component;
-					UndoSystem::EndPropertyEdit(r, e, [component, &r, e](bool isUndo) { component->GetTarget<MeshRenderComponent>(r, e)->ReloadMesh(); });
-
-					EditorSystem::Get().SetSceneDirty();
-				}
-			}
-			ImGui::EndDragDropTarget();
-		}
+		m_meshProp->Set(meshHandle, r, e);
+	}
+	if (result.EditStarted)
+	{
+		UndoSystem::BeginPropertyEdit(m_meshProp, r, e);
+	}
+	if (result.EditEnded)
+	{
+		UndoSystem::EndPropertyEdit(r, e);
 	}
 
-	auto materialProp = m_component->GetProperty("MaterialAsset");
-	if (materialProp)
+	if (ImGui::BeginDragDropTarget())
 	{
-		AssetHandle materialHandle = std::any_cast<AssetHandle>(materialProp->Get(r, e));
-		EditResult result = EditorProperty<AssetHandle>("Material", materialHandle).Draw();
-		if (result.Changed)
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset_Item"))
 		{
-			materialProp->Set(materialHandle, r, e);
-		}
-		if (result.EditStarted)
-		{
-			UndoSystem::BeginPropertyEdit(materialProp, r, e);
-		}
-		if (result.EditEnded)
-		{
-			UndoSystem::EndPropertyEdit(r, e);
-		}
-
-		if (ImGui::BeginDragDropTarget())
-		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset_Item"))
+			AssetHandle handle = *(AssetHandle*)payload->Data;
+			std::filesystem::path path = AssetRegistry::Get().GetFullPath(handle);
+			Assimp::Importer importer;
+			if (importer.IsExtensionSupported(path.extension().string().c_str()))
 			{
-				AssetHandle handle = *(AssetHandle*)payload->Data;
-				std::filesystem::path path = AssetRegistry::Get().GetFullPath(handle);
-				if (path.extension() == ".mat")
-				{
-					UndoSystem::BeginPropertyEdit(materialProp, r, e);
-					materialProp->Set(handle, r, e);
-					m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMaterial();
-					UndoSystem::EndPropertyEdit(r, e, [this, &r, e](bool isUndo) { m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMaterial(); });
+				UndoSystem::BeginPropertyEdit(m_meshProp, r, e);
+				m_meshProp->Set(handle, r, e);
+				m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMesh();
+				auto component = m_component;
+				UndoSystem::EndPropertyEdit(r, e, [component, &r, e](bool isUndo) { component->GetTarget<MeshRenderComponent>(r, e)->ReloadMesh(); });
 
-					EditorSystem::Get().SetSceneDirty();
-				}
+				EditorSystem::Get().SetSceneDirty();
 			}
-			ImGui::EndDragDropTarget();
 		}
+		ImGui::EndDragDropTarget();
+	}
+	
+	AssetHandle materialHandle = std::any_cast<AssetHandle>(m_materialProp->Get(r, e));
+	result = EditorProperty<AssetHandle>("Material", materialHandle).Draw();
+	if (result.Changed)
+	{
+		m_materialProp->Set(materialHandle, r, e);
+	}
+	if (result.EditStarted)
+	{
+		UndoSystem::BeginPropertyEdit(m_materialProp, r, e);
+	}
+	if (result.EditEnded)
+	{
+		UndoSystem::EndPropertyEdit(r, e);
+	}
+
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset_Item"))
+		{
+			AssetHandle handle = *(AssetHandle*)payload->Data;
+			std::filesystem::path path = AssetRegistry::Get().GetFullPath(handle);
+			if (path.extension() == ".mat")
+			{
+				UndoSystem::BeginPropertyEdit(m_materialProp, r, e);
+				m_materialProp->Set(handle, r, e);
+				m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMaterial();
+				UndoSystem::EndPropertyEdit(r, e, [this, &r, e](bool isUndo) { m_component->GetTarget<MeshRenderComponent>(r, e)->ReloadMaterial(); });
+
+				EditorSystem::Get().SetSceneDirty();
+			}
+		}
+		ImGui::EndDragDropTarget();
 	}
 }

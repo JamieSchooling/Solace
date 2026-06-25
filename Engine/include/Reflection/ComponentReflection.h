@@ -3,6 +3,7 @@
 #include <entt/entt.hpp>
 
 #include <vector>
+#include <unordered_map>
 
 #include "Reflection/Property.h"
 #include "Reflection/TypeID.h"
@@ -13,6 +14,7 @@ struct IComponentReflection
 	virtual const char* Name() const = 0;
     virtual IProperty* GetProperty(const char* m_name) const = 0;
     virtual const std::vector<IProperty*>& GetProperties() const = 0;
+    virtual const char* TryGetHeader(size_t index) const = 0;
     virtual bool IsOnEntity(entt::registry& r, entt::entity e) const = 0;
     virtual void Emplace(entt::registry& r, entt::entity e) const = 0;
     virtual void Erase(entt::registry& r, entt::entity e) const = 0;
@@ -39,8 +41,8 @@ struct IComponentReflection
 template<typename T>
 struct ComponentReflection : IComponentReflection
 {
-    ComponentReflection(const char* m_name, std::vector<IProperty*> properties)
-        : m_name(m_name), m_typeID(Hash(m_name)), m_properties(properties) 
+	ComponentReflection(const char* m_name, std::vector<IProperty*> properties, std::unordered_map<size_t, const char*> headers)
+		: m_name(m_name), m_typeID(Hash(m_name)), m_properties(properties), m_headers(headers)
     {}
 
 	const char* Name() const override
@@ -58,6 +60,16 @@ struct ComponentReflection : IComponentReflection
     {
         return m_properties;
     }
+
+	const char* TryGetHeader(size_t index) const override
+	{
+		if (m_headers.contains(index))
+		{
+			return m_headers.at(index);
+		}
+
+		return nullptr;
+	}
 
     bool IsOnEntity(entt::registry& r, entt::entity e) const override
     {
@@ -91,4 +103,5 @@ private:
 	const char* m_name;
 	TypeID m_typeID;
     std::vector<IProperty*> m_properties;
+	std::unordered_map<size_t, const char*> m_headers;
 };

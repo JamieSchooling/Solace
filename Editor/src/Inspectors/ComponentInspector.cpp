@@ -6,6 +6,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include <magic_enum/magic_enum.hpp>
+#include <Core/Fonts.h>
 
 ComponentInspector::ComponentInspector(std::shared_ptr<IComponentReflection> component)
 	: m_component(component)
@@ -14,22 +15,33 @@ ComponentInspector::ComponentInspector(std::shared_ptr<IComponentReflection> com
 
 void ComponentInspector::Draw(entt::registry& r, entt::entity e)
 {
+	ImGui::PushFont(Fonts::Bold);
 	if (ImGui::TreeNodeEx(m_component->Name(), ImGuiTreeNodeFlags_DefaultOpen))
 	{	
+		ImGui::PopFont();
 		DrawMenuButton(r, e);
 		DrawInspector(r, e);
 		ImGui::TreePop();
 	}
 	else
 	{
+		ImGui::PopFont();
 		DrawMenuButton(r, e);
 	}
 }
 
 void ComponentInspector::DrawInspector(entt::registry& r, entt::entity e)
 {
-	for (auto& property : m_component->GetProperties())
+	auto properties = m_component->GetProperties();
+	for (size_t i = 0; i < properties.size(); ++i)
 	{
+		if (const char* header = m_component->TryGetHeader(i))
+		{
+			ImGui::PushFont(Fonts::Bold);
+			ImGui::TextUnformatted(header);
+			ImGui::PopFont();
+		}
+		auto& property = properties[i];
 		EditResult result;
 		if (property->Type() == PropertyType::Bool)
 		{

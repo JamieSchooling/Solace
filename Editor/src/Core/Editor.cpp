@@ -16,6 +16,7 @@
 #include "Core/EditorSystem.h"
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <Core/Fonts.h>
 
 Application* CreateApplication()
 {
@@ -142,7 +143,7 @@ bool Editor::ShouldUpdate(const RegisteredSubsystem& subsystem) const
 
 void Editor::SetImGuiTheme()
 {
-	ImGui::GetIO().Fonts->AddFontFromFileTTF((Application::GetResourcePath() / "Fonts" / "RobotoMono-Regular.ttf").string().c_str(), 16.0f);
+	Fonts::Load();
 
 	ImGuiStyle& style = ImGui::GetStyle();
 

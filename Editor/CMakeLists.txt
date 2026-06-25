@@ -26,6 +26,7 @@ target_sources(${APPLICATION}
         "src/Windows/SceneViewport.cpp"
         "src/Windows/GameViewport.cpp"
         "src/Core/Undo.cpp"
+        "src/Core/Fonts.cpp"
 
     PRIVATE
     FILE_SET HEADERS
@@ -54,7 +55,8 @@ target_sources(${APPLICATION}
         "include/Windows/SceneViewport.h"
         "include/Windows/Gizmos.h"
         "include/Windows/GameViewport.h"
-        "include/Core/Undo.h")
+        "include/Core/Undo.h" 
+        "include/Core/Fonts.h")
 
 include(FetchContent)
 

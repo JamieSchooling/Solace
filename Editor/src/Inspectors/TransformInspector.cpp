@@ -84,7 +84,7 @@ void TransformInspector::DrawInspector(entt::registry& registry, entt::entity en
 	if (auto scaleProp = m_component->GetProperty("Scale"))
 	{
 		glm::vec3 scale = std::any_cast<glm::vec3>(scaleProp->Get(registry, entity));
-		EditResult result = EditorProperty<glm::vec3>("Scale", scale).Draw();
+		EditResult result = EditorProperty<glm::vec3>("Scale", scale, scaleProp->Attributes()).Draw();
 		if (result.Changed)
 		{
 			scaleProp->Set(scale, registry, entity);

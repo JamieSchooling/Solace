@@ -147,6 +147,7 @@ void Window::PreAppUpdate()
 
 void Window::FinaliseAppUpdate()
 {
+	glfwMakeContextCurrent(m_glfwInstance);
 	ZoneScoped;
 	{
 		ZoneScopedN("Window::FinaliseAppUpdate::UpdateTime");

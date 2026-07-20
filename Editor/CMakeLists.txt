@@ -26,6 +26,7 @@ target_sources(${APPLICATION}
         "src/Windows/SceneViewport.cpp"
         "src/Windows/GameViewport.cpp"
         "src/Core/Undo.cpp"
+        "src/Core/Fonts.cpp"
 
     PRIVATE
     FILE_SET HEADERS
@@ -54,7 +55,8 @@ target_sources(${APPLICATION}
         "include/Windows/SceneViewport.h"
         "include/Windows/Gizmos.h"
         "include/Windows/GameViewport.h"
-        "include/Core/Undo.h")
+        "include/Core/Undo.h" 
+        "include/Core/Fonts.h")
 
 include(FetchContent)
 
@@ -117,7 +119,7 @@ target_include_directories(ZipLib
       ${ziplib_SOURCE_DIR}/Source
 )
 
-set_target_properties(${APPLICATION} PROPERTIES CXX_STANDARD 20)
+set_property(TARGET ${APPLICATION} PROPERTY CXX_STANDARD 20)
 
 target_link_libraries(${APPLICATION} PUBLIC Engine)
 target_link_libraries(${APPLICATION} PUBLIC imgui)

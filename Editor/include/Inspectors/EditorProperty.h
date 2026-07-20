@@ -13,6 +13,8 @@
 #include <Rendering/Colour.h>
 #include "Core/EditorSystem.h"
 
+#include <Reflection/PropertyAttributes.h>
+
 template<typename T>
 using PropertyCallback = std::function<void(T&)>;
 
@@ -30,21 +32,30 @@ public:
 	virtual EditResult Draw() = 0;
 };
 
+struct AttributeInfo
+{
+	bool IsSlider = false;
+	float Min = 0.0f;
+	float Max = 0.0f;
+};
+
 template<typename T>
 class EditorProperty : public IEditorProperty
 {
 public:
-	EditorProperty(std::string label, T& data, PropertyCallback<T> onChange = nullptr)
-		: m_label(label), m_data(data), m_onChange(onChange)
+	EditorProperty(std::string label, T& data, const std::vector<std::shared_ptr<PropertyAttribute>> propertyAttributes = {}, PropertyCallback<T> onChange = nullptr)
+		: m_label(label), m_data(data), m_attributes(propertyAttributes), m_onChange(onChange)
 	{}
 
 	EditResult Draw() override;
 private:
 	T& m_data;
 	std::string m_label;
+	std::vector<std::shared_ptr<PropertyAttribute>> m_attributes;
 	PropertyCallback<T> m_onChange;
 
 	bool DrawPropertyWidget();
+	AttributeInfo GetAttributeInfo();
 };
 
 template<typename T>
@@ -106,6 +117,8 @@ bool EditorProperty<T>::DrawPropertyWidget()
 	std::string idStr = std::format("##{}", m_label);
 	const char* id = idStr.c_str();
 
+	AttributeInfo attrInfo = GetAttributeInfo();
+
 	if constexpr (std::is_same_v<T, bool>)
 	{
 		return ImGui::Checkbox(id, &m_data);
@@ -116,19 +129,23 @@ bool EditorProperty<T>::DrawPropertyWidget()
 	}
 	else if constexpr (std::is_same_v<T, float>)
 	{
-		return ImGui::DragFloat(id, &m_data);
+		return attrInfo.IsSlider ? ImGui::SliderFloat(id, &m_data, attrInfo.Min, attrInfo.Max) 
+			: ImGui::DragFloat(id, &m_data, 1.0f, attrInfo.Min, attrInfo.Max);
 	}
 	else if constexpr (std::is_same_v<T, glm::vec2>)
 	{
-		return ImGui::DragFloat2(id, &m_data.x);
+		return attrInfo.IsSlider ? ImGui::SliderFloat2(id, &m_data.x, attrInfo.Min, attrInfo.Max)
+			: ImGui::DragFloat2(id, &m_data.x, 1.0f, attrInfo.Min, attrInfo.Max);
 	}
 	else if constexpr (std::is_same_v<T, glm::vec3>)
 	{
-		return ImGui::DragFloat3(id, &m_data.x);
+		return attrInfo.IsSlider ? ImGui::SliderFloat3(id, &m_data.x, attrInfo.Min, attrInfo.Max)
+			: ImGui::DragFloat3(id, &m_data.x, 1.0f, attrInfo.Min, attrInfo.Max);
 	}
 	else if constexpr (std::is_same_v<T, glm::vec4>)
 	{
-		return ImGui::DragFloat4(id, &m_data.x);
+		return attrInfo.IsSlider ? ImGui::SliderFloat4(id, &m_data.x, attrInfo.Min, attrInfo.Max)
+			: ImGui::DragFloat4(id, &m_data.x, 1.0f, attrInfo.Min, attrInfo.Max);
 	}
 	else if constexpr (std::is_same_v<T, glm::quat>)
 	{
@@ -179,4 +196,28 @@ bool EditorProperty<T>::DrawPropertyWidget()
 	{
 		static_assert(sizeof(T) == 0, "Unsupported property type");
 	}
+}
+
+template<typename T>
+AttributeInfo EditorProperty<T>::GetAttributeInfo()
+{
+	AttributeInfo attrInfo;
+	for (auto attribute : m_attributes)
+	{
+		if (auto range = std::dynamic_pointer_cast<RangeAttribute>(attribute))
+		{
+			attrInfo.IsSlider = true;
+			attrInfo.Min = range->Min;
+			attrInfo.Max = range->Max;
+		}
+		else if (auto minAttr = std::dynamic_pointer_cast<MinAttribute>(attribute))
+		{
+			attrInfo.Min = minAttr->MinValue;
+			if (attrInfo.Max <= attrInfo.Min)
+			{
+				attrInfo.Max = std::numeric_limits<float>::max();
+			}
+		}
+	}
+	return attrInfo;
 }

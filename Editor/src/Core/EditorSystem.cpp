@@ -37,7 +37,7 @@ void EditorSystem::Start(const SubsystemParams& params)
 	m_gameRenderTarget = props.GameRenderTarget;
 
 	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
 	io.ConfigWindowsMoveFromTitleBarOnly = true;
 
 	io.IniFilename = nullptr;
@@ -137,8 +137,15 @@ void EditorSystem::PostAppUpdate()
 	}
 
 	ImGui::Render(); 
-
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+	}
+
+
 }
 
 void EditorSystem::FinaliseAppUpdate()

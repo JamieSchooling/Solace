@@ -22,7 +22,9 @@ public:
 protected:
 	std::shared_ptr<IComponentReflection> m_component;
 
-	virtual void DrawInspector(entt::registry& r, entt::entity e); 
+	virtual void DrawInspector(entt::registry& r, entt::entity e);
+private:
+	void DrawMenuButton(entt::registry& r, entt::entity e);
 };
 
 #define CUSTOM_INSPECTOR(Component, Inspector) \

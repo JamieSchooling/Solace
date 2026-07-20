@@ -3,8 +3,10 @@
 #include <any> // <-- Not great, find a better alternative
 #include <entt/entt.hpp>
 #include "Reflection/PropertyType.h"
+#include "Reflection/PropertyAttributes.h"
 
 #include <magic_enum/magic_enum.hpp>
+#include <vector>
 
 struct IComponentReflection;
 
@@ -28,6 +30,7 @@ struct IProperty
     virtual ~IProperty() = default;
     virtual const char* Name() const = 0;
     virtual PropertyType Type() const = 0;
+    virtual const std::vector<std::shared_ptr<PropertyAttribute>> Attributes() const = 0;
     virtual std::any Get(entt::registry& r, entt::entity e) const = 0;
     virtual void Set(const std::any& value, entt::registry& r, entt::entity e) const = 0; 
 	virtual EnumInfo GetEnumInfo(entt::registry& r, entt::entity e) const = 0;
@@ -36,7 +39,7 @@ struct IProperty
 template<typename Target, auto Member>
 struct Property : public IProperty
 {
-    Property(const char* n) : m_name(n), m_type(PropertyTypeResolver<ValueType>::Type) {}
+    Property(const char* n, std::vector<std::shared_ptr<PropertyAttribute>> attributes) : m_name(n), m_attributes(attributes), m_type(PropertyTypeResolver<ValueType>::Type) {}
 
     using ValueType = std::remove_reference_t<
         decltype(std::declval<Target>().*Member)
@@ -51,6 +54,11 @@ struct Property : public IProperty
     {
         return m_name;
     }
+
+	const std::vector<std::shared_ptr<PropertyAttribute>> Attributes() const
+	{
+		return m_attributes;
+	}
 
     std::any Get(entt::registry& r, entt::entity e) const override
     {
@@ -108,4 +116,5 @@ struct Property : public IProperty
 private:
 	const char* m_name;
 	const PropertyType m_type;
+	const std::vector<std::shared_ptr<PropertyAttribute>> m_attributes;
 };

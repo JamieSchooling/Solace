@@ -9,18 +9,18 @@
 
 struct MeshRenderComponent
 {
-	INIT_REFLECTION(MeshRenderComponent)
+	INIT_REFLECTION(MeshRenderComponent);
 
 	std::weak_ptr<Material> Material;
 	std::weak_ptr<Mesh> Mesh;
 	AssetHandle MeshAsset;
-	PROPERTY(MeshAsset)
+	PROPERTY(MeshAsset);
 	AssetHandle MaterialAsset;
-	PROPERTY(MaterialAsset)
+	PROPERTY(MaterialAsset);
 
 	void Initialise();
 	void ReloadMesh();
 	void ReloadMaterial();
 
-	REFLECT(MeshRenderComponent)
+	REFLECT(MeshRenderComponent);
 };

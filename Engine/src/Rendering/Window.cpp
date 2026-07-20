@@ -143,9 +143,11 @@ void Window::PreAppUpdate()
 
 void Window::FinaliseAppUpdate()
 {
+	glfwMakeContextCurrent(m_glfwInstance);
 	m_prevFrameTime = m_currentTime;
     glfwSwapBuffers(m_glfwInstance);
     glfwPollEvents();
+
 }
 
 bool Window::IsOpen()

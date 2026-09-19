@@ -101,10 +101,6 @@ void Editor::Run()
 		Update();
 
 		FrameRenderData frame;
-		frame.RenderQueue = SceneSystem::Get().GetRenderQueue();
-		frame.Lights = SceneSystem::Get().GetLightData();
-		frame.ShadowView = SceneSystem::Get().GetShadowView();
-		frame.ShadowQueue = SceneSystem::Get().GetShadowQueue();
 
 		RenderView editorView{ EditorSystem::Get().GetEditorCameraData(), m_editorViewTarget };
 		frame.RenderViews.push_back(editorView);

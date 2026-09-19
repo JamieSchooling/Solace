@@ -37,9 +37,6 @@ void SceneSystem::Shutdown()
 
 void SceneSystem::OnAppUpdate()
 {
-	m_renderQueue.clear();
-	m_shadowQueue.clear();
-
 	if (m_activeScene.MainCamera == entt::null)
 	{
 		const auto& cameraView = m_activeScene.Registry.view<Camera>();
@@ -48,8 +45,31 @@ void SceneSystem::OnAppUpdate()
 			m_activeScene.MainCamera = entity;
 		}
 	}
+}
 
-	// Set light data
+std::vector<RenderItem>& SceneSystem::FetchVisibleObjectData()
+{
+	m_visibleObjectData.clear();
+	const auto& view = m_activeScene.Registry.view<MeshRenderComponent, Transform>();
+
+	for (auto [entity, render, transform] : view.each())
+	{
+		if (render.Material.expired())
+		{
+			render.ReloadMaterial();
+		}
+		if (auto mesh = render.Mesh.lock())
+		{
+			m_visibleObjectData.emplace_back(mesh->Geometry, mesh->DepthGeometry, render.Material.lock(), m_shadowPassMaterial, transform.GetTransformMatrix());
+		}
+	}
+
+	return m_visibleObjectData;
+}
+
+
+LightData& SceneSystem::FetchLightData()
+{
 	m_lightData = LightData();
 
 	const auto& lightView = m_activeScene.Registry.view<Light, Transform>();
@@ -83,20 +103,7 @@ void SceneSystem::OnAppUpdate()
 	}
 	m_lightData.NumPointLights = pLightCount;
 
-	const auto& view = m_activeScene.Registry.view<MeshRenderComponent, Transform>();
-
-	for (auto [entity, render, transform] : view.each()) 
-	{
-		if (render.Material.expired())
-		{
-			render.ReloadMaterial();
-		}
-		if (auto mesh = render.Mesh.lock())
-		{
-			m_shadowQueue.emplace_back(mesh->DepthGeometry, m_shadowPassMaterial, transform.GetTransformMatrix());
-			m_renderQueue.emplace_back(mesh->Geometry, render.Material.lock(), transform.GetTransformMatrix());
-		}
-	}
+	return m_lightData;
 }
 
 void SceneSystem::LoadScene(Scene& scene)

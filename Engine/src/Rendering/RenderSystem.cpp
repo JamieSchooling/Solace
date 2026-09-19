@@ -3,6 +3,7 @@
 
 #include <glad/gl.h>
 #include <Rendering/TextureUnitAllocator.h>
+#include <Scenes/SceneSystem.h>
 
 #include "tracy/Tracy.hpp"
 #include "tracy/TracyOpenGL.hpp"
@@ -21,13 +22,18 @@ void RenderSystem::Shutdown()
 void RenderSystem::PostAppUpdate()
 {	
 	TextureUnitAllocator::Reset();
-	m_lightUBO->Upload(m_renderData->Lights);
+
+	auto renderQueue = SceneSystem::Get().FetchRenderQueue();
+	auto lights = SceneSystem::Get().FetchLightData();
+	auto shadowView = SceneSystem::Get().GetShadowView();
+
+	m_lightUBO->Upload(lights);
 
 	{
 		ZoneScopedN("ShadowPass");
 		//TracyGpuZone("ShadowPass");
-		m_renderData->ShadowView.RenderTarget->Use();
-		m_cameraUBO->Upload(m_renderData->ShadowView.Camera);
+		shadowView.RenderTarget->Use();
+		m_cameraUBO->Upload(shadowView.Camera);
 		//glDepthFunc(GL_GREATER);
 
 		glEnable(GL_DEPTH_TEST);
@@ -39,20 +45,20 @@ void RenderSystem::PostAppUpdate()
 		glClearDepth(1.0);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		for (RenderItem& depthItem : m_renderData->ShadowQueue)
+		for (RenderItem& depthItem : renderQueue)
 		{
 			TracyGpuZone("ShadowPass::DrawEntity");
 			// Render
-			if (!depthItem.Geometry) continue;
-			depthItem.Geometry->Use();
-			if (depthItem.Material)
+			if (!depthItem.DepthGeometry) continue;
+			depthItem.DepthGeometry->Use();
+			if (depthItem.DepthMaterial)
 			{
-				depthItem.Material->SetValue("u_model", depthItem.Transform);
-				depthItem.Material->Use();
+				depthItem.DepthMaterial->SetValue("u_model", depthItem.Transform);
+				depthItem.DepthMaterial->Use();
 			}
 			glDrawElements(GL_TRIANGLES, depthItem.Geometry->Count(), GL_UNSIGNED_INT, NULL);
 		}
-		m_renderData->ShadowView.RenderTarget->Unbind();
+		shadowView.RenderTarget->Unbind();
 	}
 
 	glEnable(GL_DEPTH_TEST);
@@ -73,7 +79,7 @@ void RenderSystem::PostAppUpdate()
 
 		m_cameraUBO->Upload(view.Camera);
 
-		for (RenderItem& item : m_renderData->RenderQueue)
+		for (RenderItem& item : renderQueue)
 		{
 			TracyGpuZone("RenderPass::DrawEntity");
 			// Render
@@ -82,8 +88,8 @@ void RenderSystem::PostAppUpdate()
 			if (item.Material)
 			{
 				item.Material->SetValue("u_model", item.Transform);
-				item.Material->SetValue("u_shadowMap", m_renderData->ShadowView.RenderTarget->GetDepthTarget());
-				item.Material->SetValue("u_lightSpaceTransform", m_renderData->ShadowView.Camera.Projection * m_renderData->ShadowView.Camera.View);
+				item.Material->SetValue("u_shadowMap", shadowView.RenderTarget->GetDepthTarget());
+				item.Material->SetValue("u_lightSpaceTransform", shadowView.Camera.Projection * shadowView.Camera.View);
 				item.Material->Use();
 			}
 			glDrawElements(GL_TRIANGLES, item.Geometry->Count(), GL_UNSIGNED_INT, NULL);

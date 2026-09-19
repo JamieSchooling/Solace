@@ -17,10 +17,9 @@ public:
 	void Shutdown() override;
 	void OnAppUpdate() override;
 
-	std::vector<RenderItem>& GetRenderQueue() { return m_renderQueue; }
-	std::vector<RenderItem>& GetShadowQueue() { return m_shadowQueue; }
+	std::vector<RenderItem>& FetchRenderQueue();
 	RenderView& GetShadowView() { return m_shadowView; }
-	LightData& GetLightData() { return m_lightData; }
+	LightData& FetchLightData();
 	Scene& GetActiveScene() { return m_activeScene; }
 	void LoadScene(Scene& scene);
 	
@@ -29,7 +28,6 @@ private:
 	EventSystem* m_eventSystem;
 
 	std::vector<RenderItem> m_renderQueue;
-	std::vector<RenderItem> m_shadowQueue;
 	RenderView m_shadowView;
 	std::shared_ptr<Material> m_shadowPassMaterial;
 	LightData m_lightData;

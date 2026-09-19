@@ -7,7 +7,9 @@
 struct RenderItem
 {
 	std::shared_ptr<VAO> Geometry;
+	std::shared_ptr<VAO> DepthGeometry;
 	std::shared_ptr<Material> Material;
+	std::shared_ptr<::Material> DepthMaterial;
 	glm::mat4 Transform = glm::mat4(1.0f);
 };
 
@@ -50,7 +52,6 @@ struct RenderView
 struct FrameRenderData
 {
 	RenderView ShadowView;
-	std::vector<RenderItem> ShadowQueue;
 	std::vector<RenderItem> RenderQueue;
 	std::vector<RenderView> RenderViews;
 	LightData Lights;

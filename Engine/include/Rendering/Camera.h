@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include "Rendering/Window.h"
+#include "Rendering/FBO.h"
 
 #include "Reflection/Reflection.h"
 #include <Transform/Transform.h>
@@ -34,6 +35,10 @@ public:
 
 	CameraProjectionType ProjectionType = CameraProjectionType::Perspective;
 	PROPERTY(ProjectionType);
+
+	// TODO: Use AssetHandle
+	std::shared_ptr<FBO> RenderTarget = nullptr;
+	//PROPERTY(RenderTarget);
 	
 	REFLECT(Camera);
 

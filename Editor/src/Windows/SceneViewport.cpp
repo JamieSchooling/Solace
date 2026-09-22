@@ -56,7 +56,7 @@ void SceneViewport::DrawContent(entt::entity& selected, Scene& scene)
 		Window::Get().SetCursorMode(CursorMode::Visible);
 	}
 
-	uint32_t textureID = EditorSystem::Get().GetSceneRenderTarget()->GetTarget()->GetID();
+	uint32_t textureID = EditorSystem::Get().GetViewportFramebuffer()->GetTarget()->GetID();
 	ImVec2 uv0 = ImVec2(0.0f, 1.0f);
 	ImVec2 uv1 = ImVec2(1.0f, 0.0f);
 	ImGui::ImageWithBg((void*)(intptr_t)textureID, m_windowSize, uv0, uv1, ImVec4(0, 0, 0, 1));
@@ -68,7 +68,7 @@ void SceneViewport::OnEvent(Event& e)
 {
 	if (e.Type == EventType::WindowResize)
 	{
-		EditorSystem::Get().GetSceneRenderTarget()->Resize(glm::ivec2(e.WindowResizeArgs.Width, e.WindowResizeArgs.Height));
+		EditorSystem::Get().GetViewportFramebuffer()->Resize(glm::ivec2(e.WindowResizeArgs.Width, e.WindowResizeArgs.Height));
 		EditorSystem::Get().RecalcCamProjection();
 	}
 }

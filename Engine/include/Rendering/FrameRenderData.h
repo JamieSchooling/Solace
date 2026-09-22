@@ -48,11 +48,3 @@ struct RenderView
 	CameraData Camera;
 	std::shared_ptr<FBO> RenderTarget;
 };
-
-struct FrameRenderData
-{
-	RenderView ShadowView;
-	std::vector<RenderItem> RenderQueue;
-	std::vector<RenderView> RenderViews;
-	LightData Lights;
-};

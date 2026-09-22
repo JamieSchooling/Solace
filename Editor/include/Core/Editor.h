@@ -28,8 +28,6 @@ public:
 protected:
 	bool ShouldUpdate(const RegisteredSubsystem& subsystem) const override;
 private:
-	std::shared_ptr<FBO> m_gameViewTarget;
-	std::shared_ptr<FBO> m_editorViewTarget;
 	inline static std::filesystem::path s_projectDirectoryPath;
 	inline static std::filesystem::path s_projectAssetsPath;
 	inline static AssetHandle s_startupScene;

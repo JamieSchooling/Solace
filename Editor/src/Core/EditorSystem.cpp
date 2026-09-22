@@ -33,8 +33,8 @@ void EditorSystem::Start(const SubsystemParams& params)
 	GLFWwindow* window = props.GLFWInstance;
 	props.EventSystem->AddListener(this);
 	
-	m_editorRenderTarget = props.EditorRenderTarget;
-	m_gameRenderTarget = props.GameRenderTarget;
+	m_viewportFramebuffer = std::make_shared<FBO>(glm::ivec2(Window::Get().GetWidth(), Window::Get().GetWidth()), std::vector<FBOAttachment>{ {AttachmentType::Colour}, { AttachmentType::Depth } });
+	m_editorCamera.RenderTarget = m_viewportFramebuffer;
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable /* | ImGuiConfigFlags_ViewportsEnable */ ;
@@ -136,6 +136,8 @@ void EditorSystem::PostAppUpdate()
 		DrawSceneSaveModal();
 	}
 
+	RenderSystem::Get().Render(m_editorCamera, m_editorCamTransform);
+
 	ImGui::Render(); 
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -230,17 +232,12 @@ void EditorSystem::ShowSceneSaveModal()
 
 void EditorSystem::RecalcCamProjection()
 {
-	m_editorCamera.RecalculateProjection(m_editorRenderTarget->GetSize());
+	m_editorCamera.RecalculateProjection(m_viewportFramebuffer->GetSize());
 }
 
-std::shared_ptr<FBO> EditorSystem::GetSceneRenderTarget()
+std::shared_ptr<FBO> EditorSystem::GetViewportFramebuffer()
 {
-	return m_editorRenderTarget;
-}
-
-std::shared_ptr<FBO> EditorSystem::GetGameRenderTarget()
-{
-	return m_gameRenderTarget;
+	return m_viewportFramebuffer;
 }
 
 Transform& EditorSystem::GetEditorCamTransform()

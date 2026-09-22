@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "Core/Subsystem.h"
 #include "Events/EventSystem.h"
 #include "Scenes/Scene.h"
@@ -17,7 +19,8 @@ public:
 	void Shutdown() override;
 	void OnAppUpdate() override;
 
-	std::vector<RenderItem>& FetchRenderQueue();
+	std::vector<RenderItem>& FetchVisibleObjectData();
+	std::vector<std::pair<Camera, Transform>>& FetchActiveCameras();
 	RenderView& GetShadowView() { return m_shadowView; }
 	LightData& FetchLightData();
 	Scene& GetActiveScene() { return m_activeScene; }
@@ -27,7 +30,8 @@ private:
 	Scene m_activeScene;
 	EventSystem* m_eventSystem;
 
-	std::vector<RenderItem> m_renderQueue;
+	std::vector<RenderItem> m_visibleObjectData;
+	std::vector<std::pair<Camera, Transform>> m_activeCameras;
 	RenderView m_shadowView;
 	std::shared_ptr<Material> m_shadowPassMaterial;
 	LightData m_lightData;

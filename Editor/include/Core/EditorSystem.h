@@ -28,9 +28,6 @@ struct EditorSystemProps : public SubsystemParams
 {
 	GLFWwindow* GLFWInstance;
 	EventSystem* EventSystem;
-	// For later use when viewport windows are implemented
-	std::shared_ptr<FBO> EditorRenderTarget;
-	std::shared_ptr<FBO> GameRenderTarget;
 };
 
 class EditorSystem : public SingletonSubsystem<EditorSystem>
@@ -93,12 +90,10 @@ public:
 
 	void RecalcCamProjection();
 
-	std::shared_ptr<FBO> GetSceneRenderTarget();
-	std::shared_ptr<FBO> GetGameRenderTarget();
+	std::shared_ptr<FBO> GetViewportFramebuffer();
 	Transform& GetEditorCamTransform();
 private:
-	std::shared_ptr<FBO> m_gameRenderTarget;
-	std::shared_ptr<FBO> m_editorRenderTarget;
+	std::shared_ptr<FBO> m_viewportFramebuffer;
 	LayoutOption m_currentLayout = LayoutOption::Default;
 	LayoutOption m_newLayout = LayoutOption::Default;
 	entt::entity m_selectedEntity = entt::null;

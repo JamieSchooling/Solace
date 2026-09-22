@@ -37,6 +37,7 @@ void SceneSystem::Shutdown()
 
 void SceneSystem::OnAppUpdate()
 {
+	// TODO: Remove MainCamera usage
 	if (m_activeScene.MainCamera == entt::null)
 	{
 		const auto& cameraView = m_activeScene.Registry.view<Camera>();
@@ -67,6 +68,18 @@ std::vector<RenderItem>& SceneSystem::FetchVisibleObjectData()
 	return m_visibleObjectData;
 }
 
+std::vector<std::pair<Camera, Transform>>& SceneSystem::FetchActiveCameras()
+{
+	m_activeCameras.clear();
+
+	const auto& cameraView = m_activeScene.Registry.view<Camera, Transform>();
+	for (auto [entity, camera, transform] : cameraView.each())
+	{
+		m_activeCameras.emplace_back(camera, transform);
+	}
+
+	return m_activeCameras;
+}
 
 LightData& SceneSystem::FetchLightData()
 {

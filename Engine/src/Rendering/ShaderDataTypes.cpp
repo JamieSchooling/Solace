@@ -26,6 +26,9 @@ ShaderDataType GLenumToShaderDataType(GLenum glEnum)
 	case GL_SAMPLER_2D:
 		return ShaderDataType::Texture2D;
 
+	case GL_SAMPLER_2D_ARRAY:
+		return ShaderDataType::Texture2DArray;
+
 	default:
 		return ShaderDataType::Unknown;
 	}

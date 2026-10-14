@@ -20,5 +20,7 @@ private:
 	IProperty* m_sizeProp;
 	IProperty* m_nearProp;
 	IProperty* m_farProp;
+	IProperty* m_cascadeCountProp;
+	IProperty* m_cascadeDistributionProp;
 };
 CUSTOM_INSPECTOR(Camera, CameraInspector)

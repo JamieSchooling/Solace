@@ -82,10 +82,10 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) : m_vertexPath(
 		GLuint index = i;
 		glGetActiveUniformsiv(m_id, 1, &index, GL_UNIFORM_BLOCK_INDEX, &blockIndex);
 
+		glGetActiveUniform(m_id, i, bufSize, &length, &size, &type, m_name);
+
 		if (blockIndex != -1) { continue; } // ignore UBO members
 
-		glGetActiveUniform(m_id, i, bufSize, &length, &size, &type, m_name);
-		uint32_t location = glGetUniformLocation(m_id, m_name);
 
 		ShaderDataType shaderType = GLenumToShaderDataType(type); 
 
@@ -95,11 +95,28 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) : m_vertexPath(
 			continue;
 		}
 
-		m_uniformLookup[m_name] =
+		if (size > 1)
 		{
-			location,
-			shaderType
-		};
+			std::string baseName(m_name);
+			size_t bracket = baseName.find("[0]");
+			if (bracket != std::string::npos) 
+			{
+				baseName = baseName.substr(0, bracket);
+			}
+
+			for (int index = 0; index < size; ++index)
+			{
+				std::string indexedName = baseName + "[" + std::to_string(index) + "]";
+				uint32_t loc = glGetUniformLocation(m_id, indexedName.c_str());
+
+				m_uniformLookup[indexedName] = { loc, shaderType };
+			}
+		}
+		else
+		{
+			uint32_t location = glGetUniformLocation(m_id, m_name);
+			m_uniformLookup[m_name] = { location, shaderType };
+		}
 	}
 }
 
@@ -177,6 +194,32 @@ void Shader::SetUniform(const std::string& m_name, UniformData uniformData)
 		else if (std::holds_alternative<std::shared_ptr<Texture>>(uniformData))
 		{
 			auto texture = std::get<std::shared_ptr<Texture>>(uniformData);
+			uint32_t texID = texture->GetID();
+			UploadUniform(desc.location, texID, TextureUnitAllocator::GetNext(texID));
+		} 
+		else
+		{
+			uint32_t texID = Texture::WhiteTexture().GetID();
+			UploadUniform(desc.location, texID, TextureUnitAllocator::GetNext(texID));
+		}
+		break;
+	case ShaderDataType::Texture2DArray:
+		if (std::holds_alternative<AssetHandle>(uniformData))
+		{
+			if (auto texture = TextureAssetCache::Load(std::get<AssetHandle>(uniformData)))
+			{
+				uint32_t texID = texture->GetID();
+				UploadUniform(desc.location, texID, TextureUnitAllocator::GetNext(texID));
+			}
+			else
+			{
+				uint32_t texID = Texture::WhiteTexture().GetID();
+				UploadUniform(desc.location, texID, TextureUnitAllocator::GetNext(texID));
+			}
+		}
+		else if (std::holds_alternative<std::shared_ptr<TextureArray>>(uniformData))
+		{
+			auto texture = std::get<std::shared_ptr<TextureArray>>(uniformData);
 			uint32_t texID = texture->GetID();
 			UploadUniform(desc.location, texID, TextureUnitAllocator::GetNext(texID));
 		} 

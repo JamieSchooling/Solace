@@ -39,4 +39,6 @@ private:
 	void SetImGuiTheme();
 
 	void RunProjectManager(std::vector<std::string> args);
+	void BuildReflectionRegistry();
+	void LoadGameModule();
 };

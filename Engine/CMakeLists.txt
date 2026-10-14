@@ -30,6 +30,7 @@ target_sources(${CORE_LIBRARY}
         "src/Assets/TextureAssetCache.cpp"
         "src/Rendering/TextureUnitAllocator.cpp"
         "src/Rendering/TextureArray.cpp"
+        "src/Core/ModuleLoader.cpp"
 
     PUBLIC
     FILE_SET HEADERS
@@ -78,7 +79,9 @@ target_sources(${CORE_LIBRARY}
         "include/Rendering/Mesh.h"
         "include/Reflection/PropertyAttributes.h"
         "include/Rendering/TextureArray.h"
-        "include/Rendering/TextureFormat.h")
+        "include/Rendering/TextureFormat.h" 
+        "include/Reflection/ReflectionModule.h" 
+        "include/Core/ModuleLoader.h" )
 
 target_include_directories(${CORE_LIBRARY}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"

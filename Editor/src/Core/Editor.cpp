@@ -18,6 +18,7 @@
 #include <imgui_impl_opengl3.h>
 #include <tracy/Tracy.hpp>
 #include <Core/Fonts.h>
+#include <Core/ModuleLoader.h>
 
 Application* CreateApplication()
 {
@@ -51,7 +52,10 @@ void Editor::Initialise(std::vector<std::string> args)
 	s_projectDirectoryPath = m_projectManager.GetProjectPath();
 	s_projectAssetsPath = m_projectManager.GetProjectAssetsPath();
 	s_startupScene = m_projectManager.GetStartupScene();
-	
+
+	BuildReflectionRegistry();
+	LoadGameModule();
+
 	Window::Get().SetTitle("Solace Editor - " + s_projectDirectoryPath.filename().string());
 
 	{
@@ -238,5 +242,36 @@ void Editor::RunProjectManager(std::vector<std::string> args)
 		m_projectManager.Update();
 		PostUpdate();
 		FinaliseUpdate();
+	}
+}
+
+void Editor::BuildReflectionRegistry()
+{
+	ReflectionModule* engine = GetReflectionModule();
+	for (auto& comp : engine->Components)
+	{
+		ReflectionRegistry::Get().push_back(comp);
+	}
+}
+
+void Editor::LoadGameModule()
+{
+	std::filesystem::path path = s_projectDirectoryPath / "Library" / "Game";
+
+	void* lib = ModuleLoader::Load(path.string().c_str());
+	if (!lib)
+	{
+		return;
+	}
+	using GetReflectionModuleFn = ReflectionModule * (*)();
+
+	auto fn = ModuleLoader::GetSymbol(lib, "GetReflectionModule");
+	GetReflectionModuleFn GetReflectionModule = reinterpret_cast<GetReflectionModuleFn>(fn);
+
+	ReflectionModule* game = GetReflectionModule();
+	std::cout << game->Components.size() << std::endl;
+	for (auto& comp : game->Components)
+	{
+		ReflectionRegistry::Get().push_back(comp);
 	}
 }

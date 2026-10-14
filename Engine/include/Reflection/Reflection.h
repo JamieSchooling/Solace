@@ -2,6 +2,7 @@
 
 #include "Reflection/Property.h"
 #include "Reflection/ComponentReflection.h"
+#include "Reflection/ReflectionModule.h"
 #include "Reflection/ReflectionRegistry.h"
 #include "Reflection/PropertyAttributes.h"
 
@@ -29,6 +30,6 @@
 
 #define REFLECT(Component) \
     static inline bool _reg_##Component = []() { \
-        ReflectionRegistry::Get().push_back(std::make_shared<ComponentReflection<Component>>(#Component, props, headers)); \
+        GetReflectionModule()->Components.push_back(std::make_shared<ComponentReflection<Component>>(#Component, props, headers)); \
         return true; \
     }()

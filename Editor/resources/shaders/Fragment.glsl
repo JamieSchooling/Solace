@@ -37,43 +37,57 @@ uniform sampler2D u_prop_albedo;
 uniform sampler2D u_prop_specular;
 uniform float u_prop_specularAmount;
 
-uniform sampler2D u_shadowMap;
+uniform sampler2DArray u_shadowMap;
+const int MAX_SHADOW_CASCADES = 3;
+uniform float u_cascadeSplits[MAX_SHADOW_CASCADES];
+uniform int u_numShadowCascades;
 
 in vec3 posWorldSpace;
 in vec3 normal;
 in vec2 texCoord;
-in vec4 fragmentPosLightSpace;
+in vec4 lightSpaceFragmentPositions[MAX_SHADOW_CASCADES];
 
 float getShadowAmount()
 {
-	float shadowAmount = 0.0;
-
-	vec3 projCoords = fragmentPosLightSpace.xyz / fragmentPosLightSpace.w;
-    projCoords = projCoords * 0.5 + 0.5;
-
-	if (projCoords.z > 1.0 || projCoords.x < 0.0 || projCoords.x > 1.0 || projCoords.y < 0.0 || projCoords.y > 1.0)
-    {
-        return 0.0;
-    }
-
-	float closestDepth = texture(u_shadowMap, projCoords.xy).r; 
-	float currentDepth = projCoords.z;
-
-	float bias = 0.000;
-	if (currentDepth - bias > closestDepth) shadowAmount = 1.0;
-
-	vec2 texelSize = 1.0 / textureSize(u_shadowMap, 0);
-	for(int x = -1; x <= 1; ++x)
+	for (int i = 0; i < MAX_SHADOW_CASCADES; i++)
 	{
-		for(int y = -1; y <= 1; ++y)
-		{
-			float pcfDepth = texture(u_shadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
-			shadowAmount += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
-		}
-	}
-	shadowAmount /= 9.0;
+        if (i >= u_numShadowCascades) break;
 
-	return shadowAmount;
+		vec4 fragPosViewSpace = u_view * vec4(posWorldSpace, 1.0);	
+		float depthValue = abs(fragPosViewSpace.z);
+		if (depthValue > u_cascadeSplits[i]) continue;
+
+		float shadowAmount = 0.0;
+
+		vec3 projCoords = lightSpaceFragmentPositions[i].xyz / lightSpaceFragmentPositions[i].w;
+		projCoords = projCoords * 0.5 + 0.5;
+
+		if (projCoords.z > 1.0 || projCoords.x < 0.0 || projCoords.x > 1.0 || projCoords.y < 0.0 || projCoords.y > 1.0)
+		{
+			return 0.0;
+		}
+
+		float closestDepth = textureLod(u_shadowMap, vec3(projCoords.xy, float(i)), 0).r; 
+		float currentDepth = projCoords.z;
+
+		float bias = 0.001;
+		bias *= 1 / (u_cascadeSplits[i] * 0.5);
+		if (currentDepth - bias > closestDepth) shadowAmount = 1.0;
+
+		vec2 texelSize = (1.0 / textureSize(u_shadowMap, 0)).xy;
+		for(int x = -1; x <= 1; ++x)
+		{
+			for(int y = -1; y <= 1; ++y)
+			{
+				float pcfDepth = textureLod(u_shadowMap, vec3(projCoords.xy + vec2(x, y) * texelSize, float(i)), 0).r; 
+				shadowAmount += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+			}
+		}
+		shadowAmount /= 9.0;
+
+		return shadowAmount;
+//		return float(i);
+	}
 }
 
 vec3 getDirectionalLight()
@@ -140,4 +154,8 @@ void main()
 	
 	vec3 rgb = texture(u_prop_albedo, texCoord).rgb;
 	colour = vec4(u_prop_colour * rgb * result, 1.0);
+
+	
+//	vec3 debugColours[3] = { vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 1.0) };
+//	colour = vec4(debugColours[int(getShadowAmount())], 1.0);
 }

@@ -33,4 +33,6 @@ private:
 	LightData* m_lightData;
 	RenderView* m_shadowView;
 	std::vector<std::pair<Camera, Transform>>* m_cameras;
+
+	std::vector<glm::vec4> GetFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view);
 };

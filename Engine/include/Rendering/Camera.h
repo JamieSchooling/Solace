@@ -28,13 +28,19 @@ public:
 	PROPERTY(Size, Min(0.0f));
 
 	float Near = 0.1f;
-	PROPERTY(Near);
+	PROPERTY(Near, Min(0.001f));
 
 	float Far = 100.0f;
 	PROPERTY(Far);
 
 	CameraProjectionType ProjectionType = CameraProjectionType::Perspective;
 	PROPERTY(ProjectionType);
+
+	int ShadowCascadeCount = 3;
+	PROPERTY(ShadowCascadeCount, Range(1, 10));
+
+	float ShadowCascadeDistribution = 0.5f;
+	PROPERTY(ShadowCascadeDistribution, Range(0.0f, 1.0f));
 
 	// TODO: Use AssetHandle
 	std::shared_ptr<FBO> RenderTarget = nullptr;

@@ -3,6 +3,7 @@
 #include <glad/gl.h>
 
 #include <iostream>
+#include <Rendering/TextureArray.h>
 
 FBO::FBO(glm::ivec2 size, std::vector<FBOAttachment> attachments)
 {
@@ -15,16 +16,35 @@ FBO::FBO(glm::ivec2 size, std::vector<FBOAttachment> attachments)
 		switch (attachment.Type)
 		{
 		case AttachmentType::Colour:
-			m_colourAttachments.push_back(std::make_shared<Texture>(m_size));
-			glNamedFramebufferTexture(m_id, GL_COLOR_ATTACHMENT0 + colourIndex, m_colourAttachments.back()->GetID(), 0);
+		{
+			auto tex = std::make_shared<Texture>(m_size);
+			glNamedFramebufferTexture(m_id, GL_COLOR_ATTACHMENT0 + colourIndex, tex->GetID(), 0);
+			m_colourAttachments.push_back(tex);
 			colourIndex++;
 			break;
+		}
 		case AttachmentType::Depth:
-			m_depthAttachment = std::make_shared<Texture>(m_size, TextureFormat::Depth32F);
-			glNamedFramebufferTexture(m_id, GL_DEPTH_ATTACHMENT, m_depthAttachment->GetID(), 0);
-			glNamedFramebufferDrawBuffer(m_id, GL_NONE);
-			glNamedFramebufferReadBuffer(m_id, GL_NONE);
+		{
+			auto depthTex = std::make_shared<Texture>(m_size, TextureFormat::Depth32F);
+			glNamedFramebufferTexture(m_id, GL_DEPTH_ATTACHMENT, depthTex->GetID(), 0);
+			m_depthAttachment = depthTex;
 			break;
+		}
+		case AttachmentType::ColourArray:
+		{
+			auto texArray = std::make_shared<TextureArray>(m_size, attachment.ArrayLength);
+			glNamedFramebufferTexture(m_id, GL_COLOR_ATTACHMENT0 + colourIndex, texArray->GetID(), 0);
+			m_colourAttachments.push_back(texArray);
+			colourIndex++;
+			break;
+		}
+		case AttachmentType::DepthArray:
+		{
+			auto depthArray = std::make_shared<TextureArray>(m_size, attachment.ArrayLength, TextureFormat::Depth32F);
+			glNamedFramebufferTexture(m_id, GL_DEPTH_ATTACHMENT, depthArray->GetID(), 0);
+			m_depthAttachment = depthArray;
+			break;
+		}
 		}
 	}
 
@@ -79,6 +99,24 @@ void FBO::Use()
 	glViewport(0, 0, m_size.x, m_size.y);
 }
 
+void FBO::BindLayer(uint32_t attachmentIndex, uint32_t layer)
+{
+	if (attachmentIndex >= m_colourAttachments.size()) return;
+
+	uint32_t textureID = std::get<std::shared_ptr<TextureArray>>(m_colourAttachments.at(attachmentIndex))->GetID();
+
+	glNamedFramebufferTextureLayer(m_id, GL_COLOR_ATTACHMENT0 + attachmentIndex, textureID, 0, layer);
+}
+
+void FBO::BindDepthLayer(uint32_t layer)
+{
+	uint32_t textureID = std::get<std::shared_ptr<TextureArray>>(m_depthAttachment)->GetID();
+	if (textureID > 0)
+	{
+		glNamedFramebufferTextureLayer(m_id, GL_DEPTH_ATTACHMENT, textureID, 0, layer);
+	}
+}
+
 void FBO::Unbind() const
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -90,13 +128,26 @@ void FBO::Resize(glm::ivec2 size)
 	uint32_t colourIndex = 0;
 	for (auto attachment : m_colourAttachments)
 	{
-		attachment->Recreate(m_size);
-		glNamedFramebufferTexture(m_id, GL_COLOR_ATTACHMENT0 + colourIndex, attachment->GetID(), 0);
+		if (std::holds_alternative<std::shared_ptr<Texture>>(attachment)) {
+			std::get<std::shared_ptr<Texture>>(attachment)->Recreate(m_size);
+			glNamedFramebufferTexture(m_id, GL_COLOR_ATTACHMENT0 + colourIndex, std::get<std::shared_ptr<Texture>>(attachment)->GetID(), 0);
+		}
+		else if (std::holds_alternative<std::shared_ptr<TextureArray>>(attachment)) {
+			std::get<std::shared_ptr<TextureArray>>(attachment)->Recreate(m_size);
+			glNamedFramebufferTexture(m_id, GL_COLOR_ATTACHMENT0 + colourIndex, std::get<std::shared_ptr<TextureArray>>(attachment)->GetID(), 0);
+		}
 		colourIndex++;
 	}
 
-	m_depthAttachment = std::make_shared<Texture>(m_size, TextureFormat::Depth32F);
-	glNamedFramebufferTexture(m_id, GL_DEPTH_ATTACHMENT, m_depthAttachment->GetID(), 0);
+	if (std::holds_alternative<std::shared_ptr<Texture>>(m_depthAttachment)) {
+		std::get<std::shared_ptr<Texture>>(m_depthAttachment)->Recreate(m_size);
+		glNamedFramebufferTexture(m_id, GL_DEPTH_ATTACHMENT, std::get<std::shared_ptr<Texture>>(m_depthAttachment)->GetID(), 0);
+	}
+	else if (std::holds_alternative<std::shared_ptr<TextureArray>>(m_depthAttachment)) {
+		std::get<std::shared_ptr<TextureArray>>(m_depthAttachment)->Recreate(m_size);
+		glNamedFramebufferTexture(m_id, GL_DEPTH_ATTACHMENT, std::get<std::shared_ptr<TextureArray>>(m_depthAttachment)->GetID(), 0);
+
+	}
 	glNamedFramebufferDrawBuffer(m_id, GL_NONE);
 	glNamedFramebufferReadBuffer(m_id, GL_NONE);
 
@@ -119,12 +170,12 @@ void FBO::Resize(glm::ivec2 size)
 	}
 }
 
-std::shared_ptr<Texture> FBO::GetTarget(uint32_t index)
+TexturePtr FBO::GetTarget(uint32_t index)
 {
 	return m_colourAttachments.at(index);
 }
 
-std::shared_ptr<Texture> FBO::GetDepthTarget()
+TexturePtr FBO::GetDepthTarget()
 {
 	return m_depthAttachment;
 }

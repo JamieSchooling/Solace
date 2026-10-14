@@ -4,6 +4,8 @@
 #include "Input/InputSystem.h"
 #include <glm/gtx/matrix_decompose.hpp>
 
+#include <variant>
+
 void SceneViewport::Open()
 {
 	EditorSystem::Get().OpenWindow<SceneViewport>();
@@ -56,7 +58,7 @@ void SceneViewport::DrawContent(entt::entity& selected, Scene& scene)
 		Window::Get().SetCursorMode(CursorMode::Visible);
 	}
 
-	uint32_t textureID = EditorSystem::Get().GetViewportFramebuffer()->GetTarget()->GetID();
+	uint32_t textureID = std::get<std::shared_ptr<Texture>>(EditorSystem::Get().GetViewportFramebuffer()->GetTarget())->GetID();
 	ImVec2 uv0 = ImVec2(0.0f, 1.0f);
 	ImVec2 uv1 = ImVec2(1.0f, 0.0f);
 	ImGui::ImageWithBg((void*)(intptr_t)textureID, m_windowSize, uv0, uv1, ImVec4(0, 0, 0, 1));

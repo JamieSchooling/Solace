@@ -125,7 +125,8 @@ bool EditorProperty<T>::DrawPropertyWidget()
 	}
 	else if constexpr (std::is_same_v<T, int>)
 	{
-		return ImGui::DragInt(id, &m_data);
+		return attrInfo.IsSlider ? ImGui::SliderInt(id, &m_data, attrInfo.Min, attrInfo.Max)
+			: ImGui::DragInt(id, &m_data, 1.0f, attrInfo.Min, attrInfo.Max);
 	}
 	else if constexpr (std::is_same_v<T, float>)
 	{

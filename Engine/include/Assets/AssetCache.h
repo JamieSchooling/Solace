@@ -49,7 +49,7 @@ inline std::shared_ptr<Material> AssetCache::Load(AssetHandle handle)
 		std::shared_ptr<Shader> shader = std::make_shared<Shader>("./resources/shaders/Vertex.glsl", "./resources/shaders/Fragment.glsl");
 		material = std::make_shared<Material>(shader, MaterialInitFlags_InitWithDefaultValues);
 		material->SetValue("u_prop_colour", glm::vec3(1.0));
-		material->SetValue("u_prop_specularAmount", 0.5f);
+		material->SetValue("u_prop_specularAmount", 0.5f); 
 	}
 	else
 	{

@@ -5,11 +5,7 @@
 
 #include <filesystem>
 
-enum class TextureFormat
-{
-	RGBA8,
-	Depth32F
-};
+#include "Rendering/TextureFormat.h"
 
 class Texture
 {
@@ -29,6 +25,7 @@ public:
 	static bool IsImageFile(const std::filesystem::path& path);
 private:
 	uint32_t m_id;
+	TextureFormat m_format;
 
 	void Init(glm::ivec2 size, TextureFormat format = TextureFormat::RGBA8, unsigned char* data = nullptr);
 	void Delete();

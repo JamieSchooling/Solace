@@ -9,9 +9,10 @@
 
 #include "Rendering/ShaderDataTypes.h"
 #include "Rendering/Texture.h"
+#include "Rendering/TextureArray.h"
 #include "Assets/AssetHandle.h"
 
-using UniformData = std::variant<std::monostate, bool, int, float, glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4, AssetHandle, std::shared_ptr<Texture>>;
+using UniformData = std::variant<std::monostate, bool, int, float, glm::vec2, glm::vec3, glm::vec4, glm::mat3, glm::mat4, AssetHandle, std::shared_ptr<Texture>, std::shared_ptr<TextureArray>>;
 
 struct UniformDescription
 {

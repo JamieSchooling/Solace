@@ -45,7 +45,7 @@ Texture& Texture::WhiteTexture()
 void Texture::Recreate(glm::ivec2 size)
 {
 	Delete();
-	Init(size);
+	Init(size, m_format);
 }
 
 void Texture::Recreate(std::filesystem::path imagePath)
@@ -65,6 +65,8 @@ bool Texture::IsImageFile(const std::filesystem::path& path)
 
 void Texture::Init(glm::ivec2 size, TextureFormat format, unsigned char* data)
 {
+	m_format = format;
+
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
 
 	if (format == TextureFormat::Depth32F)

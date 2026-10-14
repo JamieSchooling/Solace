@@ -3,6 +3,8 @@
 #include "Core/EditorSystem.h"
 #include "Rendering/RenderSystem.h"
 
+#include <variant>
+
 void GameViewport::Open()
 {
 	EditorSystem::Get().OpenWindow<GameViewport>();
@@ -10,7 +12,7 @@ void GameViewport::Open()
 
 void GameViewport::DrawContent(entt::entity& selected, Scene& scene)
 {
-	uint32_t textureID = RenderSystem::Get().GetDefaultFramebuffer()->GetTarget()->GetID();
+	uint32_t textureID = std::get<std::shared_ptr<Texture>>(RenderSystem::Get().GetDefaultFramebuffer()->GetTarget())->GetID();
 	ImVec2 uv0 = ImVec2(0.0f, 1.0f);
 	ImVec2 uv1 = ImVec2(1.0f, 0.0f);
 	ImGui::ImageWithBg((void*)(intptr_t)textureID, m_windowSize, uv0, uv1, ImVec4(0, 0, 0, 1));

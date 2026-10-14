@@ -8,6 +8,8 @@ void CameraInspector::Initialise(entt::registry& r, entt::entity e)
 	m_sizeProp = m_component->GetProperty("Size");
 	m_nearProp = m_component->GetProperty("Near");
 	m_farProp = m_component->GetProperty("Far");
+	m_cascadeCountProp = m_component->GetProperty("ShadowCascadeCount");
+	m_cascadeDistributionProp = m_component->GetProperty("ShadowCascadeDistribution");
 }
 
 void CameraInspector::DrawInspector(entt::registry& registry, entt::entity entity)
@@ -103,5 +105,35 @@ void CameraInspector::DrawInspector(entt::registry& registry, entt::entity entit
 	{
 		auto component = m_component;
 		UndoSystem::EndPropertyEdit(registry, entity, [component, entity, &registry](bool isUndo) { component->GetTarget<Camera>(registry, entity)->RecalculateProjection(); });
+	}
+
+	int cascadeCount = std::any_cast<int>(m_cascadeCountProp->Get(registry, entity));
+	result = EditorProperty<int>("Shadow Cascade Count", cascadeCount, m_cascadeCountProp->Attributes()).Draw();
+	if (result.Changed)
+	{
+		m_cascadeCountProp->Set(cascadeCount, registry, entity);
+	}
+	if (result.EditStarted)
+	{
+		UndoSystem::BeginPropertyEdit(m_cascadeCountProp, registry, entity);
+	}
+	if (result.EditEnded)
+	{
+		UndoSystem::EndPropertyEdit(registry, entity);
+	}
+
+	float cascadeDistribution = std::any_cast<float>(m_cascadeDistributionProp->Get(registry, entity));
+	result = EditorProperty<float>("Shadow Cascade Distribution", cascadeDistribution, m_cascadeDistributionProp->Attributes()).Draw();
+	if (result.Changed)
+	{
+		m_cascadeDistributionProp->Set(cascadeDistribution, registry, entity);
+	}
+	if (result.EditStarted)
+	{
+		UndoSystem::BeginPropertyEdit(m_cascadeDistributionProp, registry, entity);
+	}
+	if (result.EditEnded)
+	{
+		UndoSystem::EndPropertyEdit(registry, entity);
 	}
 }

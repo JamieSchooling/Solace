@@ -3,19 +3,26 @@
 #include <glm/glm.hpp>
 
 #include <memory>
+#include <variant>
 
 #include "Rendering/Texture.h"
 #include "Rendering/Window.h"
+#include "Rendering/TextureArray.h"
 
 enum class AttachmentType
 {
 	Colour,
-	Depth
+	Depth,
+	ColourArray,
+	DepthArray,
 };
 struct FBOAttachment
 {
 	AttachmentType Type;
+	size_t ArrayLength;
 };
+
+using TexturePtr = std::variant<std::shared_ptr<Texture>, std::shared_ptr<TextureArray>>;
 
 class FBO
 {
@@ -24,14 +31,18 @@ public:
 	FBO(glm::ivec2 size, std::vector<FBOAttachment> attachments = { {AttachmentType::Colour} });
 	~FBO();
 	void Use();
+	void BindLayer(uint32_t attachmentIndex, uint32_t layer);
+	void BindDepthLayer(uint32_t layer);
 	void Unbind() const;
 	void Resize(glm::ivec2 size);
-	std::shared_ptr<Texture> GetTarget(uint32_t index = 0);
-	std::shared_ptr<Texture> GetDepthTarget();
+
+	TexturePtr GetTarget(uint32_t index = 0);
+	TexturePtr GetDepthTarget();
 	glm::ivec2 GetSize() { return m_size; }
+	inline uint32_t GetID() const { return m_id; }
 private:
-	std::vector<std::shared_ptr<Texture>> m_colourAttachments;
-	std::shared_ptr<Texture> m_depthAttachment;
+	std::vector<TexturePtr> m_colourAttachments;
+	TexturePtr m_depthAttachment;
 	glm::ivec2 m_size = glm::ivec2(0, 0);
 	uint32_t m_id = 0;
 };

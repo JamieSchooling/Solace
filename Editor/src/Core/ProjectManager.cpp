@@ -13,6 +13,10 @@
 #include <ZipLib/ZipArchive.h>
 #include <ZipLib/ZipFile.h>
 
+#include <reproc++/reproc.hpp>
+#include <reproc++/run.hpp>
+#include <reproc++/arguments.hpp>
+
 #include <ctime>
 
 void ProjectManager::Initialise(std::filesystem::path projectPath)
@@ -375,8 +379,59 @@ void ProjectManager::CreateProject(std::filesystem::path projectPath)
 {
 	m_currentProjectPath = projectPath;
 	m_currentProjectAssetsPath = projectPath / "Assets";
+	m_currentProjectDataPath = projectPath / "Data";
+	m_currentProjectLibraryPath = projectPath / "Library";
 	std::filesystem::create_directory(m_currentProjectPath);
 	std::filesystem::create_directory(m_currentProjectAssetsPath);
+	std::filesystem::create_directory(m_currentProjectDataPath);
+	std::filesystem::create_directory(m_currentProjectLibraryPath);
+
+	std::filesystem::path cmake = Application::GetResourcePath() / "bin" / "third-party" / "cmake" / "bin" / "cmake.exe";
+	std::filesystem::path build = m_currentProjectLibraryPath / "build";
+	
+	std::filesystem::path cmakeList = m_currentProjectLibraryPath / "CMakeLists.txt";
+	std::ofstream cmakeFile(cmakeList);
+
+	std::string cmakeListsContent = m_cmakeTemplate;
+	std::string projectNamePlaceholder = "[PROJECT_NAME]";
+	size_t pos = cmakeListsContent.find(projectNamePlaceholder);
+	cmakeListsContent.replace(pos, projectNamePlaceholder.size(), m_currentProjectName);
+
+	std::string projectAssetPathPlaceholder = "[PROJECT_ASSET_PATH]";
+	pos = cmakeListsContent.find(projectAssetPathPlaceholder);
+	while (pos != std::string::npos)
+	{
+		cmakeListsContent.replace(pos, projectAssetPathPlaceholder.size(), m_currentProjectAssetsPath.generic_string());
+
+		pos = cmakeListsContent.find(projectAssetPathPlaceholder);
+	}
+	if (cmakeFile.is_open())
+	{
+		cmakeFile << cmakeListsContent;
+		cmakeFile.close();
+	}
+	else
+	{
+		// Handle file opening errors appropriately
+		throw std::runtime_error("Unable to open file for writing: " + cmakeList.string());
+	}
+
+	std::vector<std::string> args = { cmake.string(), "-S", m_currentProjectLibraryPath.string(), "-B", build.string() };
+
+	reproc::options options;
+	options.redirect.out.type = reproc::redirect::parent;
+	options.redirect.err.type = reproc::redirect::parent;
+
+	std::cout << "Running CMake..." << std::endl;
+
+	auto [status, ec] = reproc::run(args, options);
+
+	if (ec)
+	{
+		std::cout << "Process failed to launch: " << ec.message() << std::endl;
+	}
+
+	std::cout << status << std::endl;
 
 	JSON json = CreateProjectJson();
 

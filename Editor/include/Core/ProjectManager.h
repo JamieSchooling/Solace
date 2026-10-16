@@ -45,6 +45,8 @@ public:
 	bool IsProjectLoaded();
 	std::filesystem::path GetProjectPath() { return m_currentProjectPath; }
 	std::filesystem::path GetProjectAssetsPath() { return m_currentProjectAssetsPath; }
+	std::filesystem::path GetProjectDataPath() { return m_currentProjectDataPath; }
+	std::filesystem::path GetProjectLibraryPath() { return m_currentProjectLibraryPath; }
 	AssetHandle GetStartupScene() { return m_startupScene; }
 
 	void SerialiseProjectData(AssetHandle startupScene);
@@ -55,6 +57,8 @@ private:
 	std::string m_currentProjectName = "Untitled";
 	std::filesystem::path m_currentProjectPath;
 	std::filesystem::path m_currentProjectAssetsPath;
+	std::filesystem::path m_currentProjectDataPath;
+	std::filesystem::path m_currentProjectLibraryPath;
 	AssetHandle m_startupScene;
 	bool m_showProjectOpenModal = false;
 	bool m_showProjectDeletedModal = false;
@@ -79,4 +83,16 @@ private:
 
 	bool ProjectEntry(const std::string& projectName, const std::string& projectPath, time_t timestamp, const ImVec2& size);
 	
+
+	const char* m_cmakeTemplate = R"CMAKE(
+	cmake_minimum_required(VERSION 4.4)
+	project ([PROJECT_NAME])
+
+	add_library(GAME SHARED)
+
+	file(GLOB_RECURSE sources CONFIGURE_DEPENDS "[PROJECT_ASSET_PATH]/*.cpp" "[PROJECT_ASSET_PATH]/*.h")
+	target_sources(GAME PRIVATE ${sources})
+
+	set_property(TARGET GAME PROPERTY CXX_STANDARD 20)
+	)CMAKE";
 };

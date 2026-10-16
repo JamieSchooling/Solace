@@ -80,7 +80,14 @@ FetchContent_Declare(ziplib
 	GIT_SHALLOW TRUE
 	GIT_PROGRESS TRUE
 )
-FetchContent_MakeAvailable(imgui nfd imguizmo ziplib)
+set(REPROC++ ON)
+FetchContent_Declare(reproc++
+    GIT_REPOSITORY https://github.com/daandemeyer/reproc.git
+    GIT_TAG 14.2.8
+	GIT_SHALLOW TRUE
+	GIT_PROGRESS TRUE
+)
+FetchContent_MakeAvailable(imgui nfd imguizmo ziplib reproc++)
 
 add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/imgui.cpp
@@ -126,6 +133,7 @@ target_link_libraries(${APPLICATION} PUBLIC imgui)
 target_link_libraries(${APPLICATION} PRIVATE nfd)
 target_link_libraries(${APPLICATION} PRIVATE imguizmo)
 target_link_libraries(${APPLICATION} PRIVATE ZipLib)
+target_link_libraries(${APPLICATION} PRIVATE reproc++)
 
 if(WIN32 AND MSVC)
     # Hide console in Release builds

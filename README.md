@@ -1,4 +1,4 @@
-# Solace Engine
+# Solitude Engine
 
 ## A 3D Game Engine
 
@@ -11,8 +11,8 @@
 
 ### Clone the repository:
 ```bash
-git clone https://github.com/JamieSchooling/Solace.git
-cd Solace
+git clone https://github.com/JamieSchooling/Solitude.git
+cd Solitude
 ```
 
 ### Build and Run:
@@ -27,6 +27,6 @@ cmake --build build --config Release
 
 **Run:**
 ```bash
-build\Editor\Release\Solace.exe
+build\Editor\Release\Solitude.exe
 ```
 </details>

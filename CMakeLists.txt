@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required (VERSION 3.28)
 
-project (Solace)
+project (Solitude)
 
 # Include sub-projects.
 add_subdirectory (Engine)

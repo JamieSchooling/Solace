@@ -31,7 +31,7 @@ void Editor::Initialise(std::vector<std::string> args)
 
 	{
 		WindowProps props;
-		props.Title = "Solace Editor";
+		props.Title = "Solitude Editor";
 		props.EventSystem = &EventSystem::Get();
 		AddSubsystem<Window>(UpdatePhase::Always, props);
 	}
@@ -56,7 +56,7 @@ void Editor::Initialise(std::vector<std::string> args)
 	BuildReflectionRegistry();
 	LoadGameModule();
 
-	Window::Get().SetTitle("Solace Editor - " + s_projectDirectoryPath.filename().string());
+	Window::Get().SetTitle("Solitude Editor - " + s_projectDirectoryPath.filename().string());
 
 	{
 		AssetRegistryProps props;
